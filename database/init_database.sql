@@ -2,6 +2,78 @@
 
 CREATE SCHEMA public AUTHORIZATION pg_database_owner;
 
+-- DROP SEQUENCE public.assets_id_seq;
+
+CREATE SEQUENCE public.assets_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+-- DROP SEQUENCE public.birth_records_id_seq;
+
+CREATE SEQUENCE public.birth_records_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+-- DROP SEQUENCE public.death_records_id_seq;
+
+CREATE SEQUENCE public.death_records_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+-- DROP SEQUENCE public.employment_id_seq;
+
+CREATE SEQUENCE public.employment_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+-- DROP SEQUENCE public.marriage_contract_no_seq;
+
+CREATE SEQUENCE public.marriage_contract_no_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+-- DROP SEQUENCE public.marriage_id_seq;
+
+CREATE SEQUENCE public.marriage_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+-- DROP SEQUENCE public.passports_id_seq;
+
+CREATE SEQUENCE public.passports_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+-- DROP SEQUENCE public.person_id_seq;
+
+CREATE SEQUENCE public.person_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
 -- DROP SEQUENCE public.salary_audit_id_seq;
 
 CREATE SEQUENCE public.salary_audit_id_seq
@@ -17,7 +89,7 @@ CREATE SEQUENCE public.salary_audit_id_seq
 -- DROP TABLE public.person;
 
 CREATE TABLE public.person (
-	id int8 NOT NULL,
+	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
 	national_id int8 NOT NULL,
 	first_name varchar(255) NOT NULL,
 	last_name varchar(255) NOT NULL,
@@ -43,7 +115,7 @@ CREATE TABLE public.person (
 -- DROP TABLE public.assets;
 
 CREATE TABLE public.assets (
-	id int8 NOT NULL,
+	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
 	owner_id int8 NOT NULL,
 	asset_type varchar(100) NULL,
 	registration_number varchar(255) NULL,
@@ -62,7 +134,7 @@ CREATE TABLE public.assets (
 -- DROP TABLE public.death_records;
 
 CREATE TABLE public.death_records (
-	id int8 NOT NULL,
+	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
 	person_id int8 NOT NULL,
 	death_date timestamptz NOT NULL,
 	place_of_death varchar(255) NULL,
@@ -87,7 +159,7 @@ insert
 -- DROP TABLE public.employment;
 
 CREATE TABLE public.employment (
-	id int8 NOT NULL,
+	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
 	person_id int8 NOT NULL,
 	job_title varchar(255) NULL,
 	salary numeric(15, 2) NULL,
@@ -117,8 +189,8 @@ update
 -- DROP TABLE public.marriage;
 
 CREATE TABLE public.marriage (
-	id int8 NOT NULL,
-	contract_no int8 NOT NULL,
+	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
+	contract_no int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
 	husband_id int8 NOT NULL,
 	wife_id int8 NOT NULL,
 	marriage_date timestamptz NOT NULL,
@@ -153,7 +225,7 @@ insert
 -- DROP TABLE public.passports;
 
 CREATE TABLE public.passports (
-	id int8 NOT NULL,
+	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
 	person_id int8 NOT NULL,
 	passport_number varchar(20) NOT NULL,
 	issue_date date NULL,
@@ -197,7 +269,7 @@ CREATE TABLE public.salary_audit (
 -- DROP TABLE public.birth_records;
 
 CREATE TABLE public.birth_records (
-	id int8 NOT NULL,
+	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
 	birth_certificate_no int8 NOT NULL,
 	child_id int8 NOT NULL,
 	marriage_id int8 NULL,
