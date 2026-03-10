@@ -25,7 +25,7 @@ DATABASE = {
     "port": 5432,
     "dbname": "digital_id",      
     "user": "postgres",       
-    "password": "ilovecats",    
+    "password": "",    
 }
 
 
