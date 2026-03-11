@@ -56,6 +56,24 @@ CREATE SEQUENCE public.marriage_id_seq
 	START 1
 	CACHE 1
 	NO CYCLE;
+-- DROP SEQUENCE public.medical_records_id_seq;
+
+CREATE SEQUENCE public.medical_records_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+-- DROP SEQUENCE public.national_id_seq;
+
+CREATE SEQUENCE public.national_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1000000000
+	CACHE 1
+	NO CYCLE;
 -- DROP SEQUENCE public.passports_id_seq;
 
 CREATE SEQUENCE public.passports_id_seq
@@ -99,6 +117,7 @@ CREATE TABLE public.person (
 	gender bool NOT NULL,
 	dad_id int8 NULL,
 	mom_id int8 NULL,
+	marital_status varchar(20) DEFAULT 'single'::character varying NOT NULL,
 	CONSTRAINT check_lineage CHECK (((id <> dad_id) AND (id <> mom_id) AND (dad_id <> mom_id))),
 	CONSTRAINT person_email_key UNIQUE (email),
 	CONSTRAINT person_national_id_key UNIQUE (national_id),
@@ -216,6 +235,26 @@ create trigger trg_prevent_incest before
 insert
     on
     public.marriage for each row execute function check_incest_prevention();
+
+
+-- public.medical_records definition
+
+-- Drop table
+
+-- DROP TABLE public.medical_records;
+
+CREATE TABLE public.medical_records (
+	id bigserial NOT NULL,
+	person_id int8 NOT NULL,
+	blood_type varchar(3) NULL,
+	height_cm numeric(4, 1) NULL,
+	weight_kg numeric(5, 1) NULL,
+	smoker bool NULL,
+	chronic_conditions text NULL,
+	last_checkup_date date NULL,
+	CONSTRAINT medical_records_pkey PRIMARY KEY (id),
+	CONSTRAINT medical_records_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id)
+);
 
 
 -- public.passports definition
@@ -380,22 +419,27 @@ CREATE OR REPLACE FUNCTION public.handle_person_death()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
-begin  
-	update passports 
-	set is_active = false
-	where person_id = new.person_id;
+BEGIN  
+    -- deactivate passports
+    UPDATE passports 
+    SET is_active = false
+    WHERE person_id = NEW.person_id;
 		
-	update marrige
-	set valid=false,
-		end_datetime = NEW.death_date,
-		end_reason = 'death'
-	where (husband_id = NEW.person_id OR wife_id = NEW.person_id) and valide = true ;
+    -- close any active marriage
+    UPDATE marriage
+    SET valid = false,
+        end_marriage_time = NEW.death_date,
+        end_reason = 'death'
+    WHERE (husband_id = NEW.person_id OR wife_id = NEW.person_id)
+      AND valid = true;
 	
-	update employment 
-	set is_active = false
-	WHERE person_id = NEW.person_id and is_active = true;
+    -- deactivate employment
+    UPDATE employment 
+    SET is_active = false
+    WHERE person_id = NEW.person_id
+      AND is_active = true;
 	
-	return new ;
-end ;
+    RETURN NEW;
+END;
 $function$
 ;
