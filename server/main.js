@@ -1,6 +1,10 @@
+import "dotenv/config";
 
 import express from "express";
-import usersrouts from "./routs/users.js";
+
+
+import userrouts from "./routs/person.js";
+import authRouter from"./routs/auth.js";
 
 const app = express();
 const PORT = 5000;
@@ -11,4 +15,6 @@ app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
-app.use("/users",usersrouts);
+
+app.use("/api/person",userrouts);
+app.use("/api/auth", authRouter);
