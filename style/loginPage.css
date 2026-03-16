@@ -1,0 +1,615 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #080808;
+    --white: #ffffff;
+    --off-white: #e8e6e0;
+    --gray-dark: #111111;
+    --gray-mid: #333;
+    --gray-line: #2a2a2a;
+    --gray-muted: #999;
+    --gray-hint: #666;
+    --accent: #ffffff;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--black);
+    color: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    animation: gridShift 30s linear infinite;
+  }
+
+  @keyframes gridShift {
+    from { background-position: 0 0; }
+    to { background-position: 48px 48px; }
+  }
+
+
+  .layout {
+    position: relative;
+    z-index: 2;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 420px 1fr;
+  }
+
+  .left {
+    background: var(--gray-dark);
+    border-right: 1px solid var(--gray-line);
+    display: flex;
+    flex-direction: column;
+    padding: 2.5rem 2.5rem 2rem;
+    position: relative;
+    animation: slideIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(-30px); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+  }
+
+  .left::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 120px; height: 120px;
+    border-right: 1px solid var(--gray-mid);
+    border-bottom: 1px solid var(--gray-mid);
+    border-bottom-right-radius: 120px;
+  }
+
+  .left::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 80px; height: 80px;
+    border-left: 1px solid var(--gray-mid);
+    border-top: 1px solid var(--gray-mid);
+    border-top-left-radius: 80px;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-mark {
+    width: 40px; height: 40px;
+    border: 1.5px solid var(--white);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .logo-mark svg { width: 20px; height: 20px; }
+
+  .logo-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+
+  .id-card-visual {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 0;
+  }
+
+  .id-card {
+    width: 280px;
+    background: var(--black);
+    border: 1px solid #2c2c2c;
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    animation: cardFloat 4s ease-in-out infinite;
+  }
+
+  @keyframes cardFloat {
+    0%, 100% { transform: translateY(0px) rotate(-1deg); }
+    50%       { transform: translateY(-8px) rotate(-2deg); }
+  }
+
+  .id-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 1px solid #1e1e1e;
+  }
+
+  .card-chip {
+    width: 36px; height: 28px;
+    border: 1.5px solid #333;
+    border-radius: 5px;
+    margin-bottom: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 3px;
+    padding: 5px;
+  }
+
+  .chip-cell {
+    background: #222;
+    border-radius: 1px;
+  }
+
+  .chip-cell.center { background: #333; }
+
+  .card-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.1em;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .card-id {
+    font-size: 9px;
+    color: #777;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+
+  .card-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1rem;
+  }
+
+  .card-info-block {
+   display: flex;
+   flex-direction:column;
+   gap: 2px; 
+  }
+
+  .card-info-label {
+    font-size: 8px;
+    color: #666;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .card-info-value {
+    font-size: 11px;
+    color: #aaa;
+    letter-spacing: 0.05em;
+  }
+
+  .card-avatar {
+    width: 44px; height: 44px;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: #111;
+  }
+
+  .card-avatar svg { width: 24px; height: 24px; opacity: 0.7; }
+
+  .card-strip {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 28px;
+    background: #0d0d0d;
+    border-top: 1px solid #1a1a1a;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    gap: 4px;
+  }
+
+  .strip-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: #2a2a2a;
+  }
+
+  .strip-line {
+    flex: 1;
+    height: 1px;
+    background: #1e1e1e;
+  }
+
+  .card-badge {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #333;
+    border: 1px solid #222;
+    border-radius: 3px;
+    padding: 3px 6px;
+  }
+
+  .left-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .security-badges {
+    display: flex;
+    gap: 8px;
+  }
+
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--black);
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+  }
+
+  .badge-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #666;
+  }
+
+  .left-tagline {
+    font-size: 10px;
+    color: #555;
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+  }
+
+  .form-wrap {
+    width: 100%;
+    max-width: 400px;
+    animation: fadeUp 0.7s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes fadeUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .form-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .form-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: #999;
+  }
+
+  .form-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    font-weight: 400;
+    line-height: 1.0;
+    letter-spacing: 0.05em;
+    color: var(--white);
+    margin-bottom: 0.6rem;
+  }
+
+  .form-title span {
+    color: #666;
+  }
+
+  .form-sub {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.03em;
+    line-height: 1.7;
+  }
+
+  .method-tabs {
+    display: flex;
+    gap: 0;
+    border: 1px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .method-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #888;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 10px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-right: 1px solid #333;
+  }
+
+  .method-tab:last-child { border-right: none; }
+
+  .method-tab.active {
+    background: var(--white);
+    color: var(--black);
+    font-weight: 600;
+  }
+
+  .method-tab:not(.active):hover {
+    color: #ddd;
+    background: #181818;
+  }
+
+  .field-group {
+    margin-bottom: 1.4rem;
+  }
+
+  .field-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .field-label span {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #888;
+  }
+
+  .field-label a {
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    color: #666;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .field-label a:hover { color: #aaa; }
+
+  .input-wrap {
+    position: relative;
+  }
+
+  .input-wrap svg {
+    position: absolute;
+    left: 14px; top: 50%; transform: translateY(-50%);
+    width: 14px; height: 14px;
+    opacity: 0.5;
+    color: #aaa;
+    pointer-events: none;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: #f5f4f0;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    padding: 13px 14px 13px 40px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    -webkit-appearance: none;
+  }
+
+  input::placeholder { color: #555; }
+
+  input:focus {
+    border-color: #888;
+    background: #161616;
+  }
+
+  .input-hint {
+    font-size: 9px;
+    color: #555;
+    letter-spacing: 0.06em;
+    margin-top: 5px;
+    padding-left: 2px;
+  }
+
+  .biometric-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 2rem;
+  }
+
+  .bio-divider { flex: 1; height: 1px; background: #1a1a1a; }
+
+  .bio-btn {
+    background: #0d0d0d;
+    border: 1px solid #1e1e1e;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #333;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .bio-btn svg { width: 14px; height: 14px; opacity: 0.4; }
+  .bio-btn:hover { border-color: #333; color: #666; }
+
+  .or-text {
+    font-size: 9px;
+    color: #222;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .btn-submit {
+    width: 100%;
+    background: var(--white);
+    color: var(--black);
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .btn-submit:hover { opacity: 0.9; }
+  .btn-submit:active { transform: scale(0.99); }
+
+  .btn-submit svg { width: 14px; height: 14px; }
+
+  .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .bottom-row p {
+    font-size: 10px;
+    color: #777;
+    letter-spacing: 0.04em;
+  }
+
+  .bottom-row a {
+    color: #ccc;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .bottom-row a:hover { color: var(--white); }
+
+  .help-link {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #777;
+    text-decoration: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s;
+  }
+
+  .help-link:hover { color: #ccc; }
+
+  .status-bar {
+    position: absolute;
+    top: 1.5rem; right: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #666;
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #888;
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+
+  .bio-btn {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #888;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .bio-btn svg { width: 14px; height: 14px; opacity: 0.7; }
+  .bio-btn:hover { border-color: #666; color: #ddd; }
+
+  .or-text {
+    font-size: 9px;
+    color: #555;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .card-badge {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #777;
+    border: 1px solid #333;
+    border-radius: 3px;
+    padding: 3px 6px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 1; }
+  }
+
+  .method-tab:focus { outline: none; }
