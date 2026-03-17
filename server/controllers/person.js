@@ -68,9 +68,12 @@ export const getMyInfo =async (req ,res)=>{
 export const createBirth  =async (req ,res)=>{
   const {first_name,gender,doctor_name,birth_weight_kg,date_of_birth,husband_id,wife_id}=req.body;
   const { commune_code, wilaya_code, username: hospital_name } = req.user;
+  const client = await pool.connect();
   try {
     const marriage_id =await get_marriage_id(husband_id,wife_id);
     const {nin,Birth_Certificate_No} = await generateNin(wilaya_code,commune_code,gender, new Date(date_of_birth));
+
+    await client.query('BEGIN');
 
     const result_person = await pool.query(
       `INSERT INTO person (
@@ -104,13 +107,23 @@ export const createBirth  =async (req ,res)=>{
        RETURNING *`,
       [BigInt(Birth_Certificate_No), result_person.rows[0].id, marriage_id, hospital_name, doctor_name, birth_weight_kg, date_of_birth, wilaya_code, commune_code]
     );
-    res.status(201).json(result.rows[0]);
+
+    await client.query('COMMIT');
+
+    res.status(201).json({
+      person: result_person.rows[0],
+      birth_record: result.rows[0]
+    });
+
   } catch (error) {
+    await client.query('ROLLBACK');
 
     if (error.message.includes("No active marriage")) {
       return res.status(404).json({ error: error.message });
     }
     res.status(500).json({ error: error.message });
+  }finally{
+    client.release();
   }
 }
 
