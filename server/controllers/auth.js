@@ -24,15 +24,42 @@ export const login=async (req ,res)=>{
       return res.status(401).json({ error: "Wrong password" });
     }
 
-    const token = jwt.sign(
-      {
-        id: user.id,
-        role: user.role,
-        person_id: user.person_id ?? null,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    let token ;
+    if (user.role==='hospital') {
+      let result= await pool.query(
+        `SELECT  wilaya_code ,commune_code
+        FROM users 
+        where username= $1 `,
+        [username]
+      )
+      result =result.rows[0];
+      const {wilaya_code,commune_code}=result;
+      user.wilaya_code=wilaya_code;
+      user.commune_code=commune_code;
+
+      token = jwt.sign(
+        {
+          id: user.id,
+          role: user.role,
+          person_id: user.person_id ?? null,
+          wilaya_code: user.wilaya_code,
+          commune_code:user.commune_code
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+
+    }else{
+      token = jwt.sign(
+        {
+          id: user.id,
+          role: user.role,
+          person_id: user.person_id ?? null,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+    }
 
     res.json({ token });
 

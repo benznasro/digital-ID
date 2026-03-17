@@ -1,5 +1,7 @@
 import pool from '../db.js';
 
+
+//get 
 export const getPersonById=async(req,res)=>{
   try {
     const {id} =req.params;
@@ -60,5 +62,15 @@ export const getMyInfo =async (req ,res)=>{
   }
 }
 
+//servs
+
+export const addPerson =async (req ,res)=>{
+  const {}=req.body;
+  try {
+    
+  } catch (error) {
+    
+  }
+}
 
 
