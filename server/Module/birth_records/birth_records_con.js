@@ -1,4 +1,4 @@
-import pool from '../db.js';
+import pool from '../../db.js';
 
 
 export const get_Birth_record_By_Id=async(req,res)=>{

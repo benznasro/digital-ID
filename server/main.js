@@ -3,10 +3,12 @@ import "dotenv/config";
 import express from "express";
 
 
-import userrouts from "./routs/person.js";
-import authRouter from"./routs/auth.js";
-import birth_records_router from "./routs/birth_records.js"
-import medical_records_router from "./routs/medical_records.js"
+import userrouts from "./Module/person/person.js";
+import authRouter from"./Module/auth/auth.js";
+import birth_records_router from "./Module/birth_records/birth_records.js";
+import medical_records_router from "./Module/medical_records/medical_records.js";
+import hospital_router from "./Module/hospital/hospital.js";
+
 const app = express();
 const PORT = 5000;
 
@@ -24,3 +26,4 @@ app.use("/api/person",userrouts);
 app.use("/api/auth", authRouter);
 app.use("/api/birth_records", birth_records_router);
 app.use("/api/medical_records", medical_records_router);
+app.use("/api/hospital",hospital_router);

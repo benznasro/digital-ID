@@ -1,71 +1,10 @@
-import pool from '../db.js';
-import {generateNin}  from '../utils/nin.js';
-import {get_marriage_id} from '../utils/marriage.js';
-
-//get 
-export const getPersonById=async(req,res)=>{
-  try {
-    const {id} =req.params;
-    const result= await pool.query(`SELECT * FROM person WHERE id =${id}`);
-    res.json(result.rows);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-export const getUserCount = async (req, res) => {
-  try {
-    const result = await pool.query("SELECT count(*) FROM person");
-    res.json(result.rows);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-export const getSelectedUsers = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
-    const offset = (page - 1) * limit;
-
-    const result = await pool.query(
-      "SELECT * FROM person ORDER BY id LIMIT $1 OFFSET $2 ",
-      [limit, offset]
-    );
-
-    res.json({
-      page,
-      limit,
-      data: result.rows,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-export const getAllInfo =async (req ,res)=>{
-  try {
-    
-    const result = await pool.query(`SELECT * from person LIMIT 100`);
-    res.json(result.rows);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-export const getMyInfo =async (req ,res)=>{
-  try {
-    
-    const result = await pool.query(`SELECT * from person where id=${req.user.person_id}`);
-    res.json(result.rows[0]);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
+import pool from '../../db.js';
+import {generateNin}  from '../../utils/nin.js';
+import {get_marriage_id} from '../../utils/marriage.js';
 
 //servs
 
-export const createBirth  =async (req ,res)=>{
+export const create_Birth  =async (req ,res)=>{
   const {first_name,gender,doctor_name,birth_weight_kg,date_of_birth,husband_id,wife_id,blood_type,height_cm,apgar_score}=req.body;
   const { commune_code, wilaya_code, username: hospital_name } = req.user;
   const client = await pool.connect();
@@ -143,4 +82,47 @@ export const createBirth  =async (req ,res)=>{
   }
 }
 
+//serves 
+//update medical record and return status and respond
 
+export const update_Medical_Record = async (req, res) => {
+  const { personId, updates } = req.body;
+
+  if (!personId || !updates) {
+    return res.status(400).json({ error: 'personId and updates are required' });
+  }
+
+  const allowed = [
+    'blood_type',
+    'height_cm',
+    'weight_kg',
+    'smoker',
+    'chronic_conditions',
+    'last_checkup_date',
+  ];
+
+  const fields = Object.entries(updates)
+    .filter(([key, val]) => allowed.includes(key) && val !== undefined);
+
+  if (fields.length === 0) {
+    return res.status(400).json({ error: 'No valid fields to update' });
+  }
+
+  const set = fields.map(([key], i) => `${key} = $${i + 2}`).join(', ');
+  const values = [personId, ...fields.map(([, val]) => val)];
+
+  try {
+    const result = await pool.query(
+      `UPDATE medical_records SET ${set} WHERE person_id = $1`,
+      values
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: `No medical record found for person_id = ${personId}` });
+    }
+
+    res.status(200).json({ message: 'Medical record updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

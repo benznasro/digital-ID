@@ -1,4 +1,4 @@
-import pool from '../db.js';
+import pool from '../../db.js';
 
 export const get_Medical_record_by_id = async(req,res)=>{
    try {
@@ -51,47 +51,3 @@ export const get_My_Medical_record= async (req ,res)=>{
 }
 
 
-//serves 
-//update medical record and return status and respond
-
-export const updateMedicalRecord = async (req, res) => {
-  const { personId, updates } = req.body;
-
-  if (!personId || !updates) {
-    return res.status(400).json({ error: 'personId and updates are required' });
-  }
-
-  const allowed = [
-    'blood_type',
-    'height_cm',
-    'weight_kg',
-    'smoker',
-    'chronic_conditions',
-    'last_checkup_date',
-  ];
-
-  const fields = Object.entries(updates)
-    .filter(([key, val]) => allowed.includes(key) && val !== undefined);
-
-  if (fields.length === 0) {
-    return res.status(400).json({ error: 'No valid fields to update' });
-  }
-
-  const set = fields.map(([key], i) => `${key} = $${i + 2}`).join(', ');
-  const values = [personId, ...fields.map(([, val]) => val)];
-
-  try {
-    const result = await pool.query(
-      `UPDATE medical_records SET ${set} WHERE person_id = $1`,
-      values
-    );
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: `No medical record found for person_id = ${personId}` });
-    }
-
-    res.status(200).json({ message: 'Medical record updated successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};

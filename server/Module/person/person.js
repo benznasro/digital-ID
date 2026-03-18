@@ -1,7 +1,7 @@
 import express from 'express';
-import {getMyInfo,getAllInfo,getPersonById,getSelectedUsers,getUserCount,createBirth} from '../controllers/person.js';
+import {getMyInfo,getAllInfo,getPersonById,getSelectedUsers,getUserCount} from './person_con.js';
 
-import {protect,authorize} from '../controllers/middleware.js';
+import {protect,authorize} from '../middleware.js';
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ router.get("/all",protect,authorize("admin"),getAllInfo);
 router.get("/count",protect,authorize("admin"),getUserCount);
 
 
-router.post("/hospital/birth",protect,authorize("hospital"),createBirth);
+
 
 router.get("/:id",protect,authorize("admin", "police"),getPersonById);
 

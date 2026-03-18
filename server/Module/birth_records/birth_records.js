@@ -1,6 +1,6 @@
 import express from 'express';
-import {protect,authorize} from '../controllers/middleware.js';
-import{get_All_Birth_records ,get_My_birth_record,get_Selected_Birth_records,get_Birth_record_By_Id} from '../controllers/birth_records.js';
+import {protect,authorize} from '../middleware.js';
+import{get_All_Birth_records ,get_My_birth_record,get_Selected_Birth_records,get_Birth_record_By_Id} from './birth_records_con.js';
 const router =express.Router();
 
 router.get("/me",protect,get_My_birth_record);
