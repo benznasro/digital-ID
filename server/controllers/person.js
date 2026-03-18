@@ -66,7 +66,7 @@ export const getMyInfo =async (req ,res)=>{
 //servs
 
 export const createBirth  =async (req ,res)=>{
-  const {first_name,gender,doctor_name,birth_weight_kg,date_of_birth,husband_id,wife_id}=req.body;
+  const {first_name,gender,doctor_name,birth_weight_kg,date_of_birth,husband_id,wife_id,blood_type,height_cm,apgar_score}=req.body;
   const { commune_code, wilaya_code, username: hospital_name } = req.user;
   const client = await pool.connect();
   try {
@@ -74,6 +74,9 @@ export const createBirth  =async (req ,res)=>{
     const {nin,Birth_Certificate_No} = await generateNin(wilaya_code,commune_code,gender, new Date(date_of_birth));
 
     await client.query('BEGIN');
+
+    //add to person table
+
 
     const result_person = await pool.query(
       `INSERT INTO person (
@@ -99,6 +102,8 @@ export const createBirth  =async (req ,res)=>{
         wife_id ?? null,
       ]
     );
+  
+    //add to birth_records table
 
     const result= await pool.query(
       `INSERT INTO birth_records 
@@ -108,11 +113,22 @@ export const createBirth  =async (req ,res)=>{
       [BigInt(Birth_Certificate_No), result_person.rows[0].id, marriage_id, hospital_name, doctor_name, birth_weight_kg, date_of_birth, wilaya_code, commune_code]
     );
 
+    //add to medical_records table
+
+    const result_health =await pool.query(
+      `INSERT INTO medical_records 
+      (person_id,blood_type,height_cm,weight_kg,last_checkup_date,apgar_score)
+      VALUES ($1,$2,$3,$4,$5)
+      RETURNING * `,
+      [result_person.rows[0].id,blood_type,height_cm,birth_weight_kg,date_of_birth,apgar_score]
+    );
+
     await client.query('COMMIT');
 
     res.status(201).json({
       person: result_person.rows[0],
-      birth_record: result.rows[0]
+      birth_record: result.rows[0],
+      medical_record: result_health.[0]
     });
 
   } catch (error) {
