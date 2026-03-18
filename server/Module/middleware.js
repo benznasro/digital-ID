@@ -15,7 +15,6 @@ export const protect = (req, res, next) => {
   }
 };
 
-//router.get("/users", protect, authorize("admin"), getAllUsers);
 
 export const authorize = (...allowedRoles) => {
   return (req, res, next) => {

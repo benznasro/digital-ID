@@ -1,9 +1,8 @@
---data base mcd
---https://drawsql.app/teams/fijla/diagrams/digital-id
-
 -- DROP SCHEMA public;
 
 CREATE SCHEMA public AUTHORIZATION pg_database_owner;
+
+COMMENT ON SCHEMA public IS 'standard public schema';
 
 -- DROP SEQUENCE public.assets_id_seq;
 
@@ -14,6 +13,12 @@ CREATE SEQUENCE public.assets_id_seq
 	START 1
 	CACHE 1
 	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.assets_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.assets_id_seq TO postgres;
+
 -- DROP SEQUENCE public.birth_records_id_seq;
 
 CREATE SEQUENCE public.birth_records_id_seq
@@ -23,6 +28,12 @@ CREATE SEQUENCE public.birth_records_id_seq
 	START 1
 	CACHE 1
 	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.birth_records_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.birth_records_id_seq TO postgres;
+
 -- DROP SEQUENCE public.death_records_id_seq;
 
 CREATE SEQUENCE public.death_records_id_seq
@@ -32,6 +43,12 @@ CREATE SEQUENCE public.death_records_id_seq
 	START 1
 	CACHE 1
 	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.death_records_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.death_records_id_seq TO postgres;
+
 -- DROP SEQUENCE public.employment_id_seq;
 
 CREATE SEQUENCE public.employment_id_seq
@@ -41,6 +58,12 @@ CREATE SEQUENCE public.employment_id_seq
 	START 1
 	CACHE 1
 	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.employment_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.employment_id_seq TO postgres;
+
 -- DROP SEQUENCE public.marriage_contract_no_seq;
 
 CREATE SEQUENCE public.marriage_contract_no_seq
@@ -50,6 +73,12 @@ CREATE SEQUENCE public.marriage_contract_no_seq
 	START 1
 	CACHE 1
 	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.marriage_contract_no_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.marriage_contract_no_seq TO postgres;
+
 -- DROP SEQUENCE public.marriage_id_seq;
 
 CREATE SEQUENCE public.marriage_id_seq
@@ -59,6 +88,12 @@ CREATE SEQUENCE public.marriage_id_seq
 	START 1
 	CACHE 1
 	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.marriage_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.marriage_id_seq TO postgres;
+
 -- DROP SEQUENCE public.medical_records_id_seq;
 
 CREATE SEQUENCE public.medical_records_id_seq
@@ -68,6 +103,12 @@ CREATE SEQUENCE public.medical_records_id_seq
 	START 1
 	CACHE 1
 	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.medical_records_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.medical_records_id_seq TO postgres;
+
 -- DROP SEQUENCE public.national_id_seq;
 
 CREATE SEQUENCE public.national_id_seq
@@ -77,6 +118,12 @@ CREATE SEQUENCE public.national_id_seq
 	START 1000000000
 	CACHE 1
 	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.national_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.national_id_seq TO postgres;
+
 -- DROP SEQUENCE public.passports_id_seq;
 
 CREATE SEQUENCE public.passports_id_seq
@@ -86,6 +133,12 @@ CREATE SEQUENCE public.passports_id_seq
 	START 1
 	CACHE 1
 	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.passports_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.passports_id_seq TO postgres;
+
 -- DROP SEQUENCE public.person_id_seq;
 
 CREATE SEQUENCE public.person_id_seq
@@ -95,6 +148,27 @@ CREATE SEQUENCE public.person_id_seq
 	START 1
 	CACHE 1
 	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.person_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.person_id_seq TO postgres;
+
+-- DROP SEQUENCE public.roles_id_seq;
+
+CREATE SEQUENCE public.roles_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.roles_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.roles_id_seq TO postgres;
+
 -- DROP SEQUENCE public.salary_audit_id_seq;
 
 CREATE SEQUENCE public.salary_audit_id_seq
@@ -103,31 +177,81 @@ CREATE SEQUENCE public.salary_audit_id_seq
 	MAXVALUE 2147483647
 	START 1
 	CACHE 1
-	NO CYCLE;-- public.person definition
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.salary_audit_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.salary_audit_id_seq TO postgres;
+
+-- DROP SEQUENCE public.users_id_seq;
+
+CREATE SEQUENCE public.users_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.users_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.users_id_seq TO postgres;
+-- public.act_number_tracker definition
+
+-- Drop table
+
+-- DROP TABLE public.act_number_tracker;
+
+CREATE TABLE public.act_number_tracker ( wilaya_code bpchar(2) NOT NULL, commune_code bpchar(4) NOT NULL, birth_year bpchar(2) NOT NULL, last_act_no int4 DEFAULT 0 NOT NULL, CONSTRAINT act_number_tracker_pkey PRIMARY KEY (wilaya_code, commune_code, birth_year));
+
+-- Permissions
+
+ALTER TABLE public.act_number_tracker OWNER TO postgres;
+GRANT ALL ON TABLE public.act_number_tracker TO postgres;
+
+
+-- public.roles definition
+
+-- Drop table
+
+-- DROP TABLE public.roles;
+
+CREATE TABLE public.roles ( id serial4 NOT NULL, "name" varchar(50) NOT NULL, CONSTRAINT roles_name_key UNIQUE (name), CONSTRAINT roles_pkey PRIMARY KEY (id));
+
+-- Permissions
+
+ALTER TABLE public.roles OWNER TO postgres;
+GRANT ALL ON TABLE public.roles TO postgres;
+
+
+-- public.person definition
 
 -- Drop table
 
 -- DROP TABLE public.person;
 
-CREATE TABLE public.person (
-	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
-	national_id int8 NOT NULL,
-	first_name varchar(255) NOT NULL,
-	last_name varchar(255) NOT NULL,
-	email varchar(255) NULL,
-	date_of_birth date NOT NULL,
-	phone_number varchar(20) NULL,
-	gender bool NOT NULL,
-	dad_id int8 NULL,
-	mom_id int8 NULL,
-	marital_status varchar(20) DEFAULT 'single'::character varying NOT NULL,
-	CONSTRAINT check_lineage CHECK (((id <> dad_id) AND (id <> mom_id) AND (dad_id <> mom_id))),
-	CONSTRAINT person_email_key UNIQUE (email),
-	CONSTRAINT person_national_id_key UNIQUE (national_id),
-	CONSTRAINT person_pkey PRIMARY KEY (id),
-	CONSTRAINT person_dad_id_fkey FOREIGN KEY (dad_id) REFERENCES public.person(id),
-	CONSTRAINT person_mom_id_fkey FOREIGN KEY (mom_id) REFERENCES public.person(id)
-);
+CREATE TABLE public.person ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, national_id int8 NOT NULL, first_name varchar(255) NOT NULL, last_name varchar(255) NOT NULL, email varchar(255) NULL, date_of_birth date NOT NULL, phone_number varchar(20) NULL, gender bool NOT NULL, dad_id int8 NULL, mom_id int8 NULL, marital_status varchar(20) DEFAULT 'single'::character varying NOT NULL, CONSTRAINT check_lineage CHECK (((id <> dad_id) AND (id <> mom_id) AND (dad_id <> mom_id))), CONSTRAINT person_email_key UNIQUE (email), CONSTRAINT person_national_id_key UNIQUE (national_id), CONSTRAINT person_pkey PRIMARY KEY (id), CONSTRAINT person_dad_id_fkey FOREIGN KEY (dad_id) REFERENCES public.person(id), CONSTRAINT person_mom_id_fkey FOREIGN KEY (mom_id) REFERENCES public.person(id));
+
+-- Permissions
+
+ALTER TABLE public.person OWNER TO postgres;
+GRANT ALL ON TABLE public.person TO postgres;
+
+
+-- public.users definition
+
+-- Drop table
+
+-- DROP TABLE public.users;
+
+CREATE TABLE public.users ( id serial4 NOT NULL, username varchar(100) NOT NULL, "password" varchar(255) NOT NULL, role_id int4 DEFAULT 1 NULL, person_id int8 NULL, created_at timestamptz DEFAULT now() NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, CONSTRAINT users_person_id_key UNIQUE (person_id), CONSTRAINT users_pkey PRIMARY KEY (id), CONSTRAINT users_username_key UNIQUE (username), CONSTRAINT users_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id), CONSTRAINT users_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(id));
+
+-- Permissions
+
+ALTER TABLE public.users OWNER TO postgres;
+GRANT ALL ON TABLE public.users TO postgres;
 
 
 -- public.assets definition
@@ -136,17 +260,12 @@ CREATE TABLE public.person (
 
 -- DROP TABLE public.assets;
 
-CREATE TABLE public.assets (
-	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
-	owner_id int8 NOT NULL,
-	asset_type varchar(100) NULL,
-	registration_number varchar(255) NULL,
-	date_owned timestamptz DEFAULT now() NULL,
-	estimated_value numeric(15, 2) NULL,
-	CONSTRAINT assets_pkey PRIMARY KEY (id),
-	CONSTRAINT assets_registration_number_key UNIQUE (registration_number),
-	CONSTRAINT assets_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.person(id)
-);
+CREATE TABLE public.assets ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, owner_id int8 NOT NULL, asset_type varchar(100) NULL, registration_number varchar(255) NULL, date_owned timestamptz DEFAULT now() NULL, estimated_value numeric(15, 2) NULL, CONSTRAINT assets_pkey PRIMARY KEY (id), CONSTRAINT assets_registration_number_key UNIQUE (registration_number), CONSTRAINT assets_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.person(id));
+
+-- Permissions
+
+ALTER TABLE public.assets OWNER TO postgres;
+GRANT ALL ON TABLE public.assets TO postgres;
 
 
 -- public.death_records definition
@@ -155,16 +274,7 @@ CREATE TABLE public.assets (
 
 -- DROP TABLE public.death_records;
 
-CREATE TABLE public.death_records (
-	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
-	person_id int8 NOT NULL,
-	death_date timestamptz NOT NULL,
-	place_of_death varchar(255) NULL,
-	cause_of_death text NULL,
-	CONSTRAINT death_records_person_id_key UNIQUE (person_id),
-	CONSTRAINT death_records_pkey PRIMARY KEY (id),
-	CONSTRAINT death_records_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id)
-);
+CREATE TABLE public.death_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, death_date timestamptz NOT NULL, place_of_death varchar(255) NULL, cause_of_death text NULL, CONSTRAINT death_records_person_id_key UNIQUE (person_id), CONSTRAINT death_records_pkey PRIMARY KEY (id), CONSTRAINT death_records_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
 
 -- Table Triggers
 
@@ -173,6 +283,11 @@ insert
     on
     public.death_records for each row execute function handle_person_death();
 
+-- Permissions
+
+ALTER TABLE public.death_records OWNER TO postgres;
+GRANT ALL ON TABLE public.death_records TO postgres;
+
 
 -- public.employment definition
 
@@ -180,17 +295,7 @@ insert
 
 -- DROP TABLE public.employment;
 
-CREATE TABLE public.employment (
-	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
-	person_id int8 NOT NULL,
-	job_title varchar(255) NULL,
-	salary numeric(15, 2) NULL,
-	start_date date NULL,
-	is_active bool DEFAULT true NULL,
-	company_id int8 NULL,
-	CONSTRAINT employment_pkey PRIMARY KEY (id),
-	CONSTRAINT employment_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id)
-);
+CREATE TABLE public.employment ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, job_title varchar(255) NULL, salary numeric(15, 2) NULL, start_date date NULL, is_active bool DEFAULT true NULL, company_id int8 NULL, CONSTRAINT employment_pkey PRIMARY KEY (id), CONSTRAINT employment_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
 
 -- Table Triggers
 
@@ -203,6 +308,11 @@ update
     of salary on
     public.employment for each row execute function audit_salary_changes();
 
+-- Permissions
+
+ALTER TABLE public.employment OWNER TO postgres;
+GRANT ALL ON TABLE public.employment TO postgres;
+
 
 -- public.marriage definition
 
@@ -210,22 +320,7 @@ update
 
 -- DROP TABLE public.marriage;
 
-CREATE TABLE public.marriage (
-	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
-	contract_no int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
-	husband_id int8 NOT NULL,
-	wife_id int8 NOT NULL,
-	marriage_date timestamptz NOT NULL,
-	"valid" bool DEFAULT true NULL,
-	end_marriage_time timestamp NULL,
-	end_reason varchar(50) NULL,
-	CONSTRAINT check_not_self_marriage CHECK ((husband_id <> wife_id)),
-	CONSTRAINT marriage_contract_no_key UNIQUE (contract_no),
-	CONSTRAINT marriage_end_reason_check CHECK (((end_reason)::text = ANY ((ARRAY['divorce'::character varying, 'death'::character varying, 'annulment'::character varying, 'Khula'::character varying])::text[]))),
-	CONSTRAINT marriage_pkey PRIMARY KEY (id),
-	CONSTRAINT marriage_husband_id_fkey FOREIGN KEY (husband_id) REFERENCES public.person(id),
-	CONSTRAINT marriage_wife_id_fkey FOREIGN KEY (wife_id) REFERENCES public.person(id)
-);
+CREATE TABLE public.marriage ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, contract_no int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, husband_id int8 NOT NULL, wife_id int8 NOT NULL, marriage_date timestamptz NOT NULL, "valid" bool DEFAULT true NULL, end_marriage_time timestamp NULL, end_reason varchar(50) NULL, CONSTRAINT check_not_self_marriage CHECK ((husband_id <> wife_id)), CONSTRAINT marriage_contract_no_key UNIQUE (contract_no), CONSTRAINT marriage_end_reason_check CHECK (((end_reason)::text = ANY ((ARRAY['divorce'::character varying, 'death'::character varying, 'annulment'::character varying, 'Khula'::character varying])::text[]))), CONSTRAINT marriage_pkey PRIMARY KEY (id), CONSTRAINT marriage_husband_id_fkey FOREIGN KEY (husband_id) REFERENCES public.person(id), CONSTRAINT marriage_wife_id_fkey FOREIGN KEY (wife_id) REFERENCES public.person(id));
 CREATE UNIQUE INDEX idx_single_active_husband ON public.marriage USING btree (wife_id) WHERE (valid = true);
 
 -- Table Triggers
@@ -239,6 +334,11 @@ insert
     on
     public.marriage for each row execute function check_incest_prevention();
 
+-- Permissions
+
+ALTER TABLE public.marriage OWNER TO postgres;
+GRANT ALL ON TABLE public.marriage TO postgres;
+
 
 -- public.medical_records definition
 
@@ -246,18 +346,12 @@ insert
 
 -- DROP TABLE public.medical_records;
 
-CREATE TABLE public.medical_records (
-	id bigserial NOT NULL,
-	person_id int8 NOT NULL,
-	blood_type varchar(3) NULL,
-	height_cm numeric(4, 1) NULL,
-	weight_kg numeric(5, 1) NULL,
-	smoker bool NULL,
-	chronic_conditions text NULL,
-	last_checkup_date date NULL,
-	CONSTRAINT medical_records_pkey PRIMARY KEY (id),
-	CONSTRAINT medical_records_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id)
-);
+CREATE TABLE public.medical_records ( id bigserial NOT NULL, person_id int8 NOT NULL, blood_type varchar(3) NULL, height_cm numeric(4, 1) NULL, weight_kg numeric(5, 1) NULL, smoker bool NULL, chronic_conditions text NULL, last_checkup_date date NULL, CONSTRAINT medical_records_pkey PRIMARY KEY (id), CONSTRAINT medical_records_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
+
+-- Permissions
+
+ALTER TABLE public.medical_records OWNER TO postgres;
+GRANT ALL ON TABLE public.medical_records TO postgres;
 
 
 -- public.passports definition
@@ -266,17 +360,7 @@ CREATE TABLE public.medical_records (
 
 -- DROP TABLE public.passports;
 
-CREATE TABLE public.passports (
-	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
-	person_id int8 NOT NULL,
-	passport_number varchar(20) NOT NULL,
-	issue_date date NULL,
-	expiry_date date NULL,
-	is_active bool DEFAULT true NULL,
-	CONSTRAINT passports_passport_number_key UNIQUE (passport_number),
-	CONSTRAINT passports_pkey PRIMARY KEY (id),
-	CONSTRAINT passports_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id)
-);
+CREATE TABLE public.passports ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, passport_number varchar(20) NOT NULL, issue_date date NULL, expiry_date date NULL, is_active bool DEFAULT true NULL, CONSTRAINT passports_passport_number_key UNIQUE (passport_number), CONSTRAINT passports_pkey PRIMARY KEY (id), CONSTRAINT passports_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
 
 -- Table Triggers
 
@@ -285,6 +369,11 @@ insert
     on
     public.passports for each row execute function check_passport_overlap();
 
+-- Permissions
+
+ALTER TABLE public.passports OWNER TO postgres;
+GRANT ALL ON TABLE public.passports TO postgres;
+
 
 -- public.salary_audit definition
 
@@ -292,16 +381,12 @@ insert
 
 -- DROP TABLE public.salary_audit;
 
-CREATE TABLE public.salary_audit (
-	id serial4 NOT NULL,
-	employment_id int8 NULL,
-	old_salary numeric(15, 2) NULL,
-	new_salary numeric(15, 2) NULL,
-	changed_at timestamptz DEFAULT now() NULL,
-	changed_by_user varchar(100) DEFAULT CURRENT_USER NULL,
-	CONSTRAINT salary_audit_pkey PRIMARY KEY (id),
-	CONSTRAINT salary_audit_employment_id_fkey FOREIGN KEY (employment_id) REFERENCES public.employment(id)
-);
+CREATE TABLE public.salary_audit ( id serial4 NOT NULL, employment_id int8 NULL, old_salary numeric(15, 2) NULL, new_salary numeric(15, 2) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by_user varchar(100) DEFAULT CURRENT_USER NULL, CONSTRAINT salary_audit_pkey PRIMARY KEY (id), CONSTRAINT salary_audit_employment_id_fkey FOREIGN KEY (employment_id) REFERENCES public.employment(id));
+
+-- Permissions
+
+ALTER TABLE public.salary_audit OWNER TO postgres;
+GRANT ALL ON TABLE public.salary_audit TO postgres;
 
 
 -- public.birth_records definition
@@ -310,21 +395,12 @@ CREATE TABLE public.salary_audit (
 
 -- DROP TABLE public.birth_records;
 
-CREATE TABLE public.birth_records (
-	id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL,
-	birth_certificate_no int8 NOT NULL,
-	child_id int8 NOT NULL,
-	marriage_id int8 NULL,
-	hospital_name varchar(255) NULL,
-	doctor_name varchar(255) NULL,
-	birth_weight_kg numeric(4, 2) NULL,
-	birth_datetime timestamptz NOT NULL,
-	CONSTRAINT birth_records_birth_certificate_no_key UNIQUE (birth_certificate_no),
-	CONSTRAINT birth_records_child_id_key UNIQUE (child_id),
-	CONSTRAINT birth_records_pkey PRIMARY KEY (id),
-	CONSTRAINT birth_records_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.person(id),
-	CONSTRAINT birth_records_marriage_id_fkey FOREIGN KEY (marriage_id) REFERENCES public.marriage(id)
-);
+CREATE TABLE public.birth_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, birth_certificate_no int8 NOT NULL, child_id int8 NOT NULL, marriage_id int8 NULL, hospital_name varchar(255) NULL, doctor_name varchar(255) NULL, birth_weight_kg numeric(4, 2) NULL, birth_datetime timestamptz NOT NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, CONSTRAINT birth_records_birth_certificate_no_key UNIQUE (birth_certificate_no), CONSTRAINT birth_records_child_id_key UNIQUE (child_id), CONSTRAINT birth_records_pkey PRIMARY KEY (id), CONSTRAINT birth_records_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.person(id), CONSTRAINT birth_records_marriage_id_fkey FOREIGN KEY (marriage_id) REFERENCES public.marriage(id));
+
+-- Permissions
+
+ALTER TABLE public.birth_records OWNER TO postgres;
+GRANT ALL ON TABLE public.birth_records TO postgres;
 
 
 
@@ -344,6 +420,11 @@ end;
 $function$
 ;
 
+-- Permissions
+
+ALTER FUNCTION public.audit_salary_changes() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.audit_salary_changes() TO postgres;
+
 -- DROP FUNCTION public.block_dead_employment();
 
 CREATE OR REPLACE FUNCTION public.block_dead_employment()
@@ -358,6 +439,11 @@ BEGIN
 END;
 $function$
 ;
+
+-- Permissions
+
+ALTER FUNCTION public.block_dead_employment() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.block_dead_employment() TO postgres;
 
 -- DROP FUNCTION public.check_incest_prevention();
 
@@ -382,6 +468,11 @@ END;
 $function$
 ;
 
+-- Permissions
+
+ALTER FUNCTION public.check_incest_prevention() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.check_incest_prevention() TO postgres;
+
 -- DROP FUNCTION public.check_max_wives();
 
 CREATE OR REPLACE FUNCTION public.check_max_wives()
@@ -396,6 +487,11 @@ BEGIN
 END;
 $function$
 ;
+
+-- Permissions
+
+ALTER FUNCTION public.check_max_wives() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.check_max_wives() TO postgres;
 
 -- DROP FUNCTION public.check_passport_overlap();
 
@@ -415,6 +511,45 @@ begin
 end;
 $function$
 ;
+
+-- Permissions
+
+ALTER FUNCTION public.check_passport_overlap() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.check_passport_overlap() TO postgres;
+
+-- DROP FUNCTION public.get_next_act_number(bpchar, bpchar, bpchar);
+
+CREATE OR REPLACE FUNCTION public.get_next_act_number(p_wilaya character, p_commune character, p_year character)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    next_act INT;
+BEGIN
+    -- first try to increment existing row
+    UPDATE act_number_tracker
+    SET last_act_no = last_act_no + 1
+    WHERE wilaya_code  = p_wilaya
+      AND commune_code = p_commune
+      AND birth_year   = p_year
+    RETURNING last_act_no INTO next_act;
+
+    -- if no row was found, create a new one starting from 1
+    IF NOT FOUND THEN
+        INSERT INTO act_number_tracker (wilaya_code, commune_code, birth_year, last_act_no)
+        VALUES (p_wilaya, p_commune, p_year, 1)
+        RETURNING last_act_no INTO next_act;
+    END IF;
+
+    RETURN next_act;
+END;
+$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.get_next_act_number(bpchar, bpchar, bpchar) OWNER TO postgres;
+GRANT ALL ON FUNCTION public.get_next_act_number(bpchar, bpchar, bpchar) TO postgres;
 
 -- DROP FUNCTION public.handle_person_death();
 
@@ -446,3 +581,14 @@ BEGIN
 END;
 $function$
 ;
+
+-- Permissions
+
+ALTER FUNCTION public.handle_person_death() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.handle_person_death() TO postgres;
+
+
+-- Permissions
+
+GRANT ALL ON SCHEMA public TO pg_database_owner;
+GRANT USAGE ON SCHEMA public TO public;

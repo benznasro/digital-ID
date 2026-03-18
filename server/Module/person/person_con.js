@@ -1,5 +1,7 @@
-import pool from '../db.js';
+import pool from '../../db.js';
 
+
+//get 
 export const getPersonById=async(req,res)=>{
   try {
     const {id} =req.params;
@@ -19,7 +21,7 @@ export const getUserCount = async (req, res) => {
   }
 }
 
-export const getAllUsers = async (req, res) => {
+export const getSelectedUsers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
@@ -59,6 +61,5 @@ export const getMyInfo =async (req ,res)=>{
     res.status(500).json({ error: error.message });
   }
 }
-
 
 
