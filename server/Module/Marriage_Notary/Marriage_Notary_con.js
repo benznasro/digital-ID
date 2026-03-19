@@ -10,7 +10,7 @@ export const new_Marriage = async (req, res) => {
     witness1Id,
     witness2Id,
   } = req.body;
-  
+
   const {id:notaryId} =req.user;
 
   const required = { husbandId, wifeId, marriageDate, dowryAmount, witness1Id, witness2Id, notaryId };
@@ -41,6 +41,38 @@ export const new_Marriage = async (req, res) => {
     if (msg.includes('alredy have 4 wifes'))      return res.status(409).json({ error: msg });
     if (msg.includes('incest is not allowd'))     return res.status(400).json({ error: msg });
     if (msg.includes('Invalid reference'))        return res.status(400).json({ error: msg });
+
+    res.status(500).json({ error: msg });
+  }
+};
+
+
+const Divorce = async (req, res) => {
+  const { marriageId, endDate, endReason } = req.body;
+
+  if (!marriageId || !endDate ) {
+    return res.status(400).json({ error: 'marriageId and endDate   are required' });
+  }
+
+  const allowedReasons = ['divorce', 'annulment', 'Khula'];
+  if (!endReason || !allowedReasons.includes(endReason)) {
+    return res.status(400).json({ error: `endReason must be one of: ${allowedReasons.join(', ')}` });
+  }
+
+  try {
+    await pool.query(
+      `SELECT add_divorce($1, $2, $3)`,
+      [marriageId, endDate, endReason ]
+    );
+
+    res.status(200).json({ message: 'Divorce recorded successfully' });
+
+  } catch (error) {
+    const msg = error.message;
+
+    if (msg.includes('Marriage not found or already dissolved')) {
+      return res.status(404).json({ error: msg });
+    }
 
     res.status(500).json({ error: msg });
   }
