@@ -32,7 +32,7 @@ export const login = async (req, res) => {
       person_id: user.person_id ?? null,
     };
 
-    if (user.role === 'hospital') {
+    if (user.role !== 'citizen') {
       base.wilaya_code = user.wilaya_code;
       base.commune_code = user.commune_code;
     }

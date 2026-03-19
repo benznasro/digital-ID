@@ -1,3 +1,6 @@
+--data base mcd
+--https://drawsql.app/teams/fijla/diagrams/digital-id
+
 -- DROP SCHEMA public;
 
 CREATE SCHEMA public AUTHORIZATION pg_database_owner;
