@@ -256,7 +256,7 @@ GRANT ALL ON TABLE public.person TO postgres;
 
 -- DROP TABLE public.users;
 
-CREATE TABLE public.users ( id serial4 NOT NULL, username varchar(100) NOT NULL, "password" varchar(255) NOT NULL, role_id int4 DEFAULT 1 NULL, person_id int8 NULL, created_at timestamptz DEFAULT now() NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, CONSTRAINT users_person_id_key UNIQUE (person_id), CONSTRAINT users_pkey PRIMARY KEY (id), CONSTRAINT users_username_key UNIQUE (username), CONSTRAINT users_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id), CONSTRAINT users_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(id));
+CREATE TABLE public.users ( id serial4 NOT NULL, username varchar(100) NOT NULL, "password" varchar(255) NOT NULL, role_id int4 DEFAULT 1 NULL, person_id int8 NULL, created_at timestamptz DEFAULT now() NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, refresh_token text NULL, CONSTRAINT users_person_id_key UNIQUE (person_id), CONSTRAINT users_pkey PRIMARY KEY (id), CONSTRAINT users_username_key UNIQUE (username), CONSTRAINT users_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id), CONSTRAINT users_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(id));
 
 -- Permissions
 
@@ -330,7 +330,7 @@ GRANT ALL ON TABLE public.employment TO postgres;
 
 -- DROP TABLE public.marriage;
 
-CREATE TABLE public.marriage ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, contract_no int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, husband_id int8 NOT NULL, wife_id int8 NOT NULL, marriage_date timestamptz NOT NULL, "valid" bool DEFAULT true NULL, end_marriage_time timestamp NULL, end_reason varchar(50) NULL, CONSTRAINT check_not_self_marriage CHECK ((husband_id <> wife_id)), CONSTRAINT marriage_contract_no_key UNIQUE (contract_no), CONSTRAINT marriage_end_reason_check CHECK (((end_reason)::text = ANY ((ARRAY['divorce'::character varying, 'death'::character varying, 'annulment'::character varying, 'Khula'::character varying])::text[]))), CONSTRAINT marriage_pkey PRIMARY KEY (id), CONSTRAINT marriage_husband_id_fkey FOREIGN KEY (husband_id) REFERENCES public.person(id), CONSTRAINT marriage_notary_id_fkey FOREIGN KEY () REFERENCES <?>(), CONSTRAINT marriage_wife_id_fkey FOREIGN KEY (wife_id) REFERENCES public.person(id), CONSTRAINT marriage_witness_1_id_fkey FOREIGN KEY () REFERENCES <?>(), CONSTRAINT marriage_witness_2_id_fkey FOREIGN KEY () REFERENCES <?>());
+CREATE TABLE public.marriage ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, contract_no int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, husband_id int8 NOT NULL, wife_id int8 NOT NULL, marriage_date timestamptz NOT NULL, "valid" bool DEFAULT true NULL, end_marriage_time timestamptz NULL, end_reason varchar(50) NULL, witness_1_id int8 NULL, witness_2_id int8 NULL, dowry_amount numeric(12, 2) NULL, notary_id int8 NULL, CONSTRAINT check_not_self_marriage CHECK ((husband_id <> wife_id)), CONSTRAINT marriage_contract_no_key UNIQUE (contract_no), CONSTRAINT marriage_end_reason_check CHECK (((end_reason)::text = ANY ((ARRAY['divorce'::character varying, 'death'::character varying, 'annulment'::character varying, 'Khula'::character varying])::text[]))), CONSTRAINT marriage_pkey PRIMARY KEY (id), CONSTRAINT marriage_husband_id_fkey FOREIGN KEY (husband_id) REFERENCES public.person(id), CONSTRAINT marriage_notary_id_fkey FOREIGN KEY (notary_id) REFERENCES public.users(id), CONSTRAINT marriage_wife_id_fkey FOREIGN KEY (wife_id) REFERENCES public.person(id), CONSTRAINT marriage_witness_1_id_fkey FOREIGN KEY (witness_1_id) REFERENCES public.person(id), CONSTRAINT marriage_witness_2_id_fkey FOREIGN KEY (witness_2_id) REFERENCES public.person(id));
 CREATE UNIQUE INDEX idx_single_active_husband ON public.marriage USING btree (wife_id) WHERE (valid = true);
 
 -- Table Triggers
@@ -413,6 +413,104 @@ ALTER TABLE public.birth_records OWNER TO postgres;
 GRANT ALL ON TABLE public.birth_records TO postgres;
 
 
+
+-- DROP FUNCTION public.add_divorce(int8, timestamptz, varchar);
+
+CREATE OR REPLACE FUNCTION public.add_divorce(p_marriage_id bigint, p_end_date timestamp with time zone, p_end_reason character varying DEFAULT 'divorce'::character varying)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+
+    IF NOT EXISTS (SELECT 1 FROM marriage WHERE id = p_marriage_id AND valid = true) THEN
+        RAISE EXCEPTION 'Marriage not found or already dissolved';
+    END IF;
+
+    UPDATE marriage
+    SET
+        valid             = false,
+        end_marriage_time = p_end_date,
+        end_reason        = p_end_reason
+    WHERE id = p_marriage_id;
+
+ 
+    UPDATE person SET marital_status = 'divorced'
+    WHERE id IN (
+        SELECT husband_id FROM marriage WHERE id = p_marriage_id
+        UNION
+        SELECT wife_id    FROM marriage WHERE id = p_marriage_id
+    );
+
+END;
+$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.add_divorce(int8, timestamptz, varchar) OWNER TO postgres;
+GRANT ALL ON FUNCTION public.add_divorce(int8, timestamptz, varchar) TO postgres;
+
+-- DROP FUNCTION public.add_marriage(int8, int8, timestamptz, numeric, int8, int8, int8);
+
+CREATE OR REPLACE FUNCTION public.add_marriage(p_husband_id bigint, p_wife_id bigint, p_marriage_date timestamp with time zone, p_dowry_amount numeric DEFAULT NULL::numeric, p_witness_1_id bigint DEFAULT NULL::bigint, p_witness_2_id bigint DEFAULT NULL::bigint, p_notary_id bigint DEFAULT NULL::bigint)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    
+    IF EXISTS (SELECT 1 FROM death_records WHERE person_id = p_husband_id) THEN
+        RAISE EXCEPTION 'Husband is deceased';
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM death_records WHERE person_id = p_wife_id) THEN
+        RAISE EXCEPTION 'Wife is deceased';
+    END IF;
+
+    
+    IF (SELECT date_of_birth FROM person WHERE id = p_husband_id) > (p_marriage_date::date - interval '18 years') THEN
+        RAISE EXCEPTION 'Husband is under 18';
+    END IF;
+
+    IF (SELECT date_of_birth FROM person WHERE id = p_wife_id) > (p_marriage_date::date - interval '18 years') THEN
+        RAISE EXCEPTION 'Wife is under 18';
+    END IF;
+
+   
+    IF EXISTS (SELECT 1 FROM marriage WHERE wife_id = p_wife_id AND valid = true) THEN
+        RAISE EXCEPTION 'Wife is already married';
+    END IF;
+
+    INSERT INTO marriage (
+        husband_id,
+        wife_id,
+        marriage_date,
+        dowry_amount,
+        witness_1_id,
+        witness_2_id,
+        notary_id,
+        valid
+    ) VALUES (
+        p_husband_id,
+        p_wife_id,
+        p_marriage_date,
+        p_dowry_amount,
+        p_witness_1_id,
+        p_witness_2_id,
+        p_notary_id,
+        true
+    );
+
+EXCEPTION
+    WHEN foreign_key_violation THEN
+        RAISE EXCEPTION 'Invalid reference — check husband_id, wife_id, witness IDs, or notary_id';
+END;
+$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.add_marriage(int8, int8, timestamptz, numeric, int8, int8, int8) OWNER TO postgres;
+GRANT ALL ON FUNCTION public.add_marriage(int8, int8, timestamptz, numeric, int8, int8, int8) TO postgres;
 
 -- DROP FUNCTION public.audit_salary_changes();
 
