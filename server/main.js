@@ -27,3 +27,4 @@ app.use("/api/auth", authRouter);
 app.use("/api/birth_records", birth_records_router);
 app.use("/api/medical_records", medical_records_router);
 app.use("/api/hospital",hospital_router);
+

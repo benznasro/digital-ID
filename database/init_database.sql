@@ -234,6 +234,13 @@ GRANT ALL ON TABLE public.roles TO postgres;
 
 CREATE TABLE public.person ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, national_id int8 NOT NULL, first_name varchar(255) NOT NULL, last_name varchar(255) NOT NULL, email varchar(255) NULL, date_of_birth date NOT NULL, phone_number varchar(20) NULL, gender bool NOT NULL, dad_id int8 NULL, mom_id int8 NULL, marital_status varchar(20) DEFAULT 'single'::character varying NOT NULL, CONSTRAINT check_lineage CHECK (((id <> dad_id) AND (id <> mom_id) AND (dad_id <> mom_id))), CONSTRAINT person_email_key UNIQUE (email), CONSTRAINT person_national_id_key UNIQUE (national_id), CONSTRAINT person_pkey PRIMARY KEY (id), CONSTRAINT person_dad_id_fkey FOREIGN KEY (dad_id) REFERENCES public.person(id), CONSTRAINT person_mom_id_fkey FOREIGN KEY (mom_id) REFERENCES public.person(id));
 
+-- Table Triggers
+
+create trigger trg_inherit_father_last_name before
+insert
+    on
+    public.person for each row execute function inherit_father_last_name();
+
 -- Permissions
 
 ALTER TABLE public.person OWNER TO postgres;
@@ -274,7 +281,7 @@ GRANT ALL ON TABLE public.assets TO postgres;
 
 -- DROP TABLE public.death_records;
 
-CREATE TABLE public.death_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, death_date timestamptz NOT NULL, place_of_death varchar(255) NULL, cause_of_death text NULL, CONSTRAINT death_records_person_id_key UNIQUE (person_id), CONSTRAINT death_records_pkey PRIMARY KEY (id), CONSTRAINT death_records_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
+CREATE TABLE public.death_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, death_date timestamptz NOT NULL, place_of_death varchar(255) NULL, cause_of_death text NULL, doctor_id int8 NULL, icd_10_code varchar(10) NULL, kin_contact_id int8 NULL, notified_next_of_kin bool DEFAULT false NULL, hospital_user_id int4 NULL, CONSTRAINT death_records_person_id_key UNIQUE (person_id), CONSTRAINT death_records_pkey PRIMARY KEY (id), CONSTRAINT death_records_doctor_id_fkey FOREIGN KEY (doctor_id) REFERENCES public.person(id), CONSTRAINT death_records_hospital_user_id_fkey FOREIGN KEY (hospital_user_id) REFERENCES public.users(id), CONSTRAINT death_records_kin_contact_id_fkey FOREIGN KEY (kin_contact_id) REFERENCES public.person(id), CONSTRAINT death_records_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
 
 -- Table Triggers
 
@@ -320,7 +327,7 @@ GRANT ALL ON TABLE public.employment TO postgres;
 
 -- DROP TABLE public.marriage;
 
-CREATE TABLE public.marriage ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, contract_no int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, husband_id int8 NOT NULL, wife_id int8 NOT NULL, marriage_date timestamptz NOT NULL, "valid" bool DEFAULT true NULL, end_marriage_time timestamp NULL, end_reason varchar(50) NULL, CONSTRAINT check_not_self_marriage CHECK ((husband_id <> wife_id)), CONSTRAINT marriage_contract_no_key UNIQUE (contract_no), CONSTRAINT marriage_end_reason_check CHECK (((end_reason)::text = ANY ((ARRAY['divorce'::character varying, 'death'::character varying, 'annulment'::character varying, 'Khula'::character varying])::text[]))), CONSTRAINT marriage_pkey PRIMARY KEY (id), CONSTRAINT marriage_husband_id_fkey FOREIGN KEY (husband_id) REFERENCES public.person(id), CONSTRAINT marriage_wife_id_fkey FOREIGN KEY (wife_id) REFERENCES public.person(id));
+CREATE TABLE public.marriage ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, contract_no int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, husband_id int8 NOT NULL, wife_id int8 NOT NULL, marriage_date timestamptz NOT NULL, "valid" bool DEFAULT true NULL, end_marriage_time timestamp NULL, end_reason varchar(50) NULL, CONSTRAINT check_not_self_marriage CHECK ((husband_id <> wife_id)), CONSTRAINT marriage_contract_no_key UNIQUE (contract_no), CONSTRAINT marriage_end_reason_check CHECK (((end_reason)::text = ANY ((ARRAY['divorce'::character varying, 'death'::character varying, 'annulment'::character varying, 'Khula'::character varying])::text[]))), CONSTRAINT marriage_pkey PRIMARY KEY (id), CONSTRAINT marriage_husband_id_fkey FOREIGN KEY (husband_id) REFERENCES public.person(id), CONSTRAINT marriage_notary_id_fkey FOREIGN KEY () REFERENCES <?>(), CONSTRAINT marriage_wife_id_fkey FOREIGN KEY (wife_id) REFERENCES public.person(id), CONSTRAINT marriage_witness_1_id_fkey FOREIGN KEY () REFERENCES <?>(), CONSTRAINT marriage_witness_2_id_fkey FOREIGN KEY () REFERENCES <?>());
 CREATE UNIQUE INDEX idx_single_active_husband ON public.marriage USING btree (wife_id) WHERE (valid = true);
 
 -- Table Triggers
@@ -395,7 +402,7 @@ GRANT ALL ON TABLE public.salary_audit TO postgres;
 
 -- DROP TABLE public.birth_records;
 
-CREATE TABLE public.birth_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, birth_certificate_no int8 NOT NULL, child_id int8 NOT NULL, marriage_id int8 NULL, hospital_name varchar(255) NULL, doctor_name varchar(255) NULL, birth_weight_kg numeric(4, 2) NULL, birth_datetime timestamptz NOT NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, CONSTRAINT birth_records_birth_certificate_no_key UNIQUE (birth_certificate_no), CONSTRAINT birth_records_child_id_key UNIQUE (child_id), CONSTRAINT birth_records_pkey PRIMARY KEY (id), CONSTRAINT birth_records_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.person(id), CONSTRAINT birth_records_marriage_id_fkey FOREIGN KEY (marriage_id) REFERENCES public.marriage(id));
+CREATE TABLE public.birth_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, birth_certificate_no int8 NOT NULL, child_id int8 NOT NULL, marriage_id int8 NULL, hospital_name varchar(255) NULL, doctor_name varchar(255) NULL, birth_weight_kg numeric(4, 2) NULL, birth_datetime timestamptz NOT NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, apgar_score int2 NULL, CONSTRAINT birth_records_birth_certificate_no_key UNIQUE (birth_certificate_no), CONSTRAINT birth_records_child_id_key UNIQUE (child_id), CONSTRAINT birth_records_pkey PRIMARY KEY (id), CONSTRAINT birth_records_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.person(id), CONSTRAINT birth_records_marriage_id_fkey FOREIGN KEY (marriage_id) REFERENCES public.marriage(id));
 
 -- Permissions
 
@@ -586,6 +593,33 @@ $function$
 
 ALTER FUNCTION public.handle_person_death() OWNER TO postgres;
 GRANT ALL ON FUNCTION public.handle_person_death() TO postgres;
+
+-- DROP FUNCTION public.inherit_father_last_name();
+
+CREATE OR REPLACE FUNCTION public.inherit_father_last_name()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    father_last_name varchar(255);
+BEGIN
+    IF NEW.dad_id IS NOT NULL THEN
+        SELECT last_name INTO father_last_name
+        FROM person
+        WHERE id = NEW.dad_id;
+
+        NEW.last_name := father_last_name;
+    END IF;
+
+    RETURN NEW;
+END;
+$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.inherit_father_last_name() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.inherit_father_last_name() TO postgres;
 
 
 -- Permissions

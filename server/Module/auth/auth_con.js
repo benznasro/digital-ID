@@ -37,13 +37,16 @@ export const login = async (req, res) => {
       base.commune_code = user.commune_code;
     }
 
-    const token = jwt.sign(
-      base,
-      process.env.JWT_SECRET, 
-      { expiresIn: "7d" }
+
+    const accessToken  = jwt.sign(base, process.env.JWT_SECRET, { expiresIn: '15m' });
+    const refreshToken = jwt.sign({ id: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+
+    await pool.query(
+    `UPDATE users SET refresh_token = $1 WHERE id = $2`,
+    [refreshToken, user.id]
     );
 
-    res.json({ token });
+    res.json({ accessToken,refreshToken});
 
   } catch (error) {
     res.status(500).json({ error: error.message });
