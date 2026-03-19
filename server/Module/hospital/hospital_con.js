@@ -126,3 +126,58 @@ export const update_Medical_Record = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const add_Death_Record = async (req, res) => {
+  const {
+    personId,
+    deathDate,
+    placeOfDeath,
+    causeOfDeath,
+    doctorId,
+    icd10Code,
+    kinContactId,
+    notifiedNextOfKin,
+    hospitalUserId,
+  } = req.body;
+
+  if (!personId || !deathDate) {
+    return res.status(400).json({ error: 'personId and deathDate are required' });
+  }
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO death_records (
+        person_id,
+        death_date,
+        place_of_death,
+        cause_of_death,
+        doctor_id,
+        icd_10_code,
+        kin_contact_id,
+        notified_next_of_kin,
+        hospital_user_id
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+      [
+        personId,
+        deathDate,
+        placeOfDeath       ?? null,
+        causeOfDeath       ?? null,
+        doctorId           ?? null,
+        icd10Code          ?? null,
+        kinContactId       ?? null,
+        notifiedNextOfKin  ?? false,
+        hospitalUserId     ?? null,
+      ]
+    );
+
+    res.status(201).json({ message: 'Death record added successfully' });
+  } catch (error) {
+    if (error.code === '23505') {
+      return res.status(409).json({ error: `Death record already exists for person_id = ${personId}` });
+    }
+    if (error.code === '23503') {
+      return res.status(400).json({ error: 'Invalid reference — check doctorId, kinContactId, or hospitalUserId' });
+    }
+    res.status(500).json({ error: error.message });
+  }
+};
