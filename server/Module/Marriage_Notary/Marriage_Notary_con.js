@@ -47,7 +47,7 @@ export const new_Marriage = async (req, res) => {
 };
 
 
-const Divorce = async (req, res) => {
+export const Divorce = async (req, res) => {
   const { marriageId, endDate, endReason } = req.body;
 
   if (!marriageId || !endDate ) {
