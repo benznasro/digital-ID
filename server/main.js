@@ -23,10 +23,11 @@ app.get("/",(req,res)=>{
 res.send("server worked");
 });
 
+app.use(express.static('../html'));
 app.use("/api/person",userrouts);
 app.use("/api/auth", authRouter);
 app.use("/api/birth_records", birth_records_router);
 app.use("/api/medical_records", medical_records_router);
 app.use("/api/hospital",hospital_router);
-app.use("api/Marriage_Notary",Marriage_Notary_router);
+app.use("/api/Marriage_Notary",Marriage_Notary_router);
 

@@ -422,18 +422,22 @@ CREATE OR REPLACE FUNCTION public.add_divorce(p_marriage_id bigint, p_end_date t
 AS $function$
 BEGIN
 
+    IF NOT EXISTS (SELECT 1 FROM marriage WHERE id = p_marriage_id) THEN
+        RAISE EXCEPTION 'Marriage not found'
+            USING ERRCODE = 'P0001';
+    END IF;
+
     IF NOT EXISTS (SELECT 1 FROM marriage WHERE id = p_marriage_id AND valid = true) THEN
-        RAISE EXCEPTION 'Marriage not found or already dissolved';
+        RAISE EXCEPTION 'Marriage already dissolved'
+            USING ERRCODE = 'P0002';
     END IF;
 
     UPDATE marriage
-    SET
-        valid             = false,
+    SET valid             = false,
         end_marriage_time = p_end_date,
         end_reason        = p_end_reason
     WHERE id = p_marriage_id;
 
- 
     UPDATE person SET marital_status = 'divorced'
     WHERE id IN (
         SELECT husband_id FROM marriage WHERE id = p_marriage_id

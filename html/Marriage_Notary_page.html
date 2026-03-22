@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Marriage & Divorce Registration</title>
-	<link rel="stylesheet" href="../style/Marriage_Notary_page.css">
+	<link rel="stylesheet" href="./style/Marriage_Notary_page.css">
 </head>
 <body>
 	<header class="page-header">
@@ -17,8 +17,8 @@
 		</div>
 	</header>
 	<div class="tab-container">
-		<button class="tab-btn active" id="marriageTabBtn" onclick="showTab('marriage')">Marriage Registration</button>
-		<button class="tab-btn" id="divorceTabBtn" onclick="showTab('divorce')">Divorce Registration</button>
+		<button class="tab-btn active" id="marriageTabBtn">Marriage Registration</button>
+		<button class="tab-btn" id="divorceTabBtn" >Divorce Registration</button>
 	</div>
 
 	<div id="marriage" class="tab-content">
@@ -106,51 +106,6 @@
 		<div id="divorceResult" class="result-container"></div>
 	</div>
 
-  
-	<script>
-	function showTab(tab) {
-		document.getElementById('marriage').style.display = tab === 'marriage' ? '' : 'none';
-		document.getElementById('divorce').style.display = tab === 'divorce' ? '' : 'none';
-		document.getElementById('marriageTabBtn').classList.toggle('active', tab === 'marriage');
-		document.getElementById('divorceTabBtn').classList.toggle('active', tab === 'divorce');
-	}
-
-	// Marriage form submission
-	document.getElementById('marriageForm').onsubmit = async function(e) {
-		e.preventDefault();
-		const form = e.target;
-		const data = {
-			husbandId: Number(form.husbandId.value),
-			wifeId: Number(form.wifeId.value),
-			marriageDate: form.marriageDate.value,
-			dowryAmount: Number(form.dowryAmount.value),
-			witness1Id: Number(form.witness1Id.value),
-			witness2Id: Number(form.witness2Id.value)
-		};
-		
-		document.getElementById('marriageResult').innerText = JSON.stringify(data, null, 2);
-	};
-
-	// Divorce form submission
-	document.getElementById('divorceForm').onsubmit = async function(e) {
-		e.preventDefault();
-		const form = e.target;
-		const data = {
-			marriageId: Number(form.marriageId.value),
-			endReason: form.endReason.value,
-			endDate: form.endDate.value
-		};
-		
-		document.getElementById('divorceResult').innerText = JSON.stringify(data, null, 2);
-	};
-
-	// Prevent wheel from changing number input values
-	document.querySelectorAll('input[type="number"]').forEach(input => {
-		input.addEventListener('wheel', (e) => {
-			e.preventDefault();
-			input.blur();
-		}, { passive: false });
-	});
-	</script>
+  <script src="./scripts/Marriage_Notary_page.js" type="module"></script>
 </body>
 </html>
