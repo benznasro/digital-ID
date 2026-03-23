@@ -1,6 +1,3 @@
---data base mcd
---https://drawsql.app/teams/fijla/diagrams/digital-id
-
 -- DROP SCHEMA public;
 
 CREATE SCHEMA public AUTHORIZATION pg_database_owner;
@@ -66,6 +63,21 @@ CREATE SEQUENCE public.employment_id_seq
 
 ALTER SEQUENCE public.employment_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.employment_id_seq TO postgres;
+
+-- DROP SEQUENCE public.marriage_audit_id_seq;
+
+CREATE SEQUENCE public.marriage_audit_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.marriage_audit_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.marriage_audit_id_seq TO postgres;
 
 -- DROP SEQUENCE public.marriage_contract_no_seq;
 
@@ -343,11 +355,33 @@ create trigger trg_prevent_incest before
 insert
     on
     public.marriage for each row execute function check_incest_prevention();
+create trigger trg_marriage_audit after
+insert
+    or
+delete
+    or
+update
+    on
+    public.marriage for each row execute function log_marriage_changes();
 
 -- Permissions
 
 ALTER TABLE public.marriage OWNER TO postgres;
 GRANT ALL ON TABLE public.marriage TO postgres;
+
+
+-- public.marriage_audit definition
+
+-- Drop table
+
+-- DROP TABLE public.marriage_audit;
+
+CREATE TABLE public.marriage_audit ( id bigserial NOT NULL, marriage_id int8 NULL, operation varchar(10) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by varchar(100) DEFAULT CURRENT_USER NULL, old_husband_id int8 NULL, old_wife_id int8 NULL, old_marriage_date timestamptz NULL, old_valid bool NULL, old_end_reason varchar(50) NULL, old_end_marriage_time timestamp NULL, new_husband_id int8 NULL, new_wife_id int8 NULL, new_marriage_date timestamptz NULL, new_valid bool NULL, new_end_reason varchar(50) NULL, new_end_marriage_time timestamp NULL, changed_by_user_id int8 NULL, CONSTRAINT marriage_audit_pkey PRIMARY KEY (id), CONSTRAINT marriage_audit_changed_by_user_id_fkey FOREIGN KEY (changed_by_user_id) REFERENCES public.users(id));
+
+-- Permissions
+
+ALTER TABLE public.marriage_audit OWNER TO postgres;
+GRANT ALL ON TABLE public.marriage_audit TO postgres;
 
 
 -- public.medical_records definition
@@ -422,18 +456,22 @@ CREATE OR REPLACE FUNCTION public.add_divorce(p_marriage_id bigint, p_end_date t
 AS $function$
 BEGIN
 
+    IF NOT EXISTS (SELECT 1 FROM marriage WHERE id = p_marriage_id) THEN
+        RAISE EXCEPTION 'Marriage not found'
+            USING ERRCODE = 'P0001';
+    END IF;
+
     IF NOT EXISTS (SELECT 1 FROM marriage WHERE id = p_marriage_id AND valid = true) THEN
-        RAISE EXCEPTION 'Marriage not found or already dissolved';
+        RAISE EXCEPTION 'Marriage already dissolved'
+            USING ERRCODE = 'P0002';
     END IF;
 
     UPDATE marriage
-    SET
-        valid             = false,
+    SET valid             = false,
         end_marriage_time = p_end_date,
         end_reason        = p_end_reason
     WHERE id = p_marriage_id;
 
- 
     UPDATE person SET marital_status = 'divorced'
     WHERE id IN (
         SELECT husband_id FROM marriage WHERE id = p_marriage_id
@@ -457,52 +495,73 @@ CREATE OR REPLACE FUNCTION public.add_marriage(p_husband_id bigint, p_wife_id bi
  LANGUAGE plpgsql
 AS $function$
 BEGIN
-    
+
+  
     IF EXISTS (SELECT 1 FROM death_records WHERE person_id = p_husband_id) THEN
-        RAISE EXCEPTION 'Husband is deceased';
+        RAISE EXCEPTION 'Husband is deceased' USING ERRCODE = 'P0003';
     END IF;
 
     IF EXISTS (SELECT 1 FROM death_records WHERE person_id = p_wife_id) THEN
-        RAISE EXCEPTION 'Wife is deceased';
+        RAISE EXCEPTION 'Wife is deceased' USING ERRCODE = 'P0004';
     END IF;
 
-    
-    IF (SELECT date_of_birth FROM person WHERE id = p_husband_id) > (p_marriage_date::date - interval '18 years') THEN
-        RAISE EXCEPTION 'Husband is under 18';
+
+    IF (SELECT date_of_birth FROM person WHERE id = p_husband_id)
+        > (p_marriage_date::date - interval '18 years') THEN
+        RAISE EXCEPTION 'Husband is under 18' USING ERRCODE = 'P0005';
     END IF;
 
-    IF (SELECT date_of_birth FROM person WHERE id = p_wife_id) > (p_marriage_date::date - interval '18 years') THEN
-        RAISE EXCEPTION 'Wife is under 18';
+    IF (SELECT date_of_birth FROM person WHERE id = p_wife_id)
+        > (p_marriage_date::date - interval '18 years') THEN
+        RAISE EXCEPTION 'Wife is under 18' USING ERRCODE = 'P0006';
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM marriage WHERE wife_id = p_wife_id AND valid = true) THEN
+        RAISE EXCEPTION 'Wife is already married' USING ERRCODE = 'P0007';
+    END IF;
+
+    IF p_witness_1_id IS NOT NULL AND
+       EXISTS (SELECT 1 FROM death_records WHERE person_id = p_witness_1_id) THEN
+        RAISE EXCEPTION 'Witness 1 is deceased' USING ERRCODE = 'P0009';
+    END IF;
+
+    IF p_witness_2_id IS NOT NULL AND
+       EXISTS (SELECT 1 FROM death_records WHERE person_id = p_witness_2_id) THEN
+        RAISE EXCEPTION 'Witness 2 is deceased' USING ERRCODE = 'P0010';
     END IF;
 
    
-    IF EXISTS (SELECT 1 FROM marriage WHERE wife_id = p_wife_id AND valid = true) THEN
-        RAISE EXCEPTION 'Wife is already married';
+    IF p_witness_1_id IS NOT NULL AND
+       (SELECT date_of_birth FROM person WHERE id = p_witness_1_id)
+        > (p_marriage_date::date - interval '18 years') THEN
+        RAISE EXCEPTION 'Witness 1 is under 18' USING ERRCODE = 'P0011';
     END IF;
 
+    IF p_witness_2_id IS NOT NULL AND
+       (SELECT date_of_birth FROM person WHERE id = p_witness_2_id)
+        > (p_marriage_date::date - interval '18 years') THEN
+        RAISE EXCEPTION 'Witness 2 is under 18' USING ERRCODE = 'P0012';
+    END IF;
+
+   
+    UPDATE person SET marital_status = 'married'
+    WHERE id = p_husband_id OR id = p_wife_id;
+
+
     INSERT INTO marriage (
-        husband_id,
-        wife_id,
-        marriage_date,
-        dowry_amount,
-        witness_1_id,
-        witness_2_id,
-        notary_id,
-        valid
+        husband_id, wife_id, marriage_date,
+        dowry_amount, witness_1_id, witness_2_id,
+        notary_id, valid
     ) VALUES (
-        p_husband_id,
-        p_wife_id,
-        p_marriage_date,
-        p_dowry_amount,
-        p_witness_1_id,
-        p_witness_2_id,
-        p_notary_id,
-        true
+        p_husband_id, p_wife_id, p_marriage_date,
+        p_dowry_amount, p_witness_1_id, p_witness_2_id,
+        p_notary_id, true
     );
 
 EXCEPTION
     WHEN foreign_key_violation THEN
-        RAISE EXCEPTION 'Invalid reference — check husband_id, wife_id, witness IDs, or notary_id';
+        RAISE EXCEPTION 'Invalid reference — check husband, wife, witness, or notary IDs'
+            USING ERRCODE = 'P0008';
 END;
 $function$
 ;
@@ -721,6 +780,70 @@ $function$
 
 ALTER FUNCTION public.inherit_father_last_name() OWNER TO postgres;
 GRANT ALL ON FUNCTION public.inherit_father_last_name() TO postgres;
+
+-- DROP FUNCTION public.log_marriage_changes();
+
+CREATE OR REPLACE FUNCTION public.log_marriage_changes()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_user_id bigint;
+BEGIN
+   
+    BEGIN
+        v_user_id := current_setting('app.current_user_id')::bigint;
+    EXCEPTION WHEN OTHERS THEN
+        v_user_id := NULL; 
+    END;
+
+    IF TG_OP = 'INSERT' THEN
+        INSERT INTO marriage_audit (
+            marriage_id, operation, changed_by_user_id,
+            new_husband_id, new_wife_id, new_marriage_date,
+            new_valid, new_end_reason, new_end_marriage_time
+        ) VALUES (
+            NEW.id, 'INSERT', v_user_id,
+            NEW.husband_id, NEW.wife_id, NEW.marriage_date,
+            NEW.valid, NEW.end_reason, NEW.end_marriage_time
+        );
+
+    ELSIF TG_OP = 'UPDATE' THEN
+        INSERT INTO marriage_audit (
+            marriage_id, operation, changed_by_user_id,
+            old_husband_id, old_wife_id, old_marriage_date,
+            old_valid, old_end_reason, old_end_marriage_time,
+            new_husband_id, new_wife_id, new_marriage_date,
+            new_valid, new_end_reason, new_end_marriage_time
+        ) VALUES (
+            NEW.id, 'UPDATE', v_user_id,
+            OLD.husband_id, OLD.wife_id, OLD.marriage_date,
+            OLD.valid, OLD.end_reason, OLD.end_marriage_time,
+            NEW.husband_id, NEW.wife_id, NEW.marriage_date,
+            NEW.valid, NEW.end_reason, NEW.end_marriage_time
+        );
+
+    ELSIF TG_OP = 'DELETE' THEN
+        INSERT INTO marriage_audit (
+            marriage_id, operation, changed_by_user_id,
+            old_husband_id, old_wife_id, old_marriage_date,
+            old_valid, old_end_reason, old_end_marriage_time
+        ) VALUES (
+            OLD.id, 'DELETE', v_user_id,
+            OLD.husband_id, OLD.wife_id, OLD.marriage_date,
+            OLD.valid, OLD.end_reason, OLD.end_marriage_time
+        );
+    END IF;
+
+    RETURN NEW;
+END;
+$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.log_marriage_changes() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.log_marriage_changes() TO postgres;
 
 
 -- Permissions

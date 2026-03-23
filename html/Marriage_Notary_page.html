@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Marriage & Divorce Registration</title>
+	<link rel="stylesheet" href="style/Marriage_Notary_page.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+	<header class="page-header">
+		<div class="header-content">
+			<button class="sidebar-toggle" id="sidebarToggle" aria-label="Open Menu">
+				<i class="fas fa-bars"></i>
+			</button>
+			<div class="header-text">
+				<h1>Digital ID Portal</h1>
+				<p class="subtitle">Marriage & Divorce Registration System</p>
+			</div>
+		</div>
+	</header>
+
+	<div class="main-layout">
+		<!-- Sidebar -->
+		<aside class="sidebar" id="sidebar">
+			<div class="sidebar-header">
+				<span class="sidebar-title"><i class="fas fa-scale-balanced"></i> Notary Panel</span>
+			</div>
+			<nav class="sidebar-nav">
+				<ul>
+					<!-- Recent Logs -->
+					<li class="sidebar-item">
+						<a href="#" class="sidebar-link" id="logsLink">
+							<i class="fa-regular fa-clock"></i>
+							<span>Recent Logs</span>
+						</a>
+						<div class="sidebar-logs" id="sidebarLogs">
+							<div class="log-entry"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
+						</div>
+					</li>
+
+					<!-- My Contracts -->
+					<li class="sidebar-item">
+						<a href="#" class="sidebar-link" id="contractsLink">
+							<i class="fa-regular fa-file-lines"></i>
+							<span>My Contracts</span>
+							<span class="count-badge" id="contractCount">0</span>
+						</a>
+
+						<div class="sidebar-contracts" id="sidebarContracts">
+
+							<!-- Search -->
+							<div class="contracts-search">
+								<input type="text" id="contractSearch" placeholder="Search name or ID...">
+								<button id="contractClear" title="Reset all filters">
+									<i class="fa-solid fa-arrows-rotate"></i>
+								</button>
+							</div>
+
+							<!--Type filter -->
+							<div class="filter-row">
+								<select id="filterType" class="filter-select">
+									<option value="all">All Types</option>
+									<option value="INSERT"> Marriages only</option>
+									<option value="UPDATE"> Divorces only</option>
+								</select>
+							</div>
+
+							<!--Date range filter-->
+							<div class="filter-row date-range">
+								<div class="date-field">
+									<label class="date-label">From</label>
+									<input type="date" id="filterDateFrom" class="filter-date">
+								</div>
+								<div class="date-field">
+									<label class="date-label">To</label>
+									<input type="date" id="filterDateTo" class="filter-date">
+								</div>
+							</div>
+
+							<!-- Results -->
+							<ul class="contracts-list" id="contractsList">
+								<li class="contract-item">
+									<i class="fa-solid fa-spinner fa-spin"></i> Loading...
+								</li>
+							</ul>
+						</div>
+					</li>
+				</ul>
+			</nav>
+		</aside>
+
+		<!-- Main Content -->
+		<main class="main-content">
+			<div class="tab-container">
+				<button class="tab-btn active" id="marriageTabBtn">
+					<i class="fas fa-ring"></i> Marriage Registration
+				</button>
+				<button class="tab-btn" id="divorceTabBtn">
+					<i class="fas fa-gavel"></i> Divorce Registration
+				</button>
+			</div>
+
+			<!-- Marriage Tab -->
+			<div id="marriage" class="tab-content">
+				<div class="form-header">
+					<h2>Marriage Registration</h2>
+					<p class="section-desc">Register a new marriage contract. Please fill all fields accurately and confirm all information before submission.</p>
+				</div>
+				<form id="marriageForm" autocomplete="off">
+					<fieldset class="form-section">
+						<legend class="section-title">Parties Information</legend>
+						<label class="form-field">
+							<span class="field-label">Husband ID</span>
+							<input type="number" name="husbandId" required placeholder="Enter husband's national ID">
+							<small class="helper-text">National ID number</small>
+						</label>
+						<label class="form-field">
+							<span class="field-label">Wife ID (NIN)</span>
+							<input type="number" name="wifeId" required placeholder="Enter wife's national ID">
+							<small class="helper-text">National ID number</small>
+						</label>
+					</fieldset>
+					<fieldset class="form-section">
+						<legend class="section-title">Marriage Details</legend>
+						<label class="form-field">
+							<span class="field-label">Marriage Date</span>
+							<input type="date" name="marriageDate" required>
+							<small class="helper-text">Date of marriage ceremony</small>
+						</label>
+						<label class="form-field">
+							<span class="field-label">Dowry Amount</span>
+							<input type="number" step="0.01" name="dowryAmount" required placeholder="Dowry amount">
+							<small class="helper-text">Enter amount in DZD</small>
+						</label>
+					</fieldset>
+					<fieldset class="form-section">
+						<legend class="section-title">Witnesses</legend>
+						<label class="form-field">
+							<span class="field-label">Witness 1 ID</span>
+							<input type="number" name="witness1Id" required placeholder="Witness 1 national ID">
+							<small class="helper-text">National ID number</small>
+						</label>
+						<label class="form-field">
+							<span class="field-label">Witness 2 ID</span>
+							<input type="number" name="witness2Id" required placeholder="Witness 2 national ID">
+							<small class="helper-text">National ID number</small>
+						</label>
+					</fieldset>
+					<button type="submit" class="submit-btn">
+						<i class="fas fa-check-circle"></i> Register Marriage
+					</button>
+				</form>
+				<div id="marriageResult" class="result-container"></div>
+			</div>
+
+			<!-- Divorce Tab -->
+			<div id="divorce" class="tab-content" style="display:none">
+				<div class="form-header">
+					<h2>Divorce Registration</h2>
+					<p class="section-desc">Record a divorce or annulment. Please provide the marriage contract details and court judgment information.</p>
+				</div>
+				<form id="divorceForm" autocomplete="off">
+					<fieldset class="form-section">
+						<legend class="section-title">Contract Information</legend>
+						<label class="form-field">
+							<span class="field-label">Marriage Contract ID</span>
+							<input type="number" name="marriageId" required placeholder="Marriage contract number">
+							<small class="helper-text">Contract ID number</small>
+						</label>
+					</fieldset>
+					<fieldset class="form-section">
+						<legend class="section-title">Dissolution Details</legend>
+						<label class="form-field">
+							<span class="field-label">Divorce Type</span>
+							<select name="endReason" required>
+								<option value="divorce">Divorce</option>
+								<option value="annulment">Annulment</option>
+								<option value="Khula">Khula</option>
+							</select>
+						</label>
+						<label class="form-field">
+							<span class="field-label">Judgment Date</span>
+							<input type="date" name="endDate" required>
+							<small class="helper-text">Date of court judgment</small>
+						</label>
+					</fieldset>
+					<button type="submit" class="submit-btn">
+						<i class="fas fa-gavel"></i> Register Divorce
+					</button>
+				</form>
+				<div id="divorceResult" class="result-container"></div>
+			</div>
+		</main>
+	</div>
+
+	<script type="module" src="scripts/Marriage_Notary_page.js"></script>
+</body>
+</html>
