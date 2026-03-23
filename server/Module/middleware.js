@@ -47,7 +47,7 @@ export const refresh = async (req, res) => {
       role: user.role,
       person_id: user.person_id ?? null,
     };
-    if (user.role === 'hospital') {
+    if (user.role !== 'citizen') {
       base.wilaya_code = user.wilaya_code;
       base.commune_code = user.commune_code;
     }
