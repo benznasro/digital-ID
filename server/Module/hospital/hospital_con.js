@@ -181,3 +181,49 @@ export const add_Death_Record = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const get_My_AuditLogs = async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT
+                bl.id,
+                bl.birth_record_id,
+                bl.operation,
+                bl.changed_at,
+                ch.gander,
+                ch.first_name,
+                ch.last_name,
+                -- old values
+                bl.old_birth_certificate_no,
+                bl.old_child_id,
+                bl.old_doctor_name,
+                bl.old_birth_weight_kg,
+                bl.old_birth_date_time,
+                bl.old_marriage_id,
+
+                -- new values
+                bl.new_birth_certificate_no,
+                bl.new_child_id,
+                bl.new_doctor_name,
+                bl.new_birth_weight_kg,
+                bl.new_birth_date_time,
+                bl.new_marriage_id,
+
+
+            FROM birth_records_log bl
+            LEFT JOIN marriage m  ON m.id  = bl.marriage_id
+            LEFT JOIN person   ch  ON ch.id  = bl.child_id
+            
+
+            WHERE bl.changed_by_user_id = $1
+
+            ORDER BY bl.changed_at DESC
+        `, [req.user.id]);
+
+        res.status(200).json(result.rows);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
