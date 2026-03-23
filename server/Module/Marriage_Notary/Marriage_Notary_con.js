@@ -5,6 +5,9 @@ export const new_Marriage = async (req, res) => {
     const { husbandId, wifeId, marriageDate, dowryAmount, witness1Id, witness2Id } = req.body;
 
     try {
+      await pool.query('SELECT set_config($1, $2, true)',
+            ['app.current_user_id', String(req.user.id)]
+        );
       await pool.query(
           'SELECT add_marriage($1, $2, $3, $4, $5, $6)',
           [husbandId, wifeId, marriageDate, dowryAmount, witness1Id, witness2Id]
@@ -36,6 +39,9 @@ export const new_Marriage = async (req, res) => {
 export const Divorce = async (req, res) => {
   const { marriageId, endDate, endReason } = req.body;
   try {
+      await pool.query('SELECT set_config($1, $2, true)',
+            ['app.current_user_id', String(req.user.id)]
+        );
       await pool.query(
           'SELECT add_divorce($1, $2, $3)',
           [marriageId, endDate, endReason]
@@ -51,4 +57,48 @@ export const Divorce = async (req, res) => {
 
       res.status(500).json({ error: 'Internal server error' });
   }
+};
+
+
+export const get_My_AuditLogs = async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT
+                ma.id,
+                ma.marriage_id,
+                ma.operation,
+                ma.changed_at,
+
+                -- old values
+                ma.old_valid,
+                ma.old_end_reason,
+                ma.old_end_marriage_time,
+
+                -- new values
+                ma.new_valid,
+                ma.new_end_reason,
+                ma.new_end_marriage_time,
+
+                -- husband info
+                h.first_name || ' ' || h.last_name AS husband_name,
+
+                -- wife info
+                w.first_name || ' ' || w.last_name AS wife_name
+
+            FROM marriage_audit ma
+            LEFT JOIN marriage m  ON m.id  = ma.marriage_id
+            LEFT JOIN person   h  ON h.id  = m.husband_id
+            LEFT JOIN person   w  ON w.id  = m.wife_id
+
+            WHERE ma.changed_by_user_id = $1
+
+            ORDER BY ma.changed_at DESC
+        `, [req.user.id]);
+
+        res.status(200).json(result.rows);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };
