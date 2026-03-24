@@ -89,17 +89,19 @@ function renderRecords(records) {
   }
 
   list.innerHTML = records.map(r => {
+    const op = r.operation || 'INSERT';
+    const label = op === 'INSERT' ? 'Birth' : op === 'UPDATE' ? 'Update' : 'Delete';
     const date = new Date(r.changed_at).toLocaleDateString();
     return `<li class="contract-item">
       <div class="contract-item-header">
-        <span class="contract-badge badge-birth">Birth</span>
+        <span class="contract-badge badge-birth">${label}</span>
         <span class="contract-id">#${r.birth_record_id}</span>
       </div>
       <div class="contract-names">
-        Child: ${r.new_child_id || 'Unknown'}
+        Child: ${r.child_name || 'Unknown'}
       </div>
       <div class="contract-names">
-        Dr. ${r.new_doctor_name || 'Unknown'}
+        Dr. ${r.new_doctor_name || r.old_doctor_name || 'Unknown'}
       </div>
       <div class="contract-date"><i class="fa-regular fa-calendar"></i> ${date}</div>
     </li>`;
@@ -130,7 +132,8 @@ function applyFilters() {
     filtered = filtered.filter(r =>
       String(r.birth_record_id).includes(search)          ||
       String(r.new_child_id   || '').includes(search)     ||
-      (r.new_doctor_name || '').toLowerCase().includes(search)
+      (r.child_name || '').toLowerCase().includes(search) ||
+      (r.new_doctor_name || r.old_doctor_name || '').toLowerCase().includes(search)
     );
   }
 
