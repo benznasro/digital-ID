@@ -1,0 +1,236 @@
+*{
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+:root{
+  --sidebar:#0a0a0a;
+  --ButtonFontHover:#11e29d;
+}
+h3,p{
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+  font-size: 1rem;
+}
+body {
+  background-color: black;
+  margin: 0px;
+  padding: 0px;
+}
+.box_all{
+  display:flex;
+  flex-direction: row;
+  min-height: 100vh;
+  min-width: 100%;
+  align-items:start;
+ 
+}
+.box-output{
+display: flex;
+flex-direction: column;
+height: 100vh;
+width: 100%;
+justify-content:flex-start;
+gap: 15px;
+background-color:#000000;
+}
+.box-search{
+  display:flex;
+  align-items: center;
+  padding-left: 10px;
+  justify-content: space-between;
+  height: 75px;
+  
+background-color:#0a0f0f;
+border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+gap: 20px;
+}
+.check-button {
+  display: flex;
+  background-color:#0a0f0f;
+  flex-direction: column; 
+  height: 100vh;
+  width: 12rem;
+  align-items: start;
+  border:none;
+  border-right: 1px solid rgba(255, 255, 255, 0.342);
+  
+}
+search{
+  background-color:white;
+  padding-left: 12px;
+  height: 30px;
+  flex: 1;
+}
+.intet-fice{
+  padding: 0px 15px;
+  display: flex;
+  flex: 1;
+  width: 100%;
+  gap:10px;
+  background-color: #000000;
+}
+.box-tt{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+.logo{
+  width: 4rem;
+  height: 5rem;
+  background-color: #11e29d;
+  clip-path: polygon(0% 25% ,0% 75% ,100% 75% ,100% 25% ,50% 0%);
+  filter: drop-shadow(0 0 3px #11e29d);
+}
+button {
+  display: flex;
+  font-family: Roboto;
+  font-size: 18px;
+  flex-direction: row;
+  background-color: #0a0a0a;
+  color: white;
+  width: 11.9rem;
+  height: 3rem;
+  align-items: center;
+  justify-content: start;
+  gap:10px;
+  padding: 15px 10px;
+  border: none;
+}
+button:hover {
+  background:rgba(9, 221, 1, 0.1);
+  color: var(--ButtonFontHover);
+  width: 12rem;
+  height: 3rem;
+  
+  border-left: 2px solid var(--ButtonFontHover);
+  border-radius: 5px;
+}
+button svg{
+  width: 18px;
+  height: 18px;
+  
+}
+.info-svg svg{
+  width: 28px;
+  height: 28px;
+}
+.box-big-info{
+  margin: 0px;
+  margin-left: 20px;
+  margin-top: 20px;
+  display: flex;
+  flex: 0 0 280px;
+  flex-direction: column;
+  padding : 0px;
+  background-color:#0a0f0f;
+  color: rgba(255, 255, 255, 0.74);
+  height: 75%;
+}
+.box-big-info2{
+  margin: 0px;
+  margin-left: 10px;
+  margin-top: 20px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding : 0px;
+  background-color:transparent;
+  color: rgba(255, 255, 255, 0.74);
+  height: 75%;
+}
+.stica{
+  width: 100%;
+  height: 2px;
+  top:0;
+  background: linear-gradient(to right,var(--ButtonFontHover),transparent);
+}
+.box-info{
+  display: flex;
+  flex-direction: column;
+  top: 0;
+  flex: 1;
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+  height: 100%;
+  padding-left:  0px;
+  background-color:#0a0f0f;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  transition: 0.2s ease;
+}
+.box-text{
+  font-family: Arial, Helvetica, sans-serif;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  letter-spacing: 1px;
+  height: 40px;
+}
+.stica2{
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.623);
+}
+.stica3{
+  height: 13px;
+  background-color: rgb(248, 7, 7);
+}
+.box-somle1{
+  display: flex;
+  margin: 0px;
+  padding: 0px;
+  padding-left: 5px;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  height: 100px;
+  border: 1px solid rgb(17, 226, 156);
+  border-left: none;
+}
+.box-somle2{
+  display: flex;
+  margin: 0px;
+  padding: 0px;
+  padding-left: 5px;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  height: 100px;
+  border: 1px solid rgba(17,226,157);
+  border-right: none; 
+}
+.box-info2{
+  display: grid;
+  grid-template-columns: repeat(2,250px);
+  top: 0;
+  margin: 0px;
+  padding: 0px;
+  gap: 20px;
+  width:100%;
+}
+.text{
+  font-family: Roboto;
+  letter-spacing: 2px;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  color:#11e29d;
+}
+.box-info:hover{
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.01) 30%,
+    rgba(6, 230, 162, 0.404)
+  );
+border: 2px solid rgba(255, 255, 255, 0.445);
+}
+.icon {
+  background: transparent;
+  background-color: white;
+  width: 1rem;
+  border-radius: 25px;
+}
+.phto{
+  margin-left: 10px;
+  margin-right: 10px;
+  width:1fr;
+}
+.add {
+  width: 2rem;
+}
