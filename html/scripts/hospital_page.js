@@ -4,6 +4,19 @@ import { apiFetch } from './utils.js';
 const sidebar       = document.getElementById('sidebar');
 const sidebarToggle = document.getElementById('sidebarToggle');
 
+const birthDateInput = document.getElementById('birthDateTime');
+
+function getLocalDateTimeForInput() {
+  const now = new Date();
+  const offsetMinutes = now.getTimezoneOffset();
+  const localTime = new Date(now.getTime() - offsetMinutes * 60000);
+  return localTime.toISOString().slice(0, 16);
+}
+
+if (birthDateInput && !birthDateInput.value) {
+  birthDateInput.value = getLocalDateTimeForInput();
+}
+
 sidebarToggle.addEventListener('click', () => {
   sidebar.classList.toggle('open');
 });
@@ -22,6 +35,8 @@ function showResult(elementId, res) {
   div.classList.remove('error', 'success');
   div.classList.add(res.error ? 'error' : 'success');
   div.innerText = res.message || res.error || 'Unknown response';
+  console.log(res);
+  
 }
 
 //  Sidebar Logs 
@@ -74,17 +89,19 @@ function renderRecords(records) {
   }
 
   list.innerHTML = records.map(r => {
+    const op = r.operation || 'INSERT';
+    const label = op === 'INSERT' ? 'Birth' : op === 'UPDATE' ? 'Update' : 'Delete';
     const date = new Date(r.changed_at).toLocaleDateString();
     return `<li class="contract-item">
       <div class="contract-item-header">
-        <span class="contract-badge badge-birth">Birth</span>
+        <span class="contract-badge badge-birth">${label}</span>
         <span class="contract-id">#${r.birth_record_id}</span>
       </div>
       <div class="contract-names">
-        Child: ${r.new_child_id || 'Unknown'}
+        Child: ${r.child_name || 'Unknown'}
       </div>
       <div class="contract-names">
-        Dr. ${r.new_doctor_name || 'Unknown'}
+        Dr. ${r.new_doctor_name || r.old_doctor_name || 'Unknown'}
       </div>
       <div class="contract-date"><i class="fa-regular fa-calendar"></i> ${date}</div>
     </li>`;
@@ -115,7 +132,8 @@ function applyFilters() {
     filtered = filtered.filter(r =>
       String(r.birth_record_id).includes(search)          ||
       String(r.new_child_id   || '').includes(search)     ||
-      (r.new_doctor_name || '').toLowerCase().includes(search)
+      (r.child_name || '').toLowerCase().includes(search) ||
+      (r.new_doctor_name || r.old_doctor_name || '').toLowerCase().includes(search)
     );
   }
 
@@ -140,13 +158,16 @@ document.getElementById('marriageForm').onsubmit = async function(e) {
   e.preventDefault();
   const form = e.target;
   const data = {
-    newbornName:  form.newbornName.value,
-    gender:       form.gender.value,
-    weight:       Number(form.weight.value),
-    birthDateTime: document.getElementById('birthDateTime').value,
-    motherId:     form.parent1Id.value,
-    fatherId:     form.parent2Id.value,
-    doctorName:   form.doctorName.value,
+    first_name:     form.newbornName.value,
+    gender:         form.gender.value === 'male',
+    birth_weight_kg: Number(form.weight.value),
+    height_cm:      form.heightCm.value ? Number(form.heightCm.value) : null,
+    apgar_score:    form.apgarScore.value ? Number(form.apgarScore.value) : null,
+    blood_type:     form.bloodType.value || null,
+    date_of_birth:  document.getElementById('birthDateTime').value,
+    husband_id:     form.fatherId.value,
+    wife_id:        form.motherId.value,
+    doctor_name:    form.doctorName.value,
   };
 
   const res = await apiFetch('/api/hospital/new_birth', 'POST', data);

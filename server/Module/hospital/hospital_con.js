@@ -13,11 +13,14 @@ export const create_Birth  =async (req ,res)=>{
     const {nin,Birth_Certificate_No} = await generateNin(wilaya_code,commune_code,gender, new Date(date_of_birth));
 
     await client.query('BEGIN');
+    await client.query('SELECT set_config($1, $2, true)',
+      ['app.current_user_id', String(req.user.id)]
+    );
 
     //add to person table
 
 
-    const result_person = await pool.query(
+    const result_person = await client.query(
       `INSERT INTO person (
         national_id,
         last_name,
@@ -44,20 +47,37 @@ export const create_Birth  =async (req ,res)=>{
   
     //add to birth_records table
 
-    const result= await pool.query(
+    const result= await client.query(
       `INSERT INTO birth_records 
-          (birth_certificate_no, child_id, marriage_id, hospital_name, doctor_name, birth_weight_kg, birth_datetime, wilaya_code, commune_code,apgar_score)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,10$)
+          (
+          birth_certificate_no, 
+          child_id, marriage_id, 
+          hospital_name, doctor_name, 
+          birth_weight_kg, birth_date_time,
+          wilaya_code, 
+          commune_code,apgar_score
+          )
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
        RETURNING *`,
       [BigInt(Birth_Certificate_No), result_person.rows[0].id, marriage_id, hospital_name, doctor_name, birth_weight_kg, date_of_birth, wilaya_code, commune_code,apgar_score]
     );
 
+    // Safety fallback: if trigger didn't get the app user context, stamp it here.
+    await client.query(
+      `UPDATE birth_records_log
+       SET changed_by_user_id = $1
+       WHERE birth_record_id = $2
+         AND operation = 'INSERT'
+         AND changed_by_user_id IS NULL`,
+      [req.user.id, result.rows[0].id]
+    );
+
     //add to medical_records table
 
-    const result_health =await pool.query(
+    const result_health =await client.query(
       `INSERT INTO medical_records 
       (person_id,blood_type,height_cm,weight_kg,last_checkup_date)
-      VALUES ($1,$2,$3,$4)
+      VALUES ($1,$2,$3,$4,$5)
       RETURNING * `,
       [result_person.rows[0].id,blood_type,height_cm,birth_weight_kg,date_of_birth]
     );
@@ -65,9 +85,7 @@ export const create_Birth  =async (req ,res)=>{
     await client.query('COMMIT');
 
     res.status(201).json({
-      person: result_person.rows[0],
-      birth_record: result.rows[0],
-      medical_record: result_health.rows[0]
+      message: 'new born registered successfully' 
     });
 
   } catch (error) {
@@ -77,6 +95,7 @@ export const create_Birth  =async (req ,res)=>{
       return res.status(404).json({ error: error.message });
     }
     res.status(500).json({ error: error.message });
+    
   }finally{
     client.release();
   }
@@ -190,9 +209,8 @@ export const get_My_AuditLogs = async (req, res) => {
                 bl.birth_record_id,
                 bl.operation,
                 bl.changed_at,
-                ch.gander,
-                ch.first_name,
-                ch.last_name,
+        ch.gender,
+        ch.first_name || ' ' || ch.last_name AS child_name,
                 -- old values
                 bl.old_birth_certificate_no,
                 bl.old_child_id,
@@ -207,18 +225,21 @@ export const get_My_AuditLogs = async (req, res) => {
                 bl.new_doctor_name,
                 bl.new_birth_weight_kg,
                 bl.new_birth_date_time,
-                bl.new_marriage_id,
+                bl.new_marriage_id
 
 
-            FROM birth_records_log bl
-            LEFT JOIN marriage m  ON m.id  = bl.marriage_id
-            LEFT JOIN person   ch  ON ch.id  = bl.child_id
+              FROM birth_records_log bl
+            LEFT JOIN birth_records br ON br.id = bl.birth_record_id
+            LEFT JOIN person ch ON ch.id = COALESCE(bl.new_child_id, bl.old_child_id)
             
 
-            WHERE bl.changed_by_user_id = $1
+            WHERE (
+              bl.changed_by_user_id = $1
+              OR (bl.changed_by_user_id IS NULL AND br.hospital_name = $2)
+            )
 
             ORDER BY bl.changed_at DESC
-        `, [req.user.id]);
+        `, [req.user.id, req.user.username]);
 
         res.status(200).json(result.rows);
 
