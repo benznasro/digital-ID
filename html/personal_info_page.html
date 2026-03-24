@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Personal Information | Digital ID</title>
+	<link rel="stylesheet" href="style/personal_info_page.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+	<header class="page-header">
+		<div class="header-content">
+			<button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu">
+				<i class="fas fa-bars"></i>
+			</button>
+			<div class="header-text">
+				<h1>Digital ID Portal</h1>
+				<p class="subtitle">Personal Information Center</p>
+			</div>
+		</div>
+	</header>
+
+	<div class="main-layout">
+		<aside class="sidebar" id="sidebar">
+			<div class="sidebar-header">
+				<span class="sidebar-title"><i class="fa-solid fa-id-card"></i> My Profile</span>
+			</div>
+
+			<nav class="sidebar-nav">
+				<button class="sidebar-link active" data-section="overview">
+					<i class="fa-solid fa-chart-pie"></i>
+					<span>Overview</span>
+				</button>
+				<button class="sidebar-link" data-section="identity">
+					<i class="fa-solid fa-user"></i>
+					<span>Identity</span>
+				</button>
+				<button class="sidebar-link" data-section="contact">
+					<i class="fa-solid fa-address-book"></i>
+					<span>Contact</span>
+				</button>
+				<button class="sidebar-link" data-section="family">
+					<i class="fa-solid fa-people-roof"></i>
+					<span>Family</span>
+				</button>
+				<button class="sidebar-link" data-section="birth">
+					<i class="fa-solid fa-baby"></i>
+					<span>Birth Record</span>
+				</button>
+				<button class="sidebar-link" data-section="medical">
+					<i class="fa-solid fa-heart-pulse"></i>
+					<span>Medical Record</span>
+				</button>
+			</nav>
+		</aside>
+
+		<main class="main-content">
+			<div class="status-banner" id="statusBanner">Loading your data...</div>
+
+			<section class="content-section active" id="section-overview">
+				<div class="section-header">
+					<h2>Profile Overview</h2>
+					<p>Quick summary from your Digital ID records.</p>
+				</div>
+
+				<div class="overview-grid">
+					<article class="summary-card">
+						<p class="summary-label">Full Name</p>
+						<p class="summary-value" id="overviewFullName">-</p>
+					</article>
+					<article class="summary-card">
+						<p class="summary-label">National ID</p>
+						<p class="summary-value" id="overviewNationalId">-</p>
+					</article>
+					<article class="summary-card">
+						<p class="summary-label">Marital Status</p>
+						<p class="summary-value" id="overviewMarital">-</p>
+					</article>
+					<article class="summary-card">
+						<p class="summary-label">Birth Certificate</p>
+						<p class="summary-value" id="overviewBirthCertificate">-</p>
+					</article>
+					<article class="summary-card">
+						<p class="summary-label">Blood Type</p>
+						<p class="summary-value" id="overviewBloodType">-</p>
+					</article>
+					<article class="summary-card">
+						<p class="summary-label">Last Medical Checkup</p>
+						<p class="summary-value" id="overviewCheckup">-</p>
+					</article>
+				</div>
+			</section>
+
+			<section class="content-section" id="section-identity">
+				<div class="section-header">
+					<h2>Identity Details</h2>
+					<p>Core identity data from the person table.</p>
+				</div>
+
+				<div class="info-card">
+					<div class="info-row"><span>Person ID</span><strong id="identityPersonId">-</strong></div>
+					<div class="info-row"><span>National ID</span><strong id="identityNationalId">-</strong></div>
+					<div class="info-row"><span>First Name</span><strong id="identityFirstName">-</strong></div>
+					<div class="info-row"><span>Last Name</span><strong id="identityLastName">-</strong></div>
+					<div class="info-row"><span>Date of Birth</span><strong id="identityDob">-</strong></div>
+					<div class="info-row"><span>Gender</span><strong id="identityGender">-</strong></div>
+					<div class="info-row"><span>Marital Status</span><strong id="identityMarital">-</strong></div>
+				</div>
+			</section>
+
+			<section class="content-section" id="section-contact">
+				<div class="section-header">
+					<h2>Contact Information</h2>
+					<p>Email and phone currently linked to your profile.</p>
+				</div>
+
+				<div class="info-card">
+					<div class="info-row"><span>Email</span><strong id="contactEmail">-</strong></div>
+					<div class="info-row"><span>Phone Number</span><strong id="contactPhone">-</strong></div>
+				</div>
+			</section>
+
+			<section class="content-section" id="section-family">
+				<div class="section-header">
+					<h2>Family Lineage</h2>
+					<p>Family links currently available in the person table.</p>
+				</div>
+
+				<div class="info-card">
+					<div class="info-row"><span>Father ID</span><strong id="familyDad">-</strong></div>
+					<div class="info-row"><span>Mother ID</span><strong id="familyMom">-</strong></div>
+				</div>
+			</section>
+
+			<section class="content-section" id="section-birth">
+				<div class="section-header">
+					<h2>Birth Record</h2>
+					<p>Birth registration details linked to your account.</p>
+				</div>
+
+				<div class="info-card">
+					<div class="info-row"><span>Record ID</span><strong id="birthRecordId">-</strong></div>
+					<div class="info-row"><span>Birth Certificate Number</span><strong id="birthCertificate">-</strong></div>
+					<div class="info-row"><span>Birth Date and Time</span><strong id="birthDateTime">-</strong></div>
+					<div class="info-row"><span>Hospital Name</span><strong id="birthHospital">-</strong></div>
+					<div class="info-row"><span>Doctor Name</span><strong id="birthDoctor">-</strong></div>
+					<div class="info-row"><span>Birth Weight (kg)</span><strong id="birthWeight">-</strong></div>
+					<div class="info-row"><span>Apgar Score</span><strong id="birthApgar">-</strong></div>
+					<div class="info-row"><span>Marriage Record ID</span><strong id="birthMarriageId">-</strong></div>
+				</div>
+			</section>
+
+			<section class="content-section" id="section-medical">
+				<div class="section-header">
+					<h2>Medical Record</h2>
+					<p>Health details available in your medical profile.</p>
+				</div>
+
+				<div class="info-card">
+					<div class="info-row"><span>Record ID</span><strong id="medicalId">-</strong></div>
+					<div class="info-row"><span>Blood Type</span><strong id="medicalBloodType">-</strong></div>
+					<div class="info-row"><span>Height (cm)</span><strong id="medicalHeight">-</strong></div>
+					<div class="info-row"><span>Weight (kg)</span><strong id="medicalWeight">-</strong></div>
+					<div class="info-row"><span>Smoker</span><strong id="medicalSmoker">-</strong></div>
+					<div class="info-row"><span>Chronic Conditions</span><strong id="medicalConditions">-</strong></div>
+					<div class="info-row"><span>Last Checkup Date</span><strong id="medicalCheckup">-</strong></div>
+				</div>
+			</section>
+		</main>
+	</div>
+
+	<script type="module" src="scripts/personal_info_page.js"></script>
+</body>
+</html>
