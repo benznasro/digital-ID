@@ -1,6 +1,6 @@
 import { apiFetch } from './utils.js';
 
-//  Sidebar Toggle (mobile) 
+// Sidebar Toggle (mobile) 
 const sidebar       = document.getElementById('sidebar');
 const sidebarToggle = document.getElementById('sidebarToggle');
 
@@ -15,7 +15,6 @@ document.addEventListener('click', (e) => {
     }
   }
 });
-
 
 //  Result Helper 
 function showResult(elementId, res) {
@@ -37,12 +36,10 @@ async function loadSidebarLogs() {
     }
 
     logsDiv.innerHTML = logs.slice(0, 5).map(log => {
-      const icon  = log.operation === 'INSERT' ? 'fa-ring' : 'fa-gavel';
-      const label = log.operation === 'INSERT' ? 'Marriage' : 'Divorce';
-      const time  = new Date(log.changed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const time = new Date(log.changed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       return `<div class="log-entry">
-        <i class="fa-solid ${icon}"></i>
-        ${label} #${log.marriage_id} at ${time}
+        <i class="fa-solid fa-baby"></i>
+        Birth #${log.birth_record_id} at ${time}
       </div>`;
     }).join('');
 
@@ -51,44 +48,43 @@ async function loadSidebarLogs() {
   }
 }
 
-//  Sidebar Contracts 
-let allContracts = [];
+//  Sidebar Birth Records 
+let allRecords = [];
 
-async function loadSidebarContracts() {
+async function loadSidebarRecords() {
   const list = document.getElementById('contractsList');
   list.innerHTML = '<li class="contract-item"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</li>';
   try {
-    const logs = await apiFetch('/api/Marriage_Notary/my_logs', 'GET', null);
-    allContracts = logs || [];
+    const logs = await apiFetch('/api/hospital/my_logs', 'GET', null);
+    allRecords = logs || [];
     applyFilters();
   } catch (err) {
-    list.innerHTML = '<li class="contract-item" style="color:#c62828">Failed to load contracts.</li>';
+    list.innerHTML = '<li class="contract-item" style="color:#c62828">Failed to load records.</li>';
   }
 }
 
-function renderContracts(contracts) {
+function renderRecords(records) {
   const list = document.getElementById('contractsList');
 
-  // update count 
-  document.getElementById('contractCount').textContent = contracts.length;
+  document.getElementById('contractCount').textContent = records.length;
 
-  if (!contracts.length) {
-    list.innerHTML = '<li class="contract-item no-results"><i class="fa-solid fa-inbox"></i> No contracts found.</li>';
+  if (!records.length) {
+    list.innerHTML = '<li class="contract-item no-results"><i class="fa-solid fa-inbox"></i> No records found.</li>';
     return;
   }
 
-  list.innerHTML = contracts.map(c => {
-    const isMarriage = c.operation === 'INSERT';
-    const label      = isMarriage ? 'Marriage' : 'Divorce';
-    const badgeClass = isMarriage ? 'badge-marriage' : 'badge-divorce';
-    const date       = new Date(c.changed_at).toLocaleDateString();
+  list.innerHTML = records.map(r => {
+    const date = new Date(r.changed_at).toLocaleDateString();
     return `<li class="contract-item">
       <div class="contract-item-header">
-        <span class="contract-badge ${badgeClass}"> ${label}</span>
-        <span class="contract-id">#${c.marriage_id}</span>
+        <span class="contract-badge badge-birth">Birth</span>
+        <span class="contract-id">#${r.birth_record_id}</span>
       </div>
       <div class="contract-names">
-        ${c.husband_name || 'Unknown'} &amp; ${c.wife_name || 'Unknown'}
+        Child: ${r.new_child_id || 'Unknown'}
+      </div>
+      <div class="contract-names">
+        Dr. ${r.new_doctor_name || 'Unknown'}
       </div>
       <div class="contract-date"><i class="fa-regular fa-calendar"></i> ${date}</div>
     </li>`;
@@ -97,94 +93,68 @@ function renderContracts(contracts) {
 
 //  Apply All Filters 
 function applyFilters() {
-  const search     = document.getElementById('contractSearch').value.trim().toLowerCase();
-  const typeFilter = document.getElementById('filterType').value;    
-  const dateFrom   = document.getElementById('filterDateFrom').value; 
-  const dateTo     = document.getElementById('filterDateTo').value;   
+  const search   = document.getElementById('contractSearch').value.trim().toLowerCase();
+  const dateFrom = document.getElementById('filterDateFrom').value;
+  const dateTo   = document.getElementById('filterDateTo').value;
 
-  let filtered = allContracts;
+  let filtered = allRecords;
 
-  // 1 — filter by type
-  if (typeFilter !== 'all') {
-    filtered = filtered.filter(c => c.operation === typeFilter);
-  }
-
-  // 2 — filter by date range
+  // filter by date range
   if (dateFrom) {
     const from = new Date(dateFrom);
-    filtered = filtered.filter(c => new Date(c.changed_at) >= from);
+    filtered = filtered.filter(r => new Date(r.changed_at) >= from);
   }
   if (dateTo) {
     const to = new Date(dateTo);
-    to.setHours(23, 59, 59); // include the full end day
-    filtered = filtered.filter(c => new Date(c.changed_at) <= to);
+    to.setHours(23, 59, 59);
+    filtered = filtered.filter(r => new Date(r.changed_at) <= to);
   }
 
-  // 3 — filter by search text
+  // filter by search text
   if (search) {
-    filtered = filtered.filter(c =>
-      String(c.marriage_id).includes(search) ||
-      (c.husband_name || '').toLowerCase().includes(search) ||
-      (c.wife_name    || '').toLowerCase().includes(search)
+    filtered = filtered.filter(r =>
+      String(r.birth_record_id).includes(search)          ||
+      String(r.new_child_id   || '').includes(search)     ||
+      (r.new_doctor_name || '').toLowerCase().includes(search)
     );
   }
 
-  renderContracts(filtered);
+  renderRecords(filtered);
 }
 
-// wire up all filter inputs to applyFilters
+// wire up filter inputs
 document.getElementById('contractSearch').addEventListener('input',  applyFilters);
-document.getElementById('filterType').addEventListener('change',     applyFilters);
 document.getElementById('filterDateFrom').addEventListener('change', applyFilters);
 document.getElementById('filterDateTo').addEventListener('change',   applyFilters);
 
-// clear/reset all filters
+// reset button
 document.getElementById('contractClear').addEventListener('click', () => {
   document.getElementById('contractSearch').value  = '';
-  document.getElementById('filterType').value      = 'all';
   document.getElementById('filterDateFrom').value  = '';
   document.getElementById('filterDateTo').value    = '';
-  loadSidebarContracts(); // re-fetch from API
+  loadSidebarRecords();
 });
 
-//  Marriage Form 
+//  Newborn Form 
 document.getElementById('marriageForm').onsubmit = async function(e) {
   e.preventDefault();
   const form = e.target;
   const data = {
-    husbandId:    Number(form.husbandId.value),
-    wifeId:       Number(form.wifeId.value),
-    marriageDate: form.marriageDate.value,
-    dowryAmount:  Number(form.dowryAmount.value),
-    witness1Id:   Number(form.witness1Id.value),
-    witness2Id:   Number(form.witness2Id.value)
+    newbornName:  form.newbornName.value,
+    gender:       form.gender.value,
+    weight:       Number(form.weight.value),
+    birthDateTime: document.getElementById('birthDateTime').value,
+    motherId:     form.parent1Id.value,
+    fatherId:     form.parent2Id.value,
+    doctorName:   form.doctorName.value,
   };
 
-  const res = await apiFetch('/api/Marriage_Notary/new_marriage', 'POST', data);
+  const res = await apiFetch('/api/hospital/new_birth', 'POST', data);
   showResult('marriageResult', res);
 
   if (!res.error) {
     loadSidebarLogs();
-    loadSidebarContracts();
-  }
-};
-
-//  Divorce Form 
-document.getElementById('divorceForm').onsubmit = async function(e) {
-  e.preventDefault();
-  const form = e.target;
-  const data = {
-    marriageId: Number(form.marriageId.value),
-    endReason:  form.endReason.value,
-    endDate:    form.endDate.value
-  };
-
-  const res = await apiFetch('/api/Marriage_Notary/divorce', 'PATCH', data);
-  showResult('divorceResult', res);
-
-  if (!res.error) {
-    loadSidebarLogs();
-    loadSidebarContracts();
+    loadSidebarRecords();
   }
 };
 
@@ -198,4 +168,4 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
 
 //  Init 
 loadSidebarLogs();
-loadSidebarContracts();
+loadSidebarRecords();

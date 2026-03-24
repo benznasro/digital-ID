@@ -16,7 +16,7 @@ body {
 	to   { opacity: 1; transform: translateY(0); }
 }
 
-/*  HEADER ─ */
+/*  HEADER */
 .page-header {
 	text-align: center;
 	padding: 28px 16px;
@@ -70,13 +70,13 @@ body {
 	background: rgba(255,255,255,0.3);
 }
 
-/*  MAIN LAYOUT  */
+/*  MAIN LAYOUT */
 .main-layout {
 	display: flex;
 	min-height: calc(100vh - 100px);
 }
 
-/*  SIDEBAR  */
+/*  SIDEBAR */
 .sidebar {
 	position: sticky;
 	top: 0;
@@ -175,7 +175,7 @@ body {
 	flex-shrink: 0;
 }
 
-/*  CONTRACTS SEARCH  */
+/*  CONTRACTS SEARCH */
 .contracts-search {
 	display: flex;
 	align-items: center;
@@ -212,25 +212,9 @@ body {
 	border-color: #0077b6;
 }
 
-/*  FILTER ROWS  */
+/*  FILTER ROWS */
 .filter-row {
 	margin-bottom: 8px;
-}
-.filter-select {
-	width: 100%;
-	padding: 7px 10px;
-	border: 1.5px solid #d0d7de;
-	border-radius: 6px;
-	font-size: 0.88em;
-	background: #fff;
-	font-family: inherit;
-	color: #333;
-	cursor: pointer;
-	transition: border 0.2s;
-}
-.filter-select:focus {
-	border-color: #0077b6;
-	outline: none;
 }
 
 /* date range row */
@@ -267,7 +251,7 @@ body {
 	outline: none;
 }
 
-/*  CONTRACTS LIST  */
+/*  CONTRACTS LIST */
 .contracts-list {
 	list-style: none;
 	margin: 8px 0 0 0;
@@ -276,7 +260,7 @@ body {
 	overflow-y: auto;
 }
 
-/*contract card */
+/* contract card */
 .contract-item {
 	background: #f4f8fb;
 	border-radius: 8px;
@@ -309,14 +293,13 @@ body {
 	padding: 2px 8px;
 	border-radius: 10px;
 }
-.badge-marriage {
-	background: #e8f5e9;
-	color: #2e7d32;
+
+/* ✅ Birth badge — blue theme to match hospital context */
+.badge-birth {
+	background: #e3f1fa;
+	color: #0077b6;
 }
-.badge-divorce {
-	background: #fff3e0;
-	color: #e65100;
-}
+
 .contract-id {
 	font-size: 0.82em;
 	font-weight: 700;
@@ -336,7 +319,7 @@ body {
 	margin-right: 3px;
 }
 
-/*  MAIN CONTENT ─ */
+/*  MAIN CONTENT */
 .main-content {
 	flex: 1;
 	padding: 32px 0 0 0;
@@ -346,7 +329,7 @@ body {
 	min-width: 0;
 }
 
-/*  TABS  */
+/*  TABS */
 .tab-container {
 	display: flex;
 	justify-content: center;
@@ -381,7 +364,7 @@ body {
 	transform: translateY(-2px);
 }
 
-/*  TAB CONTENT  */
+/*  TAB CONTENT */
 .tab-content {
 	background: #fff;
 	max-width: 540px;
@@ -392,7 +375,7 @@ body {
 	animation: fadeIn 0.4s ease;
 }
 
-/*  FORM HEADER  */
+/*  FORM HEADER */
 .form-header {
 	margin-bottom: 24px;
 	padding-bottom: 14px;
@@ -412,7 +395,7 @@ h2 {
 	margin: 0;
 }
 
-/*  FORM SECTIONS  */
+/*  FORM SECTIONS */
 .form-section {
 	border: none;
 	padding: 0;
@@ -433,7 +416,7 @@ h2 {
 	border-bottom-color: #0077b6;
 }
 
-/*  FORM FIELDS  */
+/*  FORM FIELDS */
 .form-field {
 	display: block;
 	margin-bottom: 18px;
@@ -455,6 +438,7 @@ form input[type="number"] {
 }
 form input[type="number"],
 form input[type="date"],
+form input[type="datetime-local"],
 form input[type="text"],
 form select {
 	width: 100%;
@@ -467,9 +451,9 @@ form select {
 	transition: all 0.25s ease;
 	font-family: inherit;
 }
-
 form input[type="number"]:hover,
 form input[type="date"]:hover,
+form input[type="datetime-local"]:hover,
 form input[type="text"]:hover,
 form select:hover {
 	border-color: #0077b6;
@@ -493,7 +477,7 @@ form input::placeholder {
 	padding-left: 2px;
 }
 
-/*  SUBMIT BUTTON  */
+/*  SUBMIT BUTTON */
 .submit-btn {
 	width: 100%;
 	background: #0077b6;
@@ -523,7 +507,7 @@ form input::placeholder {
 	box-shadow: none;
 }
 
-/*  RESULT CONTAINER  */
+/*  RESULT CONTAINER */
 .result-container {
 	margin-top: 20px;
 	padding: 14px 16px;
@@ -548,11 +532,10 @@ form input::placeholder {
 	color: #c62828;
 }
 
-/*  RESPONSIVE  */
+/*  RESPONSIVE */
 @media (max-width: 1100px) {
 	.sidebar { min-width: 200px; width: 26vw; }
 }
-
 @media (max-width: 900px) {
 	.main-layout { flex-direction: column; }
 	.sidebar {
@@ -571,7 +554,6 @@ form input::placeholder {
 	.main-content { padding: 20px 0 0 0; }
 	.tab-content { max-width: 95vw; padding: 28px 20px; }
 }
-
 @media (max-width: 600px) {
 	.page-header { padding: 20px 16px; }
 	.header-text h1 { font-size: 1.5em; }
@@ -582,7 +564,6 @@ form input::placeholder {
 	.submit-btn { font-size: 0.95em; padding: 12px 0; }
 	.date-range { flex-direction: column; }
 }
-
 @media (max-width: 400px) {
 	.tab-btn { padding: 8px 10px; font-size: 0.85em; }
 	.header-text h1 { font-size: 1.2em; }

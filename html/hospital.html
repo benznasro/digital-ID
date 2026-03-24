@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Marriage & Divorce Registration</title>
+	<title>Newborn Registration</title>
 	<link rel="stylesheet" href="style/hospital.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
@@ -16,7 +16,7 @@
 			</button>
 			<div class="header-text">
 				<h1>Digital ID Portal</h1>
-				<p class="subtitle">Marriage & Divorce Registration System</p>
+				<p class="subtitle">Hospital Birth Registration System</p>
 			</div>
 		</div>
 	</header>
@@ -40,7 +40,7 @@
 						</div>
 					</li>
 
-					<!-- My Contracts -->
+					<!-- My Birth Records -->
 					<li class="sidebar-item">
 						<a href="#" class="sidebar-link" id="contractsLink">
 							<i class="fa-regular fa-file-lines"></i>
@@ -52,22 +52,15 @@
 
 							<!-- Search -->
 							<div class="contracts-search">
-								<input type="text" id="contractSearch" placeholder="Search name or ID...">
+								<input type="text" id="contractSearch" placeholder="Search by ID or doctor...">
 								<button id="contractClear" title="Reset all filters">
 									<i class="fa-solid fa-arrows-rotate"></i>
 								</button>
 							</div>
 
-							<!--Type filter -->
-							<div class="filter-row">
-								<select id="filterType" class="filter-select">
-									<option value="all">All Types</option>
-									<option value="INSERT"> Marriages only</option>
-									<option value="UPDATE"> Divorces only</option>
-								</select>
-							</div>
+							<!-- ✅ No type filter needed — all records are births -->
 
-							<!--Date range filter-->
+							<!-- Date range filter -->
 							<div class="filter-row date-range">
 								<div class="date-field">
 									<label class="date-label">From</label>
@@ -95,11 +88,11 @@
 		<main class="main-content">
 			<div class="tab-container">
 				<button class="tab-btn active">
-          <i class="fa-solid fa-baby"></i> Newborn Registration
-        </button>
+					<i class="fa-solid fa-baby"></i> Newborn Registration
+				</button>
 			</div>
 
-			<!-- Marriage Tab -->
+			<!-- Newborn Registration Tab -->
 			<div id="marriage" class="tab-content">
 				<div class="form-header">
 					<h2>Newborn Registration</h2>
@@ -111,58 +104,56 @@
 						<legend class="section-title">Newborn Information</legend>
 						<label class="form-field">
 							<span class="field-label">Newborn Name</span>
-							<input type="text" name="newbornName" required placeholder="Enter new born's name">
-							<small class="helper-text">Full name of the new born</small>
+							<input type="text" name="newbornName" required placeholder="Enter newborn's first name">
+							<small class="helper-text">First name of the newborn</small>
 						</label>
 
 						<label class="form-field">
-              <span class="field-label">Gender</span>
-              <select id="gender" name="gender" required>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
-            </label>
+							<span class="field-label">Gender</span>
+							<select id="gender" name="gender" required>
+								<option value="male">Male</option>
+								<option value="female">Female</option>
+							</select>
+						</label>
 
 						<label class="form-field">
 							<span class="field-label">Weight (kg)</span>
-							<input type="number" name="weight" required placeholder="Enter new born's weight">
+							<input type="number" name="weight" step="0.01" required placeholder="e.g. 3.20">
 							<small class="helper-text">Birth weight in kilograms</small>
 						</label>
 
 						<label class="form-field">
-              <span class="field-label">Birth Date & Time</span>
-              <input type="datetime-local" id="birthDateTime" required>
-              <small class="helper-text">Exact date and time of birth</small>
-            </label>
+							<span class="field-label">Birth Date & Time</span>
+							<input type="datetime-local" id="birthDateTime" name="birthDateTime" required>
+							<small class="helper-text">Exact date and time of birth</small>
+						</label>
 					</fieldset>
 
 					<fieldset class="form-section">
 						<legend class="section-title">Parent & Doctor Information</legend>
 						<label class="form-field">
 							<span class="field-label">Mother ID</span>
-							<input type="text" name="parent1Id" required placeholder="Enter mother's national ID">
+							<input type="number" name="parent1Id" required placeholder="Mother's national ID">
 							<small class="helper-text">National ID number of the mother</small>
 						</label>
 						<label class="form-field">
 							<span class="field-label">Father ID</span>
-							<input type="text" name="parent2Id" required placeholder="Enter father's national ID">
+							<input type="number" name="parent2Id" required placeholder="Father's national ID">
 							<small class="helper-text">National ID number of the father</small>
 						</label>
 						<label class="form-field">
 							<span class="field-label">Doctor Name</span>
-							<input type="text" name="doctorName" required placeholder="Enter doctor's name">
+							<input type="text" name="doctorName" required placeholder="Attending doctor's full name">
 							<small class="helper-text">Full name of the attending doctor</small>
 						</label>
 					</fieldset>
 
-					
 					<button type="submit" class="submit-btn">
 						<i class="fas fa-check-circle"></i> Register Newborn
 					</button>
 				</form>
 				<div id="marriageResult" class="result-container"></div>
 			</div>
-			
 		</main>
 	</div>
 
