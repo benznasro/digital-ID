@@ -4,6 +4,19 @@ import { apiFetch } from './utils.js';
 const sidebar       = document.getElementById('sidebar');
 const sidebarToggle = document.getElementById('sidebarToggle');
 
+const birthDateInput = document.getElementById('birthDateTime');
+
+function getLocalDateTimeForInput() {
+  const now = new Date();
+  const offsetMinutes = now.getTimezoneOffset();
+  const localTime = new Date(now.getTime() - offsetMinutes * 60000);
+  return localTime.toISOString().slice(0, 16);
+}
+
+if (birthDateInput && !birthDateInput.value) {
+  birthDateInput.value = getLocalDateTimeForInput();
+}
+
 sidebarToggle.addEventListener('click', () => {
   sidebar.classList.toggle('open');
 });
@@ -22,6 +35,8 @@ function showResult(elementId, res) {
   div.classList.remove('error', 'success');
   div.classList.add(res.error ? 'error' : 'success');
   div.innerText = res.message || res.error || 'Unknown response';
+  console.log(res);
+  
 }
 
 //  Sidebar Logs 
@@ -140,13 +155,16 @@ document.getElementById('marriageForm').onsubmit = async function(e) {
   e.preventDefault();
   const form = e.target;
   const data = {
-    newbornName:  form.newbornName.value,
-    gender:       form.gender.value,
-    weight:       Number(form.weight.value),
-    birthDateTime: document.getElementById('birthDateTime').value,
-    motherId:     form.parent1Id.value,
-    fatherId:     form.parent2Id.value,
-    doctorName:   form.doctorName.value,
+    first_name:     form.newbornName.value,
+    gender:         form.gender.value === 'male',
+    birth_weight_kg: Number(form.weight.value),
+    height_cm:      form.heightCm.value ? Number(form.heightCm.value) : null,
+    apgar_score:    form.apgarScore.value ? Number(form.apgarScore.value) : null,
+    blood_type:     form.bloodType.value || null,
+    date_of_birth:  document.getElementById('birthDateTime').value,
+    husband_id:     form.fatherId.value,
+    wife_id:        form.motherId.value,
+    doctor_name:    form.doctorName.value,
   };
 
   const res = await apiFetch('/api/hospital/new_birth', 'POST', data);

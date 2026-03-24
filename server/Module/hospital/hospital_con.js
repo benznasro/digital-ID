@@ -46,8 +46,15 @@ export const create_Birth  =async (req ,res)=>{
 
     const result= await pool.query(
       `INSERT INTO birth_records 
-          (birth_certificate_no, child_id, marriage_id, hospital_name, doctor_name, birth_weight_kg, birth_datetime, wilaya_code, commune_code,apgar_score)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,10$)
+          (
+          birth_certificate_no, 
+          child_id, marriage_id, 
+          hospital_name, doctor_name, 
+          birth_weight_kg, birth_date_time,
+          wilaya_code, 
+          commune_code,apgar_score
+          )
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
        RETURNING *`,
       [BigInt(Birth_Certificate_No), result_person.rows[0].id, marriage_id, hospital_name, doctor_name, birth_weight_kg, date_of_birth, wilaya_code, commune_code,apgar_score]
     );
@@ -57,7 +64,7 @@ export const create_Birth  =async (req ,res)=>{
     const result_health =await pool.query(
       `INSERT INTO medical_records 
       (person_id,blood_type,height_cm,weight_kg,last_checkup_date)
-      VALUES ($1,$2,$3,$4)
+      VALUES ($1,$2,$3,$4,$5)
       RETURNING * `,
       [result_person.rows[0].id,blood_type,height_cm,birth_weight_kg,date_of_birth]
     );
@@ -65,9 +72,7 @@ export const create_Birth  =async (req ,res)=>{
     await client.query('COMMIT');
 
     res.status(201).json({
-      person: result_person.rows[0],
-      birth_record: result.rows[0],
-      medical_record: result_health.rows[0]
+      message: 'new born registered successfully' 
     });
 
   } catch (error) {
@@ -77,6 +82,7 @@ export const create_Birth  =async (req ,res)=>{
       return res.status(404).json({ error: error.message });
     }
     res.status(500).json({ error: error.message });
+    
   }finally{
     client.release();
   }
@@ -190,7 +196,7 @@ export const get_My_AuditLogs = async (req, res) => {
                 bl.birth_record_id,
                 bl.operation,
                 bl.changed_at,
-                ch.gander,
+                ch.gender,
                 ch.first_name,
                 ch.last_name,
                 -- old values
@@ -207,12 +213,12 @@ export const get_My_AuditLogs = async (req, res) => {
                 bl.new_doctor_name,
                 bl.new_birth_weight_kg,
                 bl.new_birth_date_time,
-                bl.new_marriage_id,
+                bl.new_marriage_id
 
 
-            FROM birth_records_log bl
-            LEFT JOIN marriage m  ON m.id  = bl.marriage_id
-            LEFT JOIN person   ch  ON ch.id  = bl.child_id
+              FROM birth_records_log bl
+            LEFT JOIN marriage m  ON m.id  = bl.old_marriage_id
+            LEFT JOIN person   ch  ON ch.id  = bl.old_child_id
             
 
             WHERE bl.changed_by_user_id = $1

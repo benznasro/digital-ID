@@ -100,53 +100,80 @@
 				</div>
 				<form id="marriageForm" autocomplete="off">
 
-					<fieldset class="form-section">
-						<legend class="section-title">Newborn Information</legend>
-						<label class="form-field">
-							<span class="field-label">Newborn Name</span>
-							<input type="text" name="newbornName" required placeholder="Enter newborn's first name">
-							<small class="helper-text">First name of the newborn</small>
-						</label>
+				<fieldset class="form-section">
+					<legend class="section-title">Newborn Information</legend>
+					<label class="form-field">
+						<span class="field-label">Newborn Name</span>
+						<input type="text" name="newbornName" required placeholder="Enter newborn's first name">
+						<small class="helper-text">First name of the newborn</small>
+					</label>
 
-						<label class="form-field">
-							<span class="field-label">Gender</span>
-							<select id="gender" name="gender" required>
-								<option value="male">Male</option>
-								<option value="female">Female</option>
-							</select>
-						</label>
+					<label class="form-field">
+						<span class="field-label">Gender</span>
+						<select id="gender" name="gender" required>
+							<option value="male">Male</option>
+							<option value="female">Female</option>
+						</select>
+					</label>
 
-						<label class="form-field">
-							<span class="field-label">Weight (kg)</span>
-							<input type="number" name="weight" step="0.01" required placeholder="e.g. 3.20">
-							<small class="helper-text">Birth weight in kilograms</small>
-						</label>
+					<label class="form-field">
+						<span class="field-label">Weight (kg)</span>
+						<input type="number" name="weight" step="0.01" required placeholder="e.g. 3.20">
+						<small class="helper-text">Birth weight in kilograms</small>
+					</label>
 
-						<label class="form-field">
-							<span class="field-label">Birth Date & Time</span>
-							<input type="datetime-local" id="birthDateTime" name="birthDateTime" required>
-							<small class="helper-text">Exact date and time of birth</small>
-						</label>
-					</fieldset>
+					<label class="form-field">
+						<span class="field-label">Height (cm)</span>
+						<input type="number" name="heightCm" step="0.1" placeholder="e.g. 50.5">
+						<small class="helper-text">Optional length at birth</small>
+					</label>
 
-					<fieldset class="form-section">
-						<legend class="section-title">Parent & Doctor Information</legend>
-						<label class="form-field">
-							<span class="field-label">Mother ID</span>
-							<input type="number" name="parent1Id" required placeholder="Mother's national ID">
-							<small class="helper-text">National ID number of the mother</small>
-						</label>
-						<label class="form-field">
-							<span class="field-label">Father ID</span>
-							<input type="number" name="parent2Id" required placeholder="Father's national ID">
-							<small class="helper-text">National ID number of the father</small>
-						</label>
-						<label class="form-field">
-							<span class="field-label">Doctor Name</span>
-							<input type="text" name="doctorName" required placeholder="Attending doctor's full name">
-							<small class="helper-text">Full name of the attending doctor</small>
-						</label>
-					</fieldset>
+					<label class="form-field">
+						<span class="field-label">Apgar Score</span>
+						<input type="number" name="apgarScore" min="0" max="10" placeholder="0-10">
+					</label>
+
+					<label class="form-field">
+						<span class="field-label">Blood Type</span>
+						<select name="bloodType">
+							<option value="">Select blood type</option>
+							<option value="A+">A+</option>
+							<option value="A-">A-</option>
+							<option value="B+">B+</option>
+							<option value="B-">B-</option>
+							<option value="AB+">AB+</option>
+							<option value="AB-">AB-</option>
+							<option value="O+">O+</option>
+							<option value="O-">O-</option>
+						</select>
+						<small class="helper-text">Optional: ABO + Rh value</small>
+					</label>
+
+					<label class="form-field">
+						<span class="field-label">Birth Date & Time</span>
+						<input type="datetime-local" id="birthDateTime" name="birthDateTime" required>
+						<small class="helper-text">Exact date and time of birth</small>
+					</label>
+				</fieldset>
+
+				<fieldset class="form-section">
+					<legend class="section-title">Parent & Doctor Information</legend>
+					<label class="form-field">
+						<span class="field-label">Mother ID</span>
+						<input type="number" name="motherId" required placeholder="Mother's national ID">
+						<small class="helper-text">National ID number of the mother</small>
+					</label>
+					<label class="form-field">
+						<span class="field-label">Father ID</span>
+						<input type="number" name="fatherId" required placeholder="Father's national ID">
+						<small class="helper-text">National ID number of the father</small>
+					</label>
+					<label class="form-field">
+						<span class="field-label">Doctor Name</span>
+						<input type="text" name="doctorName" required placeholder="Attending doctor's full name">
+						<small class="helper-text">Full name of the attending doctor</small>
+					</label>
+				</fieldset>
 
 					<button type="submit" class="submit-btn">
 						<i class="fas fa-check-circle"></i> Register Newborn
