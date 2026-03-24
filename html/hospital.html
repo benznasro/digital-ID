@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Newborn Registration</title>
+	<link rel="stylesheet" href="style/hospital.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+	<header class="page-header">
+		<div class="header-content">
+			<button class="sidebar-toggle" id="sidebarToggle" aria-label="Open Menu">
+				<i class="fas fa-bars"></i>
+			</button>
+			<div class="header-text">
+				<h1>Digital ID Portal</h1>
+				<p class="subtitle">Hospital Birth Registration System</p>
+			</div>
+		</div>
+	</header>
+
+	<div class="main-layout">
+		<!-- Sidebar -->
+		<aside class="sidebar" id="sidebar">
+			<div class="sidebar-header">
+				<span class="sidebar-title"><i class="fa-solid fa-hospital"></i> Hospital Panel</span>
+			</div>
+			<nav class="sidebar-nav">
+				<ul>
+					<!-- Recent Logs -->
+					<li class="sidebar-item">
+						<a href="#" class="sidebar-link" id="logsLink">
+							<i class="fa-regular fa-clock"></i>
+							<span>Recent Logs</span>
+						</a>
+						<div class="sidebar-logs" id="sidebarLogs">
+							<div class="log-entry"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
+						</div>
+					</li>
+
+					<!-- My Birth Records -->
+					<li class="sidebar-item">
+						<a href="#" class="sidebar-link" id="contractsLink">
+							<i class="fa-regular fa-file-lines"></i>
+							<span>My Birth Records</span>
+							<span class="count-badge" id="contractCount">0</span>
+						</a>
+
+						<div class="sidebar-contracts" id="sidebarContracts">
+
+							<!-- Search -->
+							<div class="contracts-search">
+								<input type="text" id="contractSearch" placeholder="Search by ID or doctor...">
+								<button id="contractClear" title="Reset all filters">
+									<i class="fa-solid fa-arrows-rotate"></i>
+								</button>
+							</div>
+
+							<!-- ✅ No type filter needed — all records are births -->
+
+							<!-- Date range filter -->
+							<div class="filter-row date-range">
+								<div class="date-field">
+									<label class="date-label">From</label>
+									<input type="date" id="filterDateFrom" class="filter-date">
+								</div>
+								<div class="date-field">
+									<label class="date-label">To</label>
+									<input type="date" id="filterDateTo" class="filter-date">
+								</div>
+							</div>
+
+							<!-- Results -->
+							<ul class="contracts-list" id="contractsList">
+								<li class="contract-item">
+									<i class="fa-solid fa-spinner fa-spin"></i> Loading...
+								</li>
+							</ul>
+						</div>
+					</li>
+				</ul>
+			</nav>
+		</aside>
+
+		<!-- Main Content -->
+		<main class="main-content">
+			<div class="tab-container">
+				<button class="tab-btn active">
+					<i class="fa-solid fa-baby"></i> Newborn Registration
+				</button>
+			</div>
+
+			<!-- Newborn Registration Tab -->
+			<div id="marriage" class="tab-content">
+				<div class="form-header">
+					<h2>Newborn Registration</h2>
+					<p class="section-desc">Register a new birth record. Please fill all fields accurately and confirm all information before submission.</p>
+				</div>
+				<form id="marriageForm" autocomplete="off">
+
+					<fieldset class="form-section">
+						<legend class="section-title">Newborn Information</legend>
+						<label class="form-field">
+							<span class="field-label">Newborn Name</span>
+							<input type="text" name="newbornName" required placeholder="Enter newborn's first name">
+							<small class="helper-text">First name of the newborn</small>
+						</label>
+
+						<label class="form-field">
+							<span class="field-label">Gender</span>
+							<select id="gender" name="gender" required>
+								<option value="male">Male</option>
+								<option value="female">Female</option>
+							</select>
+						</label>
+
+						<label class="form-field">
+							<span class="field-label">Weight (kg)</span>
+							<input type="number" name="weight" step="0.01" required placeholder="e.g. 3.20">
+							<small class="helper-text">Birth weight in kilograms</small>
+						</label>
+
+						<label class="form-field">
+							<span class="field-label">Birth Date & Time</span>
+							<input type="datetime-local" id="birthDateTime" name="birthDateTime" required>
+							<small class="helper-text">Exact date and time of birth</small>
+						</label>
+					</fieldset>
+
+					<fieldset class="form-section">
+						<legend class="section-title">Parent & Doctor Information</legend>
+						<label class="form-field">
+							<span class="field-label">Mother ID</span>
+							<input type="number" name="parent1Id" required placeholder="Mother's national ID">
+							<small class="helper-text">National ID number of the mother</small>
+						</label>
+						<label class="form-field">
+							<span class="field-label">Father ID</span>
+							<input type="number" name="parent2Id" required placeholder="Father's national ID">
+							<small class="helper-text">National ID number of the father</small>
+						</label>
+						<label class="form-field">
+							<span class="field-label">Doctor Name</span>
+							<input type="text" name="doctorName" required placeholder="Attending doctor's full name">
+							<small class="helper-text">Full name of the attending doctor</small>
+						</label>
+					</fieldset>
+
+					<button type="submit" class="submit-btn">
+						<i class="fas fa-check-circle"></i> Register Newborn
+					</button>
+				</form>
+				<div id="marriageResult" class="result-container"></div>
+			</div>
+		</main>
+	</div>
+
+	<script type="module" src="scripts/hospital_page.js"></script>
+</body>
+</html>

@@ -47,12 +47,11 @@ async function loadSidebarLogs() {
 		}
 
 		logsDiv.innerHTML = logs.slice(0, 5).map(log => {
-			const icon  = log.operation === 'INSERT' ? 'fa-ring' : 'fa-gavel';
-			const label = log.operation === 'INSERT' ? 'Marriage' : 'Divorce';
+			const icon  = log.gander === true ? 'fa-ring' : 'fa-gavel';
 			const time  = new Date(log.changed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 			return `<div class="log-entry">
 				<i class="fa-solid ${icon}"></i>
-				${label} #${log.marriage_id} at ${time}
+				${log.last_name} ${log.first_name} #${log.birth_record_id} at ${time}
 			</div>`;
 		}).join('');
 
