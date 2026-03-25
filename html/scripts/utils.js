@@ -1,15 +1,70 @@
+const getAccessToken = () => localStorage.getItem('accessToken') || localStorage.getItem('token');
 
-export const apiFetch = async (url, method, body) => {
-    const token = localStorage.getItem('token');
+const saveTokens = (accessToken, refreshToken) => {
+    if (accessToken) {
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('token', accessToken);
+    }
+    if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken);
+    }
+};
 
-    const res = await fetch(url, {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJob3NwaXRhbF9vcmFuIiwicm9sZSI6Imhvc3BpdGFsIiwicGVyc29uX2lkIjpudWxsLCJ3aWxheWFfY29kZSI6IjE2IiwiY29tbXVuZV9jb2RlIjoiMDEwOCIsImlhdCI6MTc3NDM3NzY5NCwiZXhwIjoxNzc0Mzc4NTk0fQ.Ye5YVErdJtAs2cK1C_Xzhvbnh7cCAu3Iq3oHmRPodaQ'
-        },
-        body: body ? JSON.stringify(body) : null
+const clearTokens = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('token');
+};
+
+const tryRefreshToken = async () => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+        return false;
+    }
+
+    const refreshRes = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken })
     });
 
-    return res.json();
-}
+    const refreshData = await refreshRes.json();
+    if (!refreshRes.ok || refreshData.error || !refreshData.accessToken) {
+        clearTokens();
+        return false;
+    }
+
+    saveTokens(refreshData.accessToken, refreshData.refreshToken);
+    return true;
+};
+
+export const apiFetch = async (url, method = 'GET', body = null) => {
+    const doRequest = async () => {
+        const token = getAccessToken();
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
+
+        return fetch(url, {
+            method,
+            headers,
+            body: body ? JSON.stringify(body) : null
+        });
+    };
+
+    let res = await doRequest();
+
+    if (res.status === 401 && url !== '/api/auth/refresh') {
+        const refreshed = await tryRefreshToken();
+        if (refreshed) {
+            res = await doRequest();
+        }
+    }
+
+    try {
+        return await res.json();
+    } catch {
+        return { error: 'Invalid server response' };
+    }
+};

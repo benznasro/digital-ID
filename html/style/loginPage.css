@@ -1,5 +1,4 @@
 :root {
-  /* Same premium Digital ID theme as homepage.css */
   --bg: #F1F5F9;
   --bg-elevated: #FFFFFF;
   --fg: #0F172A;
@@ -28,7 +27,7 @@ html, body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.6;
   overflow-x: hidden;
-  /* UX: Consistent calm foundation with homepage */
+  overflow-y: hidden;
 }
 
 .layout {
@@ -46,7 +45,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 3rem;
-  /* UX: Visual identity card showcase */
+  
 }
 
 .logo-row {
@@ -90,7 +89,7 @@ html, body {
 }
 
 .id-card {
-  width: min(320px, 90vw);
+  width: min(400px, 90vw);
   background: var(--bg-elevated);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-large);
@@ -99,13 +98,12 @@ html, body {
   overflow: hidden;
   box-shadow: var(--shadow-soft);
   animation: cardFloat 4s ease-in-out infinite;
-  /* 3D floating consistent with homepage hero card */
 }
 
 @keyframes cardFloat {
   0%, 50% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
-  25% { transform: translateY(-20px) rotateX(8deg) rotateY(-8deg); }
-  75% { transform: translateY(-20px) rotateX(-8deg) rotateY(8deg); }
+  25% { transform: translateY(-10px) rotateX(4deg) rotateY(-4deg); }
+  75% { transform: translateY(-10px) rotateX(-4deg) rotateY(4deg); }
 }
 
 .id-card::before {
@@ -453,6 +451,21 @@ input:focus {
 
 .btn-submit svg { width: 1.25rem; height: 1.25rem; }
 
+.login-message {
+  min-height: 1.4rem;
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.login-message.error {
+  color: #b42318;
+}
+
+.login-message.success {
+  color: #027a48;
+}
+
 .bottom-row {
   display: flex;
   justify-content: space-between;
@@ -561,8 +574,8 @@ input:focus {
   }
 }
 
-/* JS Functionality Preserved */
+
 .method-tab:focus { outline: none; }
 
-/* UX: Seamless theme consistency with homepage – trustworthy login flow */
+
 
