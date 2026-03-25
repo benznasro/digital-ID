@@ -98,40 +98,41 @@
         <p class="form-sub">Authenticate to view and manage<br>your verified identity credentials.</p>
       </div>
 
-      <div class="method-tabs">
-        <button class="method-tab active" onclick="setTab(this)">ID Number</button>
-        <button class="method-tab" onclick="setTab(this)">Email</button>
-        <button class="method-tab" onclick="setTab(this)">Phone</button>
-      </div>
+      <form id="loginForm" autocomplete="off">
+        <div class="method-tabs" id="methodTabs">
+          <button class="method-tab active" type="button" data-method="username">Username</button>
+          <button class="method-tab" type="button" data-method="email">Email</button>
+          <button class="method-tab" type="button" data-method="phone">Phone</button>
+        </div>
 
-      <div class="field-group" id="dynamic-field">
-        <div class="field-label">
-          <span>National ID</span>
+        <div class="field-group" id="dynamic-field">
+          <div class="field-label">
+            <span id="identifierLabel">Username</span>
+          </div>
+          <div class="input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="5" width="18" height="14" rx="2"/>
+              <circle cx="9" cy="11" r="2"/>
+              <path d="M13 10h4M13 13h4M7 16h10"/>
+            </svg>
+            <input id="identifierInput" name="identifier" type="text" placeholder="Enter your username" required />
+          </div>
+          <div class="input-hint" id="identifierHint">Use your account username</div>
         </div>
-        <div class="input-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="3" y="5" width="18" height="14" rx="2"/>
-            <circle cx="9" cy="11" r="2"/>
-            <path d="M13 10h4M13 13h4M7 16h10"/>
-          </svg>
-          <input type="text" placeholder="XX-0000-0000-0000" />
-        </div>
-        <div class="input-hint">Enter your 14-digit national ID number</div>
-      </div>
 
-      <div class="field-group">
-        <div class="field-label">
-          <span>Passcode</span>
-          <a>Forgot passcode?</a>
+        <div class="field-group">
+          <div class="field-label">
+            <span>Passcode</span>
+            <a>Forgot passcode?</a>
+          </div>
+          <div class="input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="5" y="11" width="14" height="10" rx="2"/>
+              <path d="M8 11V7a4 4 0 018 0v4"/>
+            </svg>
+            <input id="passwordInput" name="password" type="password" placeholder="••••••••" required />
+          </div>
         </div>
-        <div class="input-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="5" y="11" width="14" height="10" rx="2"/>
-            <path d="M8 11V7a4 4 0 018 0v4"/>
-          </svg>
-          <input type="password" placeholder="••••••••" />
-        </div>
-      </div>
 
       <div class="biometric-row">
         <div class="bio-divider"></div>
@@ -153,12 +154,15 @@
         <div class="bio-divider"></div>
       </div>
 
-      <button class="btn-submit">
-        Verify & Access
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14M13 6l6 6-6 6"/>
-        </svg>
-      </button>
+        <div id="loginMessage" class="login-message" aria-live="polite"></div>
+
+        <button class="btn-submit" type="submit" id="loginSubmitBtn">
+          Verify & Access
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </button>
+      </form>
 
       <div class="bottom-row">
         <p>No account? <a>Register your ID</a></p>
@@ -174,27 +178,6 @@
   </div>
 </div>
 
-<script>
-  function setTab(el) {
-    document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-
-    const labels = {
-      'ID Number': ['National ID ', 'XX-0000-0000-0000', 'Enter your 14-digit national ID number'],
-      'Email':     ['Email address', 'you@email.com', 'Use your registered email'],
-      'Phone':     ['Phone number', '+213 000 000 000', 'Use the number linked to your ID'],
-    };
-
-    const key = el.textContent.trim();
-    const [label, ph, hint] = labels[key] || labels['ID Number'];
-
-    const group = document.getElementById('dynamic-field');
-    group.querySelector('.field-label span').textContent = label;
-    group.querySelector('input').placeholder = ph;
-    group.querySelector('.input-hint').textContent = hint;
-    group.querySelector('input').value = '';
-    group.querySelector('input').focus();
-  }
-</script>
+<script type="module" src="scripts/loginPage.js"></script>
 </body>
 </html>

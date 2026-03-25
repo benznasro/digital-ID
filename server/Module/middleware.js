@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import pool from "../db.js";
 
 export const protect = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
@@ -31,7 +32,10 @@ export const refresh = async (req, res) => {
   try {
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
     const { rows } = await pool.query(
-      `SELECT * FROM users WHERE id = $1 AND refresh_token = $2`,
+      `SELECT users.*, roles.name as role
+       FROM users
+       JOIN roles ON roles.id = users.role_id
+       WHERE users.id = $1 AND users.refresh_token = $2`,
       [decoded.id, refreshToken]
     );
 

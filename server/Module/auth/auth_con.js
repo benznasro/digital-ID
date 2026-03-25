@@ -4,14 +4,20 @@ import jwt from "jsonwebtoken";
 
 export const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { identifier, username, password } = req.body;
+    const loginIdentifier = (identifier || username || '').trim();
+
+    if (!loginIdentifier || !password) {
+      return res.status(400).json({ error: 'identifier and password are required' });
+    }
 
     const result = await pool.query(
       `SELECT users.*, roles.name as role 
        FROM users 
        JOIN roles ON users.role_id = roles.id
-       WHERE username = $1`,
-      [username]
+       LEFT JOIN person ON person.id = users.person_id
+       WHERE users.username = $1 OR person.email = $1 OR person.phone_number = $1`,
+      [loginIdentifier]
     );
 
     if (result.rows.length === 0) {
