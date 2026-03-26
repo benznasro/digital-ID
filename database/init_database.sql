@@ -19,6 +19,21 @@ CREATE SEQUENCE public.assets_id_seq
 ALTER SEQUENCE public.assets_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.assets_id_seq TO postgres;
 
+-- DROP SEQUENCE public.assets_id_seq1;
+
+CREATE SEQUENCE public.assets_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.assets_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.assets_id_seq1 TO postgres;
+
 -- DROP SEQUENCE public.birth_records_id_seq;
 
 CREATE SEQUENCE public.birth_records_id_seq
@@ -33,6 +48,21 @@ CREATE SEQUENCE public.birth_records_id_seq
 
 ALTER SEQUENCE public.birth_records_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.birth_records_id_seq TO postgres;
+
+-- DROP SEQUENCE public.birth_records_id_seq1;
+
+CREATE SEQUENCE public.birth_records_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.birth_records_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.birth_records_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.birth_records_log_id_seq;
 
@@ -49,6 +79,21 @@ CREATE SEQUENCE public.birth_records_log_id_seq
 ALTER SEQUENCE public.birth_records_log_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.birth_records_log_id_seq TO postgres;
 
+-- DROP SEQUENCE public.birth_records_log_id_seq1;
+
+CREATE SEQUENCE public.birth_records_log_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.birth_records_log_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.birth_records_log_id_seq1 TO postgres;
+
 -- DROP SEQUENCE public.criminal_records_id_seq;
 
 CREATE SEQUENCE public.criminal_records_id_seq
@@ -63,6 +108,21 @@ CREATE SEQUENCE public.criminal_records_id_seq
 
 ALTER SEQUENCE public.criminal_records_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.criminal_records_id_seq TO postgres;
+
+-- DROP SEQUENCE public.criminal_records_id_seq1;
+
+CREATE SEQUENCE public.criminal_records_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.criminal_records_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.criminal_records_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.death_records_id_seq;
 
@@ -79,6 +139,21 @@ CREATE SEQUENCE public.death_records_id_seq
 ALTER SEQUENCE public.death_records_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.death_records_id_seq TO postgres;
 
+-- DROP SEQUENCE public.death_records_id_seq1;
+
+CREATE SEQUENCE public.death_records_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.death_records_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.death_records_id_seq1 TO postgres;
+
 -- DROP SEQUENCE public.education_id_seq;
 
 CREATE SEQUENCE public.education_id_seq
@@ -93,6 +168,21 @@ CREATE SEQUENCE public.education_id_seq
 
 ALTER SEQUENCE public.education_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.education_id_seq TO postgres;
+
+-- DROP SEQUENCE public.education_id_seq1;
+
+CREATE SEQUENCE public.education_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.education_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.education_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.employment_id_seq;
 
@@ -109,6 +199,21 @@ CREATE SEQUENCE public.employment_id_seq
 ALTER SEQUENCE public.employment_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.employment_id_seq TO postgres;
 
+-- DROP SEQUENCE public.employment_id_seq1;
+
+CREATE SEQUENCE public.employment_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.employment_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.employment_id_seq1 TO postgres;
+
 -- DROP SEQUENCE public.marriage_audit_id_seq;
 
 CREATE SEQUENCE public.marriage_audit_id_seq
@@ -123,6 +228,21 @@ CREATE SEQUENCE public.marriage_audit_id_seq
 
 ALTER SEQUENCE public.marriage_audit_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.marriage_audit_id_seq TO postgres;
+
+-- DROP SEQUENCE public.marriage_audit_id_seq1;
+
+CREATE SEQUENCE public.marriage_audit_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.marriage_audit_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.marriage_audit_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.marriage_contract_no_seq;
 
@@ -139,6 +259,21 @@ CREATE SEQUENCE public.marriage_contract_no_seq
 ALTER SEQUENCE public.marriage_contract_no_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.marriage_contract_no_seq TO postgres;
 
+-- DROP SEQUENCE public.marriage_contract_no_seq1;
+
+CREATE SEQUENCE public.marriage_contract_no_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.marriage_contract_no_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.marriage_contract_no_seq1 TO postgres;
+
 -- DROP SEQUENCE public.marriage_id_seq;
 
 CREATE SEQUENCE public.marriage_id_seq
@@ -153,6 +288,21 @@ CREATE SEQUENCE public.marriage_id_seq
 
 ALTER SEQUENCE public.marriage_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.marriage_id_seq TO postgres;
+
+-- DROP SEQUENCE public.marriage_id_seq1;
+
+CREATE SEQUENCE public.marriage_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.marriage_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.marriage_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.medical_records_id_seq;
 
@@ -169,6 +319,21 @@ CREATE SEQUENCE public.medical_records_id_seq
 ALTER SEQUENCE public.medical_records_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.medical_records_id_seq TO postgres;
 
+-- DROP SEQUENCE public.medical_records_id_seq1;
+
+CREATE SEQUENCE public.medical_records_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.medical_records_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.medical_records_id_seq1 TO postgres;
+
 -- DROP SEQUENCE public.national_id_seq;
 
 CREATE SEQUENCE public.national_id_seq
@@ -183,6 +348,21 @@ CREATE SEQUENCE public.national_id_seq
 
 ALTER SEQUENCE public.national_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.national_id_seq TO postgres;
+
+-- DROP SEQUENCE public.passports_id_seq;
+
+CREATE SEQUENCE public.passports_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.passports_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.passports_id_seq TO postgres;
 
 -- DROP SEQUENCE public.person_id_seq;
 
@@ -199,6 +379,21 @@ CREATE SEQUENCE public.person_id_seq
 ALTER SEQUENCE public.person_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.person_id_seq TO postgres;
 
+-- DROP SEQUENCE public.person_id_seq1;
+
+CREATE SEQUENCE public.person_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.person_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.person_id_seq1 TO postgres;
+
 -- DROP SEQUENCE public.roles_id_seq;
 
 CREATE SEQUENCE public.roles_id_seq
@@ -213,6 +408,21 @@ CREATE SEQUENCE public.roles_id_seq
 
 ALTER SEQUENCE public.roles_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.roles_id_seq TO postgres;
+
+-- DROP SEQUENCE public.roles_id_seq1;
+
+CREATE SEQUENCE public.roles_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.roles_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.roles_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.salary_audit_id_seq;
 
@@ -229,6 +439,21 @@ CREATE SEQUENCE public.salary_audit_id_seq
 ALTER SEQUENCE public.salary_audit_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.salary_audit_id_seq TO postgres;
 
+-- DROP SEQUENCE public.salary_audit_id_seq1;
+
+CREATE SEQUENCE public.salary_audit_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.salary_audit_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.salary_audit_id_seq1 TO postgres;
+
 -- DROP SEQUENCE public.users_id_seq;
 
 CREATE SEQUENCE public.users_id_seq
@@ -243,6 +468,21 @@ CREATE SEQUENCE public.users_id_seq
 
 ALTER SEQUENCE public.users_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.users_id_seq TO postgres;
+
+-- DROP SEQUENCE public.users_id_seq1;
+
+CREATE SEQUENCE public.users_id_seq1
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.users_id_seq1 OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.users_id_seq1 TO postgres;
 -- public.act_number_tracker definition
 
 -- Drop table
@@ -280,7 +520,11 @@ GRANT ALL ON TABLE public.roles TO postgres;
 CREATE TABLE public.person ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, national_id int8 NOT NULL, first_name varchar(255) NOT NULL, last_name varchar(255) NOT NULL, email varchar(255) NULL, date_of_birth date NOT NULL, phone_number varchar(20) NULL, gender bool NOT NULL, dad_id int8 NULL, mom_id int8 NULL, marital_status varchar(20) DEFAULT 'single'::character varying NOT NULL, CONSTRAINT check_lineage CHECK (((id <> dad_id) AND (id <> mom_id) AND (dad_id <> mom_id))), CONSTRAINT person_email_key UNIQUE (email), CONSTRAINT person_national_id_key UNIQUE (national_id), CONSTRAINT person_pkey PRIMARY KEY (id), CONSTRAINT person_dad_id_fkey FOREIGN KEY (dad_id) REFERENCES public.person(id), CONSTRAINT person_mom_id_fkey FOREIGN KEY (mom_id) REFERENCES public.person(id));
 
 -- Table Triggers
--- Triggers are created in the final hardening section after all functions exist.
+
+create trigger trg_inherit_father_last_name before
+insert
+    on
+    public.person for each row execute function inherit_father_last_name();
 
 -- Permissions
 
@@ -295,6 +539,7 @@ GRANT ALL ON TABLE public.person TO postgres;
 -- DROP TABLE public.users;
 
 CREATE TABLE public.users ( id serial4 NOT NULL, username varchar(100) NOT NULL, "password" varchar(255) NOT NULL, role_id int4 DEFAULT 1 NULL, person_id int8 NULL, created_at timestamptz DEFAULT now() NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, refresh_token text NULL, CONSTRAINT users_person_id_key UNIQUE (person_id), CONSTRAINT users_pkey PRIMARY KEY (id), CONSTRAINT users_username_key UNIQUE (username), CONSTRAINT users_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id), CONSTRAINT users_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(id));
+CREATE INDEX idx_users_role_id ON public.users USING btree (role_id);
 
 -- Permissions
 
@@ -323,6 +568,8 @@ GRANT ALL ON TABLE public.assets TO postgres;
 -- DROP TABLE public.birth_records_log;
 
 CREATE TABLE public.birth_records_log ( id bigserial NOT NULL, birth_record_id int8 NULL, operation varchar(10) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by varchar(100) DEFAULT CURRENT_USER NULL, changed_by_user_id int8 NULL, old_birth_certificate_no int8 NULL, old_child_id int8 NULL, old_doctor_name varchar(255) NULL, old_birth_weight_kg numeric(4, 2) NULL, new_birth_certificate_no int8 NULL, new_child_id int8 NULL, new_doctor_name varchar(255) NULL, new_birth_weight_kg numeric(4, 2) NULL, old_birth_date_time timestamptz NULL, new_birth_date_time timestamptz NULL, old_marriage_id int8 NULL, new_marriage_id int8 NULL, CONSTRAINT birth_records_log_pkey PRIMARY KEY (id), CONSTRAINT birth_records_log_changed_by_user_id_fkey FOREIGN KEY (changed_by_user_id) REFERENCES public.users(id));
+CREATE INDEX idx_birth_records_log_changed_user_time ON public.birth_records_log USING btree (changed_by_user_id, changed_at DESC);
+CREATE INDEX idx_birth_records_log_record_time ON public.birth_records_log USING btree (birth_record_id, changed_at DESC);
 
 -- Permissions
 
@@ -353,9 +600,14 @@ GRANT ALL ON TABLE public.criminal_records TO postgres;
 -- DROP TABLE public.death_records;
 
 CREATE TABLE public.death_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, death_date timestamptz NOT NULL, place_of_death varchar(255) NULL, cause_of_death text NULL, doctor_id int8 NULL, icd_10_code varchar(10) NULL, kin_contact_id int8 NULL, notified_next_of_kin bool DEFAULT false NULL, hospital_user_id int4 NULL, CONSTRAINT death_records_person_id_key UNIQUE (person_id), CONSTRAINT death_records_pkey PRIMARY KEY (id), CONSTRAINT death_records_doctor_id_fkey FOREIGN KEY (doctor_id) REFERENCES public.person(id), CONSTRAINT death_records_hospital_user_id_fkey FOREIGN KEY (hospital_user_id) REFERENCES public.users(id), CONSTRAINT death_records_kin_contact_id_fkey FOREIGN KEY (kin_contact_id) REFERENCES public.person(id), CONSTRAINT death_records_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
+CREATE INDEX idx_death_records_hospital_user_id ON public.death_records USING btree (hospital_user_id);
 
 -- Table Triggers
--- Triggers are created in the final hardening section after all functions exist.
+
+create trigger trg_on_dath_deactivate_all after
+insert
+    on
+    public.death_records for each row execute function handle_person_death();
 
 -- Permissions
 
@@ -390,6 +642,17 @@ CREATE INDEX idx_employment_active ON public.employment USING btree (is_active);
 CREATE INDEX idx_employment_company_id ON public.employment USING btree (company_id);
 CREATE INDEX idx_employment_person_id ON public.employment USING btree (person_id);
 
+-- Table Triggers
+
+create trigger trg_check_death_before_job before
+insert
+    on
+    public.employment for each row execute function block_dead_employment();
+create trigger trg_salary_audit after
+update
+    of salary on
+    public.employment for each row execute function audit_salary_changes();
+
 -- Permissions
 
 ALTER TABLE public.employment OWNER TO postgres;
@@ -402,11 +665,29 @@ GRANT ALL ON TABLE public.employment TO postgres;
 
 -- DROP TABLE public.marriage;
 
-CREATE TABLE public.marriage ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, contract_no int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, husband_id int8 NOT NULL, wife_id int8 NOT NULL, marriage_date timestamptz NOT NULL, "valid" bool DEFAULT true NULL, end_marriage_time timestamptz NULL, end_reason varchar(50) NULL, witness_1_id int8 NULL, witness_2_id int8 NULL, dowry_amount numeric(12, 2) NULL, notary_id int8 NULL, CONSTRAINT check_not_self_marriage CHECK ((husband_id <> wife_id)), CONSTRAINT marriage_contract_no_key UNIQUE (contract_no), CONSTRAINT marriage_end_reason_check CHECK (((end_reason)::text = ANY ((ARRAY['divorce'::character varying, 'death'::character varying, 'annulment'::character varying, 'Khula'::character varying])::text[]))), CONSTRAINT marriage_pkey PRIMARY KEY (id), CONSTRAINT marriage_husband_id_fkey FOREIGN KEY (husband_id) REFERENCES public.person(id), CONSTRAINT marriage_notary_id_fkey FOREIGN KEY (notary_id) REFERENCES public.users(id), CONSTRAINT marriage_wife_id_fkey FOREIGN KEY (wife_id) REFERENCES public.person(id), CONSTRAINT marriage_witness_1_id_fkey FOREIGN KEY (witness_1_id) REFERENCES public.person(id), CONSTRAINT marriage_witness_2_id_fkey FOREIGN KEY (witness_2_id) REFERENCES public.person(id));
+CREATE TABLE public.marriage ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, contract_no int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, husband_id int8 NOT NULL, wife_id int8 NOT NULL, marriage_date timestamptz NOT NULL, "valid" bool DEFAULT true NULL, end_marriage_time timestamptz NULL, end_reason varchar(50) NULL, witness_1_id int8 NULL, witness_2_id int8 NULL, dowry_amount numeric(12, 2) NULL, notary_id int8 NULL, CONSTRAINT check_not_self_marriage CHECK ((husband_id <> wife_id)), CONSTRAINT marriage_contract_no_key UNIQUE (contract_no), CONSTRAINT marriage_end_reason_check CHECK (((end_reason)::text = ANY (ARRAY[('divorce'::character varying)::text, ('death'::character varying)::text, ('annulment'::character varying)::text, ('Khula'::character varying)::text]))), CONSTRAINT marriage_pkey PRIMARY KEY (id), CONSTRAINT marriage_husband_id_fkey FOREIGN KEY (husband_id) REFERENCES public.person(id), CONSTRAINT marriage_notary_id_fkey FOREIGN KEY (notary_id) REFERENCES public.users(id), CONSTRAINT marriage_wife_id_fkey FOREIGN KEY (wife_id) REFERENCES public.person(id), CONSTRAINT marriage_witness_1_id_fkey FOREIGN KEY (witness_1_id) REFERENCES public.person(id), CONSTRAINT marriage_witness_2_id_fkey FOREIGN KEY (witness_2_id) REFERENCES public.person(id));
+CREATE INDEX idx_marriage_husband_valid ON public.marriage USING btree (husband_id) WHERE (valid = true);
+CREATE INDEX idx_marriage_wife_valid ON public.marriage USING btree (wife_id) WHERE (valid = true);
 CREATE UNIQUE INDEX idx_single_active_husband ON public.marriage USING btree (wife_id) WHERE (valid = true);
 
 -- Table Triggers
--- Triggers are created in the final hardening section after all functions exist.
+
+create trigger trg_limit_wives before
+insert
+    on
+    public.marriage for each row execute function check_max_wives();
+create trigger trg_prevent_incest before
+insert
+    on
+    public.marriage for each row execute function check_incest_prevention();
+create trigger trg_marriage_audit after
+insert
+    or
+delete
+    or
+update
+    on
+    public.marriage for each row execute function log_marriage_changes();
 
 -- Permissions
 
@@ -421,6 +702,7 @@ GRANT ALL ON TABLE public.marriage TO postgres;
 -- DROP TABLE public.marriage_audit;
 
 CREATE TABLE public.marriage_audit ( id bigserial NOT NULL, marriage_id int8 NULL, operation varchar(10) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by varchar(100) DEFAULT CURRENT_USER NULL, old_husband_id int8 NULL, old_wife_id int8 NULL, old_marriage_date timestamptz NULL, old_valid bool NULL, old_end_reason varchar(50) NULL, old_end_marriage_time timestamp NULL, new_husband_id int8 NULL, new_wife_id int8 NULL, new_marriage_date timestamptz NULL, new_valid bool NULL, new_end_reason varchar(50) NULL, new_end_marriage_time timestamp NULL, changed_by_user_id int8 NULL, CONSTRAINT marriage_audit_pkey PRIMARY KEY (id), CONSTRAINT marriage_audit_changed_by_user_id_fkey FOREIGN KEY (changed_by_user_id) REFERENCES public.users(id));
+CREATE INDEX idx_marriage_audit_changed_user_time ON public.marriage_audit USING btree (changed_by_user_id, changed_at DESC);
 
 -- Permissions
 
@@ -449,6 +731,14 @@ GRANT ALL ON TABLE public.medical_records TO postgres;
 -- DROP TABLE public.passports;
 
 CREATE TABLE public.passports ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, passport_number varchar(20) NOT NULL, issue_date date NULL, expiry_date date NULL, is_active bool DEFAULT true NULL, CONSTRAINT passports_passport_number_key UNIQUE (passport_number), CONSTRAINT passports_pkey PRIMARY KEY (id), CONSTRAINT passports_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
+CREATE INDEX idx_passports_person_active ON public.passports USING btree (person_id) WHERE (is_active = true);
+
+-- Table Triggers
+
+create trigger trg_no_passport_overlap before
+insert
+    on
+    public.passports for each row execute function check_passport_overlap();
 
 -- Permissions
 
@@ -477,9 +767,18 @@ GRANT ALL ON TABLE public.salary_audit TO postgres;
 -- DROP TABLE public.birth_records;
 
 CREATE TABLE public.birth_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, birth_certificate_no int8 NOT NULL, child_id int8 NOT NULL, marriage_id int8 NULL, hospital_name varchar(255) NULL, doctor_name varchar(255) NULL, birth_weight_kg numeric(4, 2) NULL, birth_date_time timestamptz NOT NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, apgar_score int2 NULL, CONSTRAINT birth_records_birth_certificate_no_key UNIQUE (birth_certificate_no), CONSTRAINT birth_records_child_id_key UNIQUE (child_id), CONSTRAINT birth_records_pkey PRIMARY KEY (id), CONSTRAINT birth_records_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.person(id), CONSTRAINT birth_records_marriage_id_fkey FOREIGN KEY (marriage_id) REFERENCES public.marriage(id));
+CREATE INDEX idx_birth_records_marriage_id ON public.birth_records USING btree (marriage_id);
 
 -- Table Triggers
--- Triggers are created in the final hardening section after all functions exist.
+
+create trigger trg_birth_records_audit after
+insert
+    or
+delete
+    or
+update
+    on
+    public.birth_records for each row execute function log_birth_record_changes();
 
 -- Permissions
 
@@ -526,6 +825,7 @@ $function$
 -- Permissions
 
 ALTER FUNCTION public.add_divorce(int8, timestamptz, varchar) OWNER TO postgres;
+GRANT ALL ON FUNCTION public.add_divorce(int8, timestamptz, varchar) TO public;
 GRANT ALL ON FUNCTION public.add_divorce(int8, timestamptz, varchar) TO postgres;
 
 -- DROP FUNCTION public.add_marriage(int8, int8, timestamptz, numeric, int8, int8, int8);
@@ -609,6 +909,7 @@ $function$
 -- Permissions
 
 ALTER FUNCTION public.add_marriage(int8, int8, timestamptz, numeric, int8, int8, int8) OWNER TO postgres;
+GRANT ALL ON FUNCTION public.add_marriage(int8, int8, timestamptz, numeric, int8, int8, int8) TO public;
 GRANT ALL ON FUNCTION public.add_marriage(int8, int8, timestamptz, numeric, int8, int8, int8) TO postgres;
 
 -- DROP FUNCTION public.audit_salary_changes();
@@ -630,6 +931,7 @@ $function$
 -- Permissions
 
 ALTER FUNCTION public.audit_salary_changes() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.audit_salary_changes() TO public;
 GRANT ALL ON FUNCTION public.audit_salary_changes() TO postgres;
 
 -- DROP FUNCTION public.block_dead_employment();
@@ -650,6 +952,7 @@ $function$
 -- Permissions
 
 ALTER FUNCTION public.block_dead_employment() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.block_dead_employment() TO public;
 GRANT ALL ON FUNCTION public.block_dead_employment() TO postgres;
 
 -- DROP FUNCTION public.check_incest_prevention();
@@ -678,6 +981,7 @@ $function$
 -- Permissions
 
 ALTER FUNCTION public.check_incest_prevention() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.check_incest_prevention() TO public;
 GRANT ALL ON FUNCTION public.check_incest_prevention() TO postgres;
 
 -- DROP FUNCTION public.check_max_wives();
@@ -698,6 +1002,7 @@ $function$
 -- Permissions
 
 ALTER FUNCTION public.check_max_wives() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.check_max_wives() TO public;
 GRANT ALL ON FUNCTION public.check_max_wives() TO postgres;
 
 -- DROP FUNCTION public.check_passport_overlap();
@@ -722,6 +1027,7 @@ $function$
 -- Permissions
 
 ALTER FUNCTION public.check_passport_overlap() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.check_passport_overlap() TO public;
 GRANT ALL ON FUNCTION public.check_passport_overlap() TO postgres;
 
 -- DROP FUNCTION public.get_next_act_number(bpchar, bpchar, bpchar);
@@ -756,6 +1062,7 @@ $function$
 -- Permissions
 
 ALTER FUNCTION public.get_next_act_number(bpchar, bpchar, bpchar) OWNER TO postgres;
+GRANT ALL ON FUNCTION public.get_next_act_number(bpchar, bpchar, bpchar) TO public;
 GRANT ALL ON FUNCTION public.get_next_act_number(bpchar, bpchar, bpchar) TO postgres;
 
 -- DROP FUNCTION public.handle_person_death();
@@ -814,6 +1121,7 @@ $function$
 -- Permissions
 
 ALTER FUNCTION public.handle_person_death() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.handle_person_death() TO public;
 GRANT ALL ON FUNCTION public.handle_person_death() TO postgres;
 
 -- DROP FUNCTION public.inherit_father_last_name();
@@ -841,6 +1149,7 @@ $function$
 -- Permissions
 
 ALTER FUNCTION public.inherit_father_last_name() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.inherit_father_last_name() TO public;
 GRANT ALL ON FUNCTION public.inherit_father_last_name() TO postgres;
 
 -- DROP FUNCTION public.log_birth_record_changes();
@@ -896,6 +1205,7 @@ $function$
 -- Permissions
 
 ALTER FUNCTION public.log_birth_record_changes() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.log_birth_record_changes() TO public;
 GRANT ALL ON FUNCTION public.log_birth_record_changes() TO postgres;
 
 -- DROP FUNCTION public.log_marriage_changes();
@@ -960,158 +1270,8 @@ $function$
 -- Permissions
 
 ALTER FUNCTION public.log_marriage_changes() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.log_marriage_changes() TO public;
 GRANT ALL ON FUNCTION public.log_marriage_changes() TO postgres;
-
-
--- Final hardening section: create indexes and triggers after all functions exist
-
-CREATE INDEX IF NOT EXISTS idx_birth_records_log_changed_user_time
-ON public.birth_records_log USING btree (changed_by_user_id, changed_at DESC);
-
-CREATE INDEX IF NOT EXISTS idx_birth_records_log_record_time
-ON public.birth_records_log USING btree (birth_record_id, changed_at DESC);
-
-CREATE INDEX IF NOT EXISTS idx_marriage_audit_changed_user_time
-ON public.marriage_audit USING btree (changed_by_user_id, changed_at DESC);
-
-CREATE INDEX IF NOT EXISTS idx_marriage_husband_valid
-ON public.marriage USING btree (husband_id)
-WHERE valid = true;
-
-CREATE INDEX IF NOT EXISTS idx_marriage_wife_valid
-ON public.marriage USING btree (wife_id)
-WHERE valid = true;
-
-CREATE INDEX IF NOT EXISTS idx_birth_records_marriage_id
-ON public.birth_records USING btree (marriage_id);
-
-CREATE INDEX IF NOT EXISTS idx_death_records_hospital_user_id
-ON public.death_records USING btree (hospital_user_id);
-
-CREATE INDEX IF NOT EXISTS idx_passports_person_active
-ON public.passports USING btree (person_id)
-WHERE is_active = true;
-
-CREATE INDEX IF NOT EXISTS idx_users_role_id
-ON public.users USING btree (role_id);
-
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_trigger
-        WHERE tgname = 'trg_inherit_father_last_name'
-          AND tgrelid = 'public.person'::regclass
-    ) THEN
-        CREATE TRIGGER trg_inherit_father_last_name
-        BEFORE INSERT ON public.person
-        FOR EACH ROW EXECUTE FUNCTION inherit_father_last_name();
-    END IF;
-END $$;
-
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_trigger
-        WHERE tgname = 'trg_on_dath_deactivate_all'
-          AND tgrelid = 'public.death_records'::regclass
-    ) THEN
-        CREATE TRIGGER trg_on_dath_deactivate_all
-        AFTER INSERT ON public.death_records
-        FOR EACH ROW EXECUTE FUNCTION handle_person_death();
-    END IF;
-END $$;
-
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_trigger
-        WHERE tgname = 'trg_check_death_before_job'
-          AND tgrelid = 'public.employment'::regclass
-    ) THEN
-        CREATE TRIGGER trg_check_death_before_job
-        BEFORE INSERT ON public.employment
-        FOR EACH ROW EXECUTE FUNCTION block_dead_employment();
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_trigger
-        WHERE tgname = 'trg_salary_audit'
-          AND tgrelid = 'public.employment'::regclass
-    ) THEN
-        CREATE TRIGGER trg_salary_audit
-        AFTER UPDATE OF salary ON public.employment
-        FOR EACH ROW EXECUTE FUNCTION audit_salary_changes();
-    END IF;
-END $$;
-
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_trigger
-        WHERE tgname = 'trg_limit_wives'
-          AND tgrelid = 'public.marriage'::regclass
-    ) THEN
-        CREATE TRIGGER trg_limit_wives
-        BEFORE INSERT ON public.marriage
-        FOR EACH ROW EXECUTE FUNCTION check_max_wives();
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_trigger
-        WHERE tgname = 'trg_prevent_incest'
-          AND tgrelid = 'public.marriage'::regclass
-    ) THEN
-        CREATE TRIGGER trg_prevent_incest
-        BEFORE INSERT ON public.marriage
-        FOR EACH ROW EXECUTE FUNCTION check_incest_prevention();
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_trigger
-        WHERE tgname = 'trg_marriage_audit'
-          AND tgrelid = 'public.marriage'::regclass
-    ) THEN
-        CREATE TRIGGER trg_marriage_audit
-        AFTER INSERT OR DELETE OR UPDATE ON public.marriage
-        FOR EACH ROW EXECUTE FUNCTION log_marriage_changes();
-    END IF;
-END $$;
-
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_trigger
-        WHERE tgname = 'trg_no_passport_overlap'
-          AND tgrelid = 'public.passports'::regclass
-    ) THEN
-        CREATE TRIGGER trg_no_passport_overlap
-        BEFORE INSERT ON public.passports
-        FOR EACH ROW EXECUTE FUNCTION check_passport_overlap();
-    END IF;
-END $$;
-
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_trigger
-        WHERE tgname = 'trg_birth_records_audit'
-          AND tgrelid = 'public.birth_records'::regclass
-    ) THEN
-        CREATE TRIGGER trg_birth_records_audit
-        AFTER INSERT OR DELETE OR UPDATE ON public.birth_records
-        FOR EACH ROW EXECUTE FUNCTION log_birth_record_changes();
-    END IF;
-END $$;
-
-INSERT INTO public.roles (name)
-VALUES
-  ('citizen'),
-  ('hospital'),
-  ('police'),
-  ('government'),
-  ('admin'),
-  ('Marriage_Notary')
-ON CONFLICT (name) DO NOTHING;
 
 
 -- Permissions
