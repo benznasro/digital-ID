@@ -60,6 +60,13 @@ function smokerLabel(value) {
   return 'Not available';
 }
 
+function gitfullname(id){
+if(id){
+return id-first_name;
+}else{
+  return 'Not available';
+}
+}
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) {
@@ -100,6 +107,7 @@ function renderBirth(birth) {
 }
 
 function renderMedical(medical) {
+  
   setText('overviewBloodType', fmt(medical?.blood_type));
   setText('overviewCheckup', formatDate(medical?.last_checkup_date));
 
@@ -112,16 +120,20 @@ function renderMedical(medical) {
   setText('medicalCheckup', formatDate(medical?.last_checkup_date));
 }
 function renderMarriage(marriage){
-  setText('FullHesbend"', fmt(marriage?.blood_type));
-  setText('FullWife', formatDate(marriage?.last_checkup_date));
-
-  setText('valid', fmt(marriage?.id));
-  setText('divorceDate', fmt(marriage?.blood_type));
-  setText('MarriageDate', fmt(marriage?.height_cm));
-  setText('witness_1', fmt(marriage?.weight_kg));
-  setText('witness_2', smokerLabel(marriage?.smoker));
-  setText('dowry_amount', fmt(marriage?.chronic_conditions));
-  setText('notary', formatDate(marriage?.last_checkup_date));
+  const fullNameHesbend = `${fmt(marriage-hesbend?.first_name)} ${fmt(marriage-hesbend?.last_name)}`.trim();
+  const fullNameWife = `${fmt(marriage-wife?.first_name)} ${fmt(marriage-wife?.last_name)}`.trim();
+  const fullwitness_1 = `${fmt(marriage-witness_1?.first_name)} ${fmt(marriage-witness_1?.last_name)}`.trim();
+  const fullwitness_2 = `${fmt(marriage-witness_1?.first_name)} ${fmt(marriage-witness_1?.last_name)}`.trim();
+  setText('FullHesbend"', fmt(marriage?.fullNameHesbend));
+  setText('FullWife', formatDate(marriage?.fullNameWife));
+  setText('valid', fmt(marriage?.contract_no));
+  setText('valid', fmt(marriage?.valid));
+  setText('divorceDate', formatDate(marriage?.divorcedate));
+  setText('MarriageDate', formatDate(marriage?.marriagedate));
+  setText('witness_1', fmt(marriage?.fullwitness_1));
+  setText('witness_2', smokerLabel(marriage?.fullwitness_1));
+  setText('dowry_amount', fmt(marriage?.dowry_amount));
+  setText('notary', formatDate(marriage?.notary));
 }
 function activateSection(sectionName) {
   sidebarLinks.forEach((btn) => {
