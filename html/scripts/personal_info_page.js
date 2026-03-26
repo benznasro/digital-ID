@@ -59,14 +59,6 @@ function smokerLabel(value) {
   }
   return 'Not available';
 }
-
-function gitfullname(id){
-if(id){
-return id-first_name;
-}else{
-  return 'Not available';
-}
-}
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) {
@@ -95,8 +87,6 @@ function renderPerson(person) {
 
 function renderBirth(birth) {
   setText('overviewBirthCertificate', fmt(birth?.birth_certificate_no));
-
-  setText('birthRecordId', fmt(birth?.id));
   setText('birthCertificate', fmt(birth?.birth_certificate_no));
   setText('birthDateTime', formatDateTime(birth?.birth_datetime));
   setText('birthHospital', fmt(birth?.hospital_name));
@@ -107,11 +97,8 @@ function renderBirth(birth) {
 }
 
 function renderMedical(medical) {
-  
   setText('overviewBloodType', fmt(medical?.blood_type));
   setText('overviewCheckup', formatDate(medical?.last_checkup_date));
-
-  setText('medicalId', fmt(medical?.id));
   setText('medicalBloodType', fmt(medical?.blood_type));
   setText('medicalHeight', fmt(medical?.height_cm));
   setText('medicalWeight', fmt(medical?.weight_kg));
@@ -124,16 +111,28 @@ function renderMarriage(marriage){
   const fullNameWife = `${fmt(marriage-wife?.first_name)} ${fmt(marriage-wife?.last_name)}`.trim();
   const fullwitness_1 = `${fmt(marriage-witness_1?.first_name)} ${fmt(marriage-witness_1?.last_name)}`.trim();
   const fullwitness_2 = `${fmt(marriage-witness_1?.first_name)} ${fmt(marriage-witness_1?.last_name)}`.trim();
-  setText('FullHesbend"', fmt(marriage?.fullNameHesbend));
-  setText('FullWife', formatDate(marriage?.fullNameWife));
-  setText('valid', fmt(marriage?.contract_no));
-  setText('valid', fmt(marriage?.valid));
-  setText('divorceDate', formatDate(marriage?.divorcedate));
+  setText('FullHesbend', fmt(marriage?.fullNameHesbend));
+  setText('FullWife', fmt(marriage?.fullNameWife));
+  setText('Contract_no', fmt(marriage?.contract_no));
+  setText('Valid', fmt(marriage?.valid));
+  setText('DivorceDate', formatDate(marriage?.end_reason));
   setText('MarriageDate', formatDate(marriage?.marriagedate));
-  setText('witness_1', fmt(marriage?.fullwitness_1));
-  setText('witness_2', smokerLabel(marriage?.fullwitness_1));
-  setText('dowry_amount', fmt(marriage?.dowry_amount));
-  setText('notary', formatDate(marriage?.notary));
+  setText('EndMarriageTime', formatDate(marriage?.end_marriage_time));
+  setText('Witness_1', fmt(marriage?.fullwitness_1));
+  setText('Witness_2', fmt(marriage?.fullwitness_1));
+  setText('Dowry_amount', fmt(marriage?.dowry_amount));
+  setText('Notary', fmt(marriage?.fullNamenotary));
+}
+function renderEducation(education) {
+  const fullNamestudent = `${fmt(education-student?.first_name)} ${fmt(education-student?.last_name)}`.trim();
+  setText('FullNameStudent', fmt(education?.fullNamestudent));
+  setText('UniversityName', fmt(education?.university_name));
+  setText('Major', fmt(education?.major));
+  setText('DegreeType', fmt(education?.degree_type));
+  setText('StudyMode', fmt(education?.study_mode));
+  setText('StartDate', smokerLabel(education?.start_date));
+  setText('GraduationDate', fmt(education?.graduation_date));
+  setText('Certificate', formatDate(education?.certificate_url));
 }
 function activateSection(sectionName) {
   sidebarLinks.forEach((btn) => {
@@ -175,7 +174,8 @@ async function loadProfileData() {
     apiFetch('/api/person/me', 'GET', null),
     apiFetch('/api/birth_records/me', 'GET', null),
     apiFetch('/api/medical_records/me', 'GET', null),
-    apiFetch('/api/marriage/me', 'GET', null)
+    apiFetch('/api/marriage/me', 'GET', null),
+    apiFetch('/api/education/me', 'GET', null)
   ]);
 
   const errors = [];
@@ -203,7 +203,13 @@ async function loadProfileData() {
     renderMarriage(marriageRes.value);
   } else {
     renderMarriage(null);
-    errors.push('medical record');
+    errors.push('marriage ');
+  }
+    if (educationRes.status === 'fulfilled' && !educationRes.value?.error) {
+    renderEducation(educationRes.value);
+  } else {
+    renderEducation(null);
+    errors.push('education ');
   }
   if (errors.length === 0) {
     setBanner('Your records are loaded successfully.', 'success');
