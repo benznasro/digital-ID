@@ -73,15 +73,12 @@ function renderPerson(person) {
   setText('overviewFullName', fullName === 'Not available Not available' ? 'Not available' : fullName);
   setText('overviewNationalId', fmt(person?.national_id));
   setText('overviewMarital', fmt(person?.marital_status));
-
-  setText('identityPersonId', fmt(person?.id));
   setText('identityNationalId', fmt(person?.national_id));
   setText('identityFirstName', fmt(person?.first_name));
   setText('identityLastName', fmt(person?.last_name));
   setText('identityDob', formatDate(person?.date_of_birth));
   setText('identityGender', genderLabel(person?.gender));
   setText('identityMarital', fmt(person?.marital_status));
-
   setText('contactEmail', fmt(person?.email));
   setText('contactPhone', fmt(person?.phone_number));
 
@@ -114,7 +111,18 @@ function renderMedical(medical) {
   setText('medicalConditions', fmt(medical?.chronic_conditions));
   setText('medicalCheckup', formatDate(medical?.last_checkup_date));
 }
+function renderMarriage(marriage){
+  setText('FullHesbend"', fmt(marriage?.blood_type));
+  setText('FullWife', formatDate(marriage?.last_checkup_date));
 
+  setText('valid', fmt(marriage?.id));
+  setText('divorceDate', fmt(marriage?.blood_type));
+  setText('MarriageDate', fmt(marriage?.height_cm));
+  setText('witness_1', fmt(marriage?.weight_kg));
+  setText('witness_2', smokerLabel(marriage?.smoker));
+  setText('dowry_amount', fmt(marriage?.chronic_conditions));
+  setText('notary', formatDate(marriage?.last_checkup_date));
+}
 function activateSection(sectionName) {
   sidebarLinks.forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.section === sectionName);
@@ -151,10 +159,11 @@ document.addEventListener('click', (e) => {
 async function loadProfileData() {
   setBanner('Loading your data...');
 
-  const [personRes, birthRes, medicalRes] = await Promise.allSettled([
+  const [personRes, birthRes, medicalRes,marriageRes] = await Promise.allSettled([
     apiFetch('/api/person/me', 'GET', null),
     apiFetch('/api/birth_records/me', 'GET', null),
-    apiFetch('/api/medical_records/me', 'GET', null)
+    apiFetch('/api/medical_records/me', 'GET', null),
+    apiFetch('/api/marriage/me', 'GET', null)
   ]);
 
   const errors = [];
@@ -178,7 +187,12 @@ async function loadProfileData() {
     renderMedical(null);
     errors.push('medical record');
   }
-
+  if (marriageRes.status === 'fulfilled' && !marriageRes.value?.error) {
+    renderMarriage(marriageRes.value);
+  } else {
+    renderMarriage(null);
+    errors.push('medical record');
+  }
   if (errors.length === 0) {
     setBanner('Your records are loaded successfully.', 'success');
     return;
