@@ -130,9 +130,9 @@ function renderEducation(education) {
   setText('Major', fmt(education?.major));
   setText('DegreeType', fmt(education?.degree_type));
   setText('StudyMode', fmt(education?.study_mode));
-  setText('StartDate', smokerLabel(education?.start_date));
-  setText('GraduationDate', fmt(education?.graduation_date));
-  setText('Certificate', formatDate(education?.certificate_url));
+  setText('StartDate', formatDate(education?.start_date));
+  setText('GraduationDate', formatDate(education?.graduation_date));
+  setText('Certificate', fmt(education?.certificate_url));
 }
 function activateSection(sectionName) {
   sidebarLinks.forEach((btn) => {
