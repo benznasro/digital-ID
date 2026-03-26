@@ -60,6 +60,13 @@ function smokerLabel(value) {
   return 'Not available';
 }
 
+function gitfullname(id){
+if(id){
+return id-first_name;
+}else{
+  return 'Not available';
+}
+}
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) {
@@ -73,15 +80,12 @@ function renderPerson(person) {
   setText('overviewFullName', fullName === 'Not available Not available' ? 'Not available' : fullName);
   setText('overviewNationalId', fmt(person?.national_id));
   setText('overviewMarital', fmt(person?.marital_status));
-
-  setText('identityPersonId', fmt(person?.id));
   setText('identityNationalId', fmt(person?.national_id));
   setText('identityFirstName', fmt(person?.first_name));
   setText('identityLastName', fmt(person?.last_name));
   setText('identityDob', formatDate(person?.date_of_birth));
   setText('identityGender', genderLabel(person?.gender));
   setText('identityMarital', fmt(person?.marital_status));
-
   setText('contactEmail', fmt(person?.email));
   setText('contactPhone', fmt(person?.phone_number));
 
@@ -103,6 +107,7 @@ function renderBirth(birth) {
 }
 
 function renderMedical(medical) {
+  
   setText('overviewBloodType', fmt(medical?.blood_type));
   setText('overviewCheckup', formatDate(medical?.last_checkup_date));
 
@@ -114,7 +119,22 @@ function renderMedical(medical) {
   setText('medicalConditions', fmt(medical?.chronic_conditions));
   setText('medicalCheckup', formatDate(medical?.last_checkup_date));
 }
-
+function renderMarriage(marriage){
+  const fullNameHesbend = `${fmt(marriage-hesbend?.first_name)} ${fmt(marriage-hesbend?.last_name)}`.trim();
+  const fullNameWife = `${fmt(marriage-wife?.first_name)} ${fmt(marriage-wife?.last_name)}`.trim();
+  const fullwitness_1 = `${fmt(marriage-witness_1?.first_name)} ${fmt(marriage-witness_1?.last_name)}`.trim();
+  const fullwitness_2 = `${fmt(marriage-witness_1?.first_name)} ${fmt(marriage-witness_1?.last_name)}`.trim();
+  setText('FullHesbend"', fmt(marriage?.fullNameHesbend));
+  setText('FullWife', formatDate(marriage?.fullNameWife));
+  setText('valid', fmt(marriage?.contract_no));
+  setText('valid', fmt(marriage?.valid));
+  setText('divorceDate', formatDate(marriage?.divorcedate));
+  setText('MarriageDate', formatDate(marriage?.marriagedate));
+  setText('witness_1', fmt(marriage?.fullwitness_1));
+  setText('witness_2', smokerLabel(marriage?.fullwitness_1));
+  setText('dowry_amount', fmt(marriage?.dowry_amount));
+  setText('notary', formatDate(marriage?.notary));
+}
 function activateSection(sectionName) {
   sidebarLinks.forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.section === sectionName);
@@ -151,10 +171,11 @@ document.addEventListener('click', (e) => {
 async function loadProfileData() {
   setBanner('Loading your data...');
 
-  const [personRes, birthRes, medicalRes] = await Promise.allSettled([
+  const [personRes, birthRes, medicalRes,marriageRes] = await Promise.allSettled([
     apiFetch('/api/person/me', 'GET', null),
     apiFetch('/api/birth_records/me', 'GET', null),
-    apiFetch('/api/medical_records/me', 'GET', null)
+    apiFetch('/api/medical_records/me', 'GET', null),
+    apiFetch('/api/marriage/me', 'GET', null)
   ]);
 
   const errors = [];
@@ -178,7 +199,12 @@ async function loadProfileData() {
     renderMedical(null);
     errors.push('medical record');
   }
-
+  if (marriageRes.status === 'fulfilled' && !marriageRes.value?.error) {
+    renderMarriage(marriageRes.value);
+  } else {
+    renderMarriage(null);
+    errors.push('medical record');
+  }
   if (errors.length === 0) {
     setBanner('Your records are loaded successfully.', 'success');
     return;
