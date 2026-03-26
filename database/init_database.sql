@@ -34,6 +34,36 @@ CREATE SEQUENCE public.birth_records_id_seq
 ALTER SEQUENCE public.birth_records_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.birth_records_id_seq TO postgres;
 
+-- DROP SEQUENCE public.birth_records_log_id_seq;
+
+CREATE SEQUENCE public.birth_records_log_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.birth_records_log_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.birth_records_log_id_seq TO postgres;
+
+-- DROP SEQUENCE public.criminal_records_id_seq;
+
+CREATE SEQUENCE public.criminal_records_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.criminal_records_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.criminal_records_id_seq TO postgres;
+
 -- DROP SEQUENCE public.death_records_id_seq;
 
 CREATE SEQUENCE public.death_records_id_seq
@@ -48,6 +78,21 @@ CREATE SEQUENCE public.death_records_id_seq
 
 ALTER SEQUENCE public.death_records_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.death_records_id_seq TO postgres;
+
+-- DROP SEQUENCE public.education_id_seq;
+
+CREATE SEQUENCE public.education_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+-- Permissions
+
+ALTER SEQUENCE public.education_id_seq OWNER TO postgres;
+GRANT ALL ON SEQUENCE public.education_id_seq TO postgres;
 
 -- DROP SEQUENCE public.employment_id_seq;
 
@@ -138,21 +183,6 @@ CREATE SEQUENCE public.national_id_seq
 
 ALTER SEQUENCE public.national_id_seq OWNER TO postgres;
 GRANT ALL ON SEQUENCE public.national_id_seq TO postgres;
-
--- DROP SEQUENCE public.passports_id_seq;
-
-CREATE SEQUENCE public.passports_id_seq
-	INCREMENT BY 1
-	MINVALUE 1
-	MAXVALUE 9223372036854775807
-	START 1
-	CACHE 1
-	NO CYCLE;
-
--- Permissions
-
-ALTER SEQUENCE public.passports_id_seq OWNER TO postgres;
-GRANT ALL ON SEQUENCE public.passports_id_seq TO postgres;
 
 -- DROP SEQUENCE public.person_id_seq;
 
@@ -250,11 +280,7 @@ GRANT ALL ON TABLE public.roles TO postgres;
 CREATE TABLE public.person ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, national_id int8 NOT NULL, first_name varchar(255) NOT NULL, last_name varchar(255) NOT NULL, email varchar(255) NULL, date_of_birth date NOT NULL, phone_number varchar(20) NULL, gender bool NOT NULL, dad_id int8 NULL, mom_id int8 NULL, marital_status varchar(20) DEFAULT 'single'::character varying NOT NULL, CONSTRAINT check_lineage CHECK (((id <> dad_id) AND (id <> mom_id) AND (dad_id <> mom_id))), CONSTRAINT person_email_key UNIQUE (email), CONSTRAINT person_national_id_key UNIQUE (national_id), CONSTRAINT person_pkey PRIMARY KEY (id), CONSTRAINT person_dad_id_fkey FOREIGN KEY (dad_id) REFERENCES public.person(id), CONSTRAINT person_mom_id_fkey FOREIGN KEY (mom_id) REFERENCES public.person(id));
 
 -- Table Triggers
-
-create trigger trg_inherit_father_last_name before
-insert
-    on
-    public.person for each row execute function inherit_father_last_name();
+-- Triggers are created in the final hardening section after all functions exist.
 
 -- Permissions
 
@@ -290,6 +316,36 @@ ALTER TABLE public.assets OWNER TO postgres;
 GRANT ALL ON TABLE public.assets TO postgres;
 
 
+-- public.birth_records_log definition
+
+-- Drop table
+
+-- DROP TABLE public.birth_records_log;
+
+CREATE TABLE public.birth_records_log ( id bigserial NOT NULL, birth_record_id int8 NULL, operation varchar(10) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by varchar(100) DEFAULT CURRENT_USER NULL, changed_by_user_id int8 NULL, old_birth_certificate_no int8 NULL, old_child_id int8 NULL, old_doctor_name varchar(255) NULL, old_birth_weight_kg numeric(4, 2) NULL, new_birth_certificate_no int8 NULL, new_child_id int8 NULL, new_doctor_name varchar(255) NULL, new_birth_weight_kg numeric(4, 2) NULL, old_birth_date_time timestamptz NULL, new_birth_date_time timestamptz NULL, old_marriage_id int8 NULL, new_marriage_id int8 NULL, CONSTRAINT birth_records_log_pkey PRIMARY KEY (id), CONSTRAINT birth_records_log_changed_by_user_id_fkey FOREIGN KEY (changed_by_user_id) REFERENCES public.users(id));
+
+-- Permissions
+
+ALTER TABLE public.birth_records_log OWNER TO postgres;
+GRANT ALL ON TABLE public.birth_records_log TO postgres;
+
+
+-- public.criminal_records definition
+
+-- Drop table
+
+-- DROP TABLE public.criminal_records;
+
+CREATE TABLE public.criminal_records ( id bigserial NOT NULL, person_id int8 NOT NULL, case_number varchar(50) NOT NULL, status bool DEFAULT true NULL, violation_type text NOT NULL, disposition varchar(100) NULL, description text NULL, occurrence_date timestamptz NULL, filing_date timestamptz DEFAULT CURRENT_TIMESTAMP NULL, fine_amount numeric(12, 2) DEFAULT 0.00 NULL, sentence_details text NULL, location_details text NULL, is_expunged bool DEFAULT false NULL, CONSTRAINT criminal_records_case_number_key UNIQUE (case_number), CONSTRAINT criminal_records_pkey PRIMARY KEY (id), CONSTRAINT fk_person FOREIGN KEY (person_id) REFERENCES public.person(id) ON DELETE CASCADE);
+CREATE INDEX idx_criminal_case_number ON public.criminal_records USING btree (case_number);
+CREATE INDEX idx_criminal_person_id ON public.criminal_records USING btree (person_id);
+
+-- Permissions
+
+ALTER TABLE public.criminal_records OWNER TO postgres;
+GRANT ALL ON TABLE public.criminal_records TO postgres;
+
+
 -- public.death_records definition
 
 -- Drop table
@@ -299,16 +355,28 @@ GRANT ALL ON TABLE public.assets TO postgres;
 CREATE TABLE public.death_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, death_date timestamptz NOT NULL, place_of_death varchar(255) NULL, cause_of_death text NULL, doctor_id int8 NULL, icd_10_code varchar(10) NULL, kin_contact_id int8 NULL, notified_next_of_kin bool DEFAULT false NULL, hospital_user_id int4 NULL, CONSTRAINT death_records_person_id_key UNIQUE (person_id), CONSTRAINT death_records_pkey PRIMARY KEY (id), CONSTRAINT death_records_doctor_id_fkey FOREIGN KEY (doctor_id) REFERENCES public.person(id), CONSTRAINT death_records_hospital_user_id_fkey FOREIGN KEY (hospital_user_id) REFERENCES public.users(id), CONSTRAINT death_records_kin_contact_id_fkey FOREIGN KEY (kin_contact_id) REFERENCES public.person(id), CONSTRAINT death_records_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
 
 -- Table Triggers
-
-create trigger trg_on_dath_deactivate_all after
-insert
-    on
-    public.death_records for each row execute function handle_person_death();
+-- Triggers are created in the final hardening section after all functions exist.
 
 -- Permissions
 
 ALTER TABLE public.death_records OWNER TO postgres;
 GRANT ALL ON TABLE public.death_records TO postgres;
+
+
+-- public.education definition
+
+-- Drop table
+
+-- DROP TABLE public.education;
+
+CREATE TABLE public.education ( id bigserial NOT NULL, person_id int8 NOT NULL, university_name varchar(255) NOT NULL, major varchar(150) NOT NULL, degree_type varchar(50) NULL, gpa numeric(4, 2) NULL, study_mode varchar(50) NULL, start_date date NULL, graduation_date date NULL, certificate_url varchar(255) NULL, is_verified bool DEFAULT false NULL, created_at timestamptz DEFAULT CURRENT_TIMESTAMP NULL, CONSTRAINT education_pkey PRIMARY KEY (id), CONSTRAINT fk_person_education FOREIGN KEY (person_id) REFERENCES public.person(id) ON DELETE CASCADE);
+CREATE INDEX idx_education_degree ON public.education USING btree (degree_type);
+CREATE INDEX idx_education_person_id ON public.education USING btree (person_id);
+
+-- Permissions
+
+ALTER TABLE public.education OWNER TO postgres;
+GRANT ALL ON TABLE public.education TO postgres;
 
 
 -- public.employment definition
@@ -317,18 +385,10 @@ GRANT ALL ON TABLE public.death_records TO postgres;
 
 -- DROP TABLE public.employment;
 
-CREATE TABLE public.employment ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, job_title varchar(255) NULL, salary numeric(15, 2) NULL, start_date date NULL, is_active bool DEFAULT true NULL, company_id int8 NULL, CONSTRAINT employment_pkey PRIMARY KEY (id), CONSTRAINT employment_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
-
--- Table Triggers
-
-create trigger trg_check_death_before_job before
-insert
-    on
-    public.employment for each row execute function block_dead_employment();
-create trigger trg_salary_audit after
-update
-    of salary on
-    public.employment for each row execute function audit_salary_changes();
+CREATE TABLE public.employment ( id bigserial NOT NULL, person_id int8 NOT NULL, company_id int8 NOT NULL, job_title varchar(150) NOT NULL, department varchar(100) NULL, employment_type varchar(50) NULL, salary numeric(15, 2) DEFAULT 0.00 NULL, is_active bool DEFAULT true NULL, start_date date NOT NULL, end_date date NULL, manager_id int8 NULL, work_location varchar(255) NULL, CONSTRAINT employment_pkey PRIMARY KEY (id), CONSTRAINT fk_manager FOREIGN KEY (manager_id) REFERENCES public.person(id) ON DELETE SET NULL, CONSTRAINT fk_person_employment FOREIGN KEY (person_id) REFERENCES public.person(id) ON DELETE CASCADE);
+CREATE INDEX idx_employment_active ON public.employment USING btree (is_active);
+CREATE INDEX idx_employment_company_id ON public.employment USING btree (company_id);
+CREATE INDEX idx_employment_person_id ON public.employment USING btree (person_id);
 
 -- Permissions
 
@@ -346,23 +406,7 @@ CREATE TABLE public.marriage ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT B
 CREATE UNIQUE INDEX idx_single_active_husband ON public.marriage USING btree (wife_id) WHERE (valid = true);
 
 -- Table Triggers
-
-create trigger trg_limit_wives before
-insert
-    on
-    public.marriage for each row execute function check_max_wives();
-create trigger trg_prevent_incest before
-insert
-    on
-    public.marriage for each row execute function check_incest_prevention();
-create trigger trg_marriage_audit after
-insert
-    or
-delete
-    or
-update
-    on
-    public.marriage for each row execute function log_marriage_changes();
+-- Triggers are created in the final hardening section after all functions exist.
 
 -- Permissions
 
@@ -406,13 +450,6 @@ GRANT ALL ON TABLE public.medical_records TO postgres;
 
 CREATE TABLE public.passports ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, passport_number varchar(20) NOT NULL, issue_date date NULL, expiry_date date NULL, is_active bool DEFAULT true NULL, CONSTRAINT passports_passport_number_key UNIQUE (passport_number), CONSTRAINT passports_pkey PRIMARY KEY (id), CONSTRAINT passports_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
 
--- Table Triggers
-
-create trigger trg_no_passport_overlap before
-insert
-    on
-    public.passports for each row execute function check_passport_overlap();
-
 -- Permissions
 
 ALTER TABLE public.passports OWNER TO postgres;
@@ -425,7 +462,7 @@ GRANT ALL ON TABLE public.passports TO postgres;
 
 -- DROP TABLE public.salary_audit;
 
-CREATE TABLE public.salary_audit ( id serial4 NOT NULL, employment_id int8 NULL, old_salary numeric(15, 2) NULL, new_salary numeric(15, 2) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by_user varchar(100) DEFAULT CURRENT_USER NULL, CONSTRAINT salary_audit_pkey PRIMARY KEY (id), CONSTRAINT salary_audit_employment_id_fkey FOREIGN KEY (employment_id) REFERENCES public.employment(id));
+CREATE TABLE public.salary_audit ( id serial4 NOT NULL, employment_id int8 NULL, old_salary numeric(15, 2) NULL, new_salary numeric(15, 2) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by_user varchar(100) DEFAULT CURRENT_USER NULL, CONSTRAINT salary_audit_pkey PRIMARY KEY (id), CONSTRAINT salary_audit_employment_id_fkey FOREIGN KEY (employment_id) REFERENCES public.employment(id) ON DELETE CASCADE);
 
 -- Permissions
 
@@ -439,7 +476,10 @@ GRANT ALL ON TABLE public.salary_audit TO postgres;
 
 -- DROP TABLE public.birth_records;
 
-CREATE TABLE public.birth_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, birth_certificate_no int8 NOT NULL, child_id int8 NOT NULL, marriage_id int8 NULL, hospital_name varchar(255) NULL, doctor_name varchar(255) NULL, birth_weight_kg numeric(4, 2) NULL, birth_datetime timestamptz NOT NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, apgar_score int2 NULL, CONSTRAINT birth_records_birth_certificate_no_key UNIQUE (birth_certificate_no), CONSTRAINT birth_records_child_id_key UNIQUE (child_id), CONSTRAINT birth_records_pkey PRIMARY KEY (id), CONSTRAINT birth_records_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.person(id), CONSTRAINT birth_records_marriage_id_fkey FOREIGN KEY (marriage_id) REFERENCES public.marriage(id));
+CREATE TABLE public.birth_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, birth_certificate_no int8 NOT NULL, child_id int8 NOT NULL, marriage_id int8 NULL, hospital_name varchar(255) NULL, doctor_name varchar(255) NULL, birth_weight_kg numeric(4, 2) NULL, birth_date_time timestamptz NOT NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, apgar_score int2 NULL, CONSTRAINT birth_records_birth_certificate_no_key UNIQUE (birth_certificate_no), CONSTRAINT birth_records_child_id_key UNIQUE (child_id), CONSTRAINT birth_records_pkey PRIMARY KEY (id), CONSTRAINT birth_records_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.person(id), CONSTRAINT birth_records_marriage_id_fkey FOREIGN KEY (marriage_id) REFERENCES public.marriage(id));
+
+-- Table Triggers
+-- Triggers are created in the final hardening section after all functions exist.
 
 -- Permissions
 
@@ -730,6 +770,28 @@ BEGIN
     SET is_active = false
     WHERE person_id = NEW.person_id;
 		
+        -- mark deceased person status
+        UPDATE person
+        SET marital_status = 'deceased'
+        WHERE id = NEW.person_id;
+
+        -- mark the still-living spouse as widowed when marriage ends by death
+        UPDATE person p
+        SET marital_status = 'widowed'
+        WHERE p.id IN (
+            SELECT CASE
+                             WHEN m.husband_id = NEW.person_id THEN m.wife_id
+                             ELSE m.husband_id
+                         END
+            FROM marriage m
+            WHERE (m.husband_id = NEW.person_id OR m.wife_id = NEW.person_id)
+                AND m.valid = true
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM death_records d
+            WHERE d.person_id = p.id
+        );
+
     -- close any active marriage
     UPDATE marriage
     SET valid = false,
@@ -780,6 +842,61 @@ $function$
 
 ALTER FUNCTION public.inherit_father_last_name() OWNER TO postgres;
 GRANT ALL ON FUNCTION public.inherit_father_last_name() TO postgres;
+
+-- DROP FUNCTION public.log_birth_record_changes();
+
+CREATE OR REPLACE FUNCTION public.log_birth_record_changes()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_user_id bigint;
+BEGIN
+    -- Get current app user
+    BEGIN
+        v_user_id := current_setting('app.current_user_id')::bigint;
+    EXCEPTION WHEN OTHERS THEN
+        v_user_id := NULL; 
+    END;
+
+    IF TG_OP = 'INSERT' THEN
+        INSERT INTO birth_records_log (
+            birth_record_id, operation, changed_by_user_id,
+            new_birth_certificate_no, new_child_id, new_doctor_name, 
+            new_birth_weight_kg, new_marriage_id, new_birth_date_time
+        ) VALUES (
+            NEW.id, 'INSERT', v_user_id,
+            NEW.birth_certificate_no, NEW.child_id, NEW.doctor_name, 
+            NEW.birth_weight_kg, NEW.marriage_id, NEW.birth_date_time
+        );
+    ELSIF TG_OP = 'UPDATE' THEN
+        INSERT INTO birth_records_log (
+            birth_record_id, operation, changed_by_user_id,
+            old_birth_certificate_no, old_child_id, old_doctor_name, old_birth_weight_kg, old_marriage_id, old_birth_date_time,
+            new_birth_certificate_no, new_child_id, new_doctor_name, new_birth_weight_kg, new_marriage_id, new_birth_date_time
+        ) VALUES (
+            NEW.id, 'UPDATE', v_user_id,
+            OLD.birth_certificate_no, OLD.child_id, OLD.doctor_name, OLD.birth_weight_kg, OLD.marriage_id, OLD.birth_date_time,
+            NEW.birth_certificate_no, NEW.child_id, NEW.doctor_name, NEW.birth_weight_kg, NEW.marriage_id, NEW.birth_date_time
+        );
+    ELSIF TG_OP = 'DELETE' THEN
+        INSERT INTO birth_records_log (
+            birth_record_id, operation, changed_by_user_id,
+            old_birth_certificate_no, old_child_id, old_doctor_name, old_birth_weight_kg, old_marriage_id, old_birth_date_time
+        ) VALUES (
+            OLD.id, 'DELETE', v_user_id,
+            OLD.birth_certificate_no, OLD.child_id, OLD.doctor_name, OLD.birth_weight_kg, OLD.marriage_id, OLD.birth_date_time
+        );
+    END IF;
+    RETURN NEW;
+END;
+$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.log_birth_record_changes() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.log_birth_record_changes() TO postgres;
 
 -- DROP FUNCTION public.log_marriage_changes();
 
@@ -844,6 +961,157 @@ $function$
 
 ALTER FUNCTION public.log_marriage_changes() OWNER TO postgres;
 GRANT ALL ON FUNCTION public.log_marriage_changes() TO postgres;
+
+
+-- Final hardening section: create indexes and triggers after all functions exist
+
+CREATE INDEX IF NOT EXISTS idx_birth_records_log_changed_user_time
+ON public.birth_records_log USING btree (changed_by_user_id, changed_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_birth_records_log_record_time
+ON public.birth_records_log USING btree (birth_record_id, changed_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_marriage_audit_changed_user_time
+ON public.marriage_audit USING btree (changed_by_user_id, changed_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_marriage_husband_valid
+ON public.marriage USING btree (husband_id)
+WHERE valid = true;
+
+CREATE INDEX IF NOT EXISTS idx_marriage_wife_valid
+ON public.marriage USING btree (wife_id)
+WHERE valid = true;
+
+CREATE INDEX IF NOT EXISTS idx_birth_records_marriage_id
+ON public.birth_records USING btree (marriage_id);
+
+CREATE INDEX IF NOT EXISTS idx_death_records_hospital_user_id
+ON public.death_records USING btree (hospital_user_id);
+
+CREATE INDEX IF NOT EXISTS idx_passports_person_active
+ON public.passports USING btree (person_id)
+WHERE is_active = true;
+
+CREATE INDEX IF NOT EXISTS idx_users_role_id
+ON public.users USING btree (role_id);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+        WHERE tgname = 'trg_inherit_father_last_name'
+          AND tgrelid = 'public.person'::regclass
+    ) THEN
+        CREATE TRIGGER trg_inherit_father_last_name
+        BEFORE INSERT ON public.person
+        FOR EACH ROW EXECUTE FUNCTION inherit_father_last_name();
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+        WHERE tgname = 'trg_on_dath_deactivate_all'
+          AND tgrelid = 'public.death_records'::regclass
+    ) THEN
+        CREATE TRIGGER trg_on_dath_deactivate_all
+        AFTER INSERT ON public.death_records
+        FOR EACH ROW EXECUTE FUNCTION handle_person_death();
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+        WHERE tgname = 'trg_check_death_before_job'
+          AND tgrelid = 'public.employment'::regclass
+    ) THEN
+        CREATE TRIGGER trg_check_death_before_job
+        BEFORE INSERT ON public.employment
+        FOR EACH ROW EXECUTE FUNCTION block_dead_employment();
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+        WHERE tgname = 'trg_salary_audit'
+          AND tgrelid = 'public.employment'::regclass
+    ) THEN
+        CREATE TRIGGER trg_salary_audit
+        AFTER UPDATE OF salary ON public.employment
+        FOR EACH ROW EXECUTE FUNCTION audit_salary_changes();
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+        WHERE tgname = 'trg_limit_wives'
+          AND tgrelid = 'public.marriage'::regclass
+    ) THEN
+        CREATE TRIGGER trg_limit_wives
+        BEFORE INSERT ON public.marriage
+        FOR EACH ROW EXECUTE FUNCTION check_max_wives();
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+        WHERE tgname = 'trg_prevent_incest'
+          AND tgrelid = 'public.marriage'::regclass
+    ) THEN
+        CREATE TRIGGER trg_prevent_incest
+        BEFORE INSERT ON public.marriage
+        FOR EACH ROW EXECUTE FUNCTION check_incest_prevention();
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+        WHERE tgname = 'trg_marriage_audit'
+          AND tgrelid = 'public.marriage'::regclass
+    ) THEN
+        CREATE TRIGGER trg_marriage_audit
+        AFTER INSERT OR DELETE OR UPDATE ON public.marriage
+        FOR EACH ROW EXECUTE FUNCTION log_marriage_changes();
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+        WHERE tgname = 'trg_no_passport_overlap'
+          AND tgrelid = 'public.passports'::regclass
+    ) THEN
+        CREATE TRIGGER trg_no_passport_overlap
+        BEFORE INSERT ON public.passports
+        FOR EACH ROW EXECUTE FUNCTION check_passport_overlap();
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+        WHERE tgname = 'trg_birth_records_audit'
+          AND tgrelid = 'public.birth_records'::regclass
+    ) THEN
+        CREATE TRIGGER trg_birth_records_audit
+        AFTER INSERT OR DELETE OR UPDATE ON public.birth_records
+        FOR EACH ROW EXECUTE FUNCTION log_birth_record_changes();
+    END IF;
+END $$;
+
+INSERT INTO public.roles (name)
+VALUES
+  ('citizen'),
+  ('hospital'),
+  ('police'),
+  ('government'),
+  ('admin'),
+  ('Marriage_Notary')
+ON CONFLICT (name) DO NOTHING;
 
 
 -- Permissions
