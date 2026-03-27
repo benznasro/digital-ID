@@ -44,7 +44,7 @@ DATABASE = {
 }
 
 # bcrypt hash for plain password: password
-DEFAULT_PASSWORD_HASH = "$2b$12$KIXQ4N6YV9Sg4J1kIY4cR.8JCyA6Dc4Kj6VwBEm90Lk9RdtqvOB2S"
+DEFAULT_PASSWORD_HASH = "$2b$12$jL0MZV.okNAMo8YO2Wpa.OmLHWLCZPuST42JePt2oWD7L.NBdSTnG"
 
 FAKE = Faker(["fr_FR", "en_US"])
 TODAY = date.today()
