@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>طلب جواز السفر </title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
+</head>
+<body>
+
+
+<div class="overlay" id="ov">
+  <div class="spin"></div>
+  <div class="ov-txt" id="ov-txt">جاري المعالجة...</div>
+
+</div>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="flag">
+      <div class="flag-g">
+
+    </div><div class="flag-w">☽★</div></div>
+    <div class="h-titles">
+      <h1>  اهلا بكم انا اخوكم بالله </h1>
+      <p>  Biometric Passport</p>
+    </div>
+    <div class="h-live"><div class="h-live-dot">
+
+    </div>خدمة رقمية</div>
+  </div>
+</div>
+
+<div class="page">
+
+
+  <div class="steps" id="stepsBar">
+    <div class="step-w">
+      <div class="step-num active" id="sn1">1</div><div class="step-lbl active" id="sl1">هويتك</div></div>
+    <div class="step-line" id="ln1"></div>
+    <div class="step-w">
+      <div class="step-num" id="sn2">2</div><div class="step-lbl" id="sl2">الجواز</div></div>
+    <div class="step-line" id="ln2"></div>
+    <div class="step-w">
+      
+      <div class="step-num" id="sn3">3</div><div class="step-lbl" id="sl3">صورتك</div></div>
+    <div class="step-line" id="ln3"></div>
+    <div class="step-w">
+      
+      <div class="step-num" id="sn4">4</div><div class="step-lbl" id="sl4">مراجعة</div></div>
+    <div class="step-line" id="ln4"></div>
+    <div class="step-w">
+      
+      <div class="step-num" id="sn5">5</div><div class="step-lbl" id="sl5">تم ✓</div></div>
+  </div>
+
+  
+
+
+  <div class="panel on" id="p1">
+
+    <div class="card">
+      <div class="card-head">
+    
+        <div class="card-head-text">
+          <h2>التعرف على هويتك</h2>
+          <p>أدخل رقم بطاقتك الوطنية وتاريخ ميلادك </p>
+        </div>
+      </div>
+
+
+                    <div class="card-body">
+
+        <div class="alert info">
+                <i></i>
+          <span>بياناتك تُسترجع تلقائياً من سجل السكان. لا حاجة لإدخال معلوماتك الشخصية يدوياً.</span>
+        </div>
+
+        <div class="row c2">
+          <div class="fg" id="fg-cni">
+                   <label>رقم البطاقة الوطنية <span class="req">*</span></label>
+            <input id="inp-cni" type="text" placeholder="مثال: 1234567890" maxlength="18">
+            <div class="err-msg">أدخل رقم البطاقة الوطنية</div>
+          </div>
+          <div class="fg" id="fg-dob">
+                        <label>تاريخ الميلاد <span class="req">*</span> <span class="sub">— للتأكد من هويتك</span></label>
+                  <input id="inp-dob" type="date">
+                    <div class="err-msg">أدخل تاريخ ميلادك</div>
+          </div>
+        </div>
+
+        <div class="row c2">
+          <div class="fg" id="fg-wil">
+            <label>الولاية <span class="req"> *</span></label>
+  <select id="inp-wil">
+                                                 <option value="">   -- اختر ولايتك --  </option>
+                                                 <option>01 - أدرار</option><option>02 - الشلف</option><option>03 - الأغواط</option>
+                                                 <option>04 - أم البواقي</option><option>05 - باتنة</option><option>06 - بجاية</option>
+                                                 <option>07 - بسكرة</option><option>08 - بشار</option><option>09 - البليدة</option>
+                                                 <option>10 - البويرة</option><option>11 - تمنراست</option><option>12 - تبسة</option>
+                                                 <option>13 - تلمسان</option><option>14 - تيارت</option><option>15 - تيزي وزو</option>
+                                                 <option>16 - الجزائر العاصمة</option><option>17 - الجلفة</option><option>18 - جيجل</option>
+                                                 <option>19 - سطيف</option><option>20 - سعيدة</option><option>21 - سكيكدة</option>
+                                                 <option>22 - سيدي بلعباس</option><option>23 - عنابة</option><option>24 - قالمة</option>
+                                                 <option>25 - قسنطينة</option><option>26 - المدية</option><option>27 - مستغانم</option>
+                                                 <option>28 - المسيلة</option><option>29 - معسكر</option><option>30 - ورقلة</option>
+                                                 <option>31 - وهران</option><option>32 - البيض</option><option>33 - إليزي</option>
+                                                 <option>34 - برج بوعريريج</option><option>35 - بومرداس</option><option>36 - الطارف</option>
+                                                 <option>37 - تندوف</option><option>38 - تيسمسيلت</option><option>39 - الوادي</option>
+                                                 <option>40 - خنشلة</option><option>41 - سوق أهراس</option><option>42 - تيبازة</option>
+                                                 <option>43 - ميلة</option><option>44 - عين الدفلى</option><option>45 - النعامة</option>
+                                                 <option>46 - عين تموشنت</option><option>47 - غرداية</option><option>48 - غليزان</option>
+                                                 <option>49 - تيميمون</option><option>50 - برج باجي مختار</option><option>51 - أولاد جلال</option>
+                                                 <option>52 - بني عباس</option><option>53 - عين صالح</option><option>54 - عين قزام</option>
+                                                 <option>55 - توقرت</option><option>56 - جانت</option><option>57 - المغير</option>
+                                                 <option>58 - المنيعة</option>
+  </select>
+            <div class="err-msg">اختر ولايتك</div>
+          </div>
+          <div class="fg" id="fg-gen">
+            <label>الجنس <span class="req">*</span></label>
+            <select id="inp-gen">
+
+              <option value="">-- اختر --</option>
+              <option value="ذكر">ذكر — Male</option>
+              <option value="أنثى">أنثى — Famele</option>
+            </select>
+            <div class="err-msg">اختر الجنس</div>
+          </div>
+        </div>
+
+                                                       </div>
+    </div>
+
+
+  
+  
+    <div class="card" id="profile-card" style="display:none;">
+      <div class="card-head">
+        <div class="card-ico">✅</div>
+        <div class="card-head-text">
+          <h2>تم التعرف على هويتك</h2>
+          <p>البيانات مُسترجَعة تلقائياً من سجل السكان — لا يمكن تعديلها</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="alert success" style="margin-bottom:12px;">
+          <i>✅</i>
+          <span>هويتك مُؤكَّدة. البيانات أدناه صحيحة من قاعدة بيانات السكان.</span>
+        </div>
+        <div class="profile-grid" id="profileGrid"></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <div></div>
+      <button class="btn btn-main" onclick="step1()">التحقق والمتابعة ←</button>
+    </div>
+  </div>
+
+
+  
+
+
+
+  <div class="panel" id="p2">
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-ico">📒</div>
+        <div class="card-head-text">
+          <h2>نوع الجواز والصلاحية</h2>
+          <p>اختر ما يناسبك</p>
+        </div>
+      </div>
+      <div class="card-body">
+
+        <p style="font-size:.78rem;font-weight:700;color:var(--label);margin-bottom:10px;">نوع الجواز:</p>
+        <div class="type-opts" style="margin-bottom:16px;">
+          <div class="type-opt selected" id="to-ord" onclick="selType('ord')">
+            <div class="type-dot"></div>
+            <div class="type-info">
+              <strong>جواز عادي — 32 صفحة</strong>
+              <span>للسفر العائلي والسياحي — الأكثر طلباً</span>
+            </div>
+            <span class="type-badge green">مجاني</span>
+          </div>
+          <div class="type-opt" id="to-ext" onclick="selType('ext')">
+            <div class="type-dot"></div>
+            <div class="type-info">
+              <strong>جواز موسّع — 48 صفحة</strong>
+              <span>للمسافرين بكثرة — تجار ورجال أعمال</span>
+            </div>
+            <span class="type-badge gold">رسوم رمزية</span>
+          </div>
+        </div>
+
+        <div class="row c2">
+          <div class="fg" id="fg-val">
+            <label>مدة الصلاحية <span class="req">*</span></label>
+            <select id="inp-val">
+              <option value="">-- اختر --</option>
+              <option value="5">5 سنوات</option>
+              <option value="10">10 سنوات (يُنصح)</option>
+            </select>
+            <div class="err-msg">اختر مدة الصلاحية</div>
+          </div>
+          <div class="fg" id="fg-rsn">
+            <label>سبب الطلب <span class="req">*</span></label>
+            <select id="inp-rsn">
+              <option value="">-- اختر --</option>
+              <option value="new">أول مرة — Premier passeport</option>
+              <option value="renew">تجديد جواز منتهي</option>
+              <option value="lost">ضياع الجواز</option>
+              <option value="damaged">تلف الجواز</option>
+            </select>
+            <div class="err-msg">اختر سبب الطلب</div>
+          </div>
+        </div>
+
+        <!-- Lost/damaged extra field -->
+        <div class="row c2" id="lost-row" style="display:none;">
+          <div class="fg">
+            <label>رقم محضر الضياع <span class="req">*</span> <span class="sub">(من مخفر الشرطة)</span></label>
+            <input id="inp-lost" type="text" placeholder="رقم المحضر">
+          </div>
+          <div class="fg">
+            <label>تاريخ تقديم المحضر</label>
+            <input id="inp-lost-date" type="date">
+          </div>
+        </div>
+
+        <div class="row c2">
+          <div class="fg">
+            <label>مكان الاستلام <span class="req">*</span></label>
+            <select id="inp-pickup">
+              <option value="">-- اختر --</option>
+              <option>مقر الولاية</option>
+              <option>البلدية المحلية</option>
+              <option>مكتب البريد الجزائري</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>البريد الإلكتروني <span class="sub">(اختياري — للإشعارات)</span></label>
+            <input id="inp-email" type="email" placeholder="exemple@gmail.com">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  
+
+
+
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-ico">🔍</div>
+        <div class="card-head-text">
+          <h2>فحص الأهلية التلقائي</h2>
+          <p>يتم التحقق من شروط الجواز بشكل فوري</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="checks">
+          <div class="chk ok">
+            <span class="chk-ico">✅</span>
+            <div class="chk-txt"><strong>الهوية الوطنية</strong><span>تم التحقق من صحة البطاقة</span></div>
+            <span class="chk-st ok">✓ مؤكَّد</span>
+          </div>
+          <div class="chk" id="chk-law">
+            <span class="chk-ico">⚖️</span>
+            <div class="chk-txt"><strong>الوضع القانوني والقضائي</strong><span>لا حكم قضائي يمنع السفر</span></div>
+            <span class="chk-st pend" id="chk-law-s">⏳ جارٍ الفحص</span>
+          </div>
+          <div class="chk" id="chk-mil">
+            <span class="chk-ico">🪖</span>
+            <div class="chk-txt"><strong>الخدمة العسكرية</strong><span>مؤجَّل / مستوفي / معفى</span></div>
+            <span class="chk-st pend" id="chk-mil-s">⏳ جارٍ الفحص</span>
+          </div>
+          <div class="chk" id="chk-tax">
+            <span class="chk-ico">💰</span>
+            <div class="chk-txt"><strong>الوضع الجبائي</strong><span>لا مخالفات ضريبية</span></div>
+            <span class="chk-st pend" id="chk-tax-s">⏳ جارٍ الفحص</span>
+          </div>
+        </div>
+        <div id="elig-ok" style="display:none;margin-top:12px;">
+          <div class="alert success"><i>✅</i><span>كل الشروط مستوفاة — يمكنك الانتقال للخطوة التالية.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="go(1)">← رجوع</button>
+      <button class="btn btn-main" onclick="step2()">التالي — تحميل صورتي ←</button>
+    </div>
+  </div>
+
+
+  
+  <div class="panel" id="p3">
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-ico">📷</div>
+        <div class="card-head-text">
+          <h2>صورتك الشخصية</h2>
+          <p>pic — خلفية بيضاء إلزامية</p>
+        </div>
+      </div>
+      <div class="card-body">
+
+        <div class="alert warn" style="margin-bottom:14px;">
+          <i>⚠️</i>
+          <span>الصورة يجب أن تكون <strong>حديثة (6 أشهر)</strong>، على <strong>خلفية بيضاء فقط</strong>، وجهك ظاهر بوضوح، <strong>بدون نظارات</strong>.</span>
+        </div>
+  
+
+
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
+          <div>
+            <div class="photo-zone" onclick="document.getElementById('pf').click()" id="pz">
+              <input type="file" id="pf" accept="image/*" onchange="loadPhoto(this)">
+              <img id="prev-img">
+              <div id="pz-ph">
+                <div class="pz-icon">📷</div>
+                <div class="pz-title">اضغط لتحميل صورتك</div>
+                <div class="pz-sub">JPG / PNG — حجم أقصى 5MB</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p style="font-size:.76rem;font-weight:700;margin-bottom:8px;">شروط الصورة المقبولة:</p>
+            <div class="photo-rules">
+              <div class="pr" id="pr1">⬜ خلفية بيضاء</div>
+              <div class="pr" id="pr2">👤 وجه كامل وواضح</div>
+              <div class="pr" id="pr3">🚫 بدون نظارات</div>
+              <div class="pr" id="pr4">💡 إضاءة جيدة</div>
+              <div class="pr" id="pr5">📐 دقة كافية</div>
+              <div class="pr" id="pr6">📅 حديثة — 6 أشهر</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="face-card" style="display:none;margin-top:14px;border:none;box-shadow:none;border:1px solid var(--border);border-radius:9px;">
+          <div class="card-head" style="background:#fafbfc;border-radius:9px 9px 0 0;">
+            <div class="card-ico">🤖</div>
+            <div class="card-head-text">
+              <h2>نتيجة الفحص بالذكاء الاصطناعي</h2>
+              <p>Face Recognition — تقابل الصورة مع هويتك</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="checks" id="face-checks"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="go(2)">← رجوع</button>
+      <button class="btn btn-main" onclick="step3()">التالي — مراجعة الطلب ←</button>
+    </div>
+  </div>
+
+ 
+  <div class="panel" id="p4">
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-ico">📋</div>
+        <div class="card-head-text">
+          <h2>مراجعة الطلب قبل الإرسال</h2>
+          <p>تأكد من صحة جميع المعلومات</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <table class="sum-table" id="sumTable"></table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-ico">✍️</div>
+        <div class="card-head-text"><h2>إقرار وموافقة</h2></div>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:.84rem;line-height:1.6;">
+
+            <input type="checkbox" id="ck1" style="width:auto;margin-top:3px;accent-color:var(--green);">
+
+            أُقرّ بأن جميع المعلومات المُقدَّمة صحيحة ودقيقة، وأتحمل المسؤولية القانونية عن أي معلومات مغلوطة.
+          </label>
+
+          <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:.84rem;line-height:1.6;">
+            <input type="checkbox" id="ck2" style="width:auto;margin-top:3px;accent-color:var(--green);">
+
+            أوافق على معالجة بياناتي الشخصية والبيومترية من طرف الجهات المختصة حسب القانون رقم 18-07.
+
+          </label>
+          <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:.84rem;line-height:1.6;">
+
+            <input type="checkbox" id="ck3" style="width:auto;margin-top:3px;accent-color:var(--green);">
+            أعلم أن طلبي سيُعالَج خلال 15–30 يوم عمل وسأُخطَر عند جاهزية الجواز.
+          </label>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="btn-row">
+
+      <button class="btn btn-back" onclick="go(3)">← رجوع</button>
+      <button class="btn btn-main" onclick="submit()">📤 إرسال الطلب الرسمي</button>
+    </div>
+  </div>
+
+
+  <div class="panel" id="p5">
+    <div class="card">
+
+      <div class="success-wrap">
+
+        <div class="big-ico">🎉</div>
+
+        <h2>طلبك وصل بنجاح!</h2>
+
+        <p>تم استلام طلبك وسيُعالَج من طرف مصالح الولاية. ستُخطَر عند جاهزية جوازك.</p>
+        <div class="track-code" id="track-code">DZ-202439103701</div>
+        <p style="font-size:.76rem;color:var(--muted);">احتفظ برقم الطلب هذا لمتابعة حالته</p>
+        <div class="timeline">
+          <div class="tl"><div class="tl-d done"></div><div class="tl-t"><strong>✅ استلام الطلب</strong><span>الآن — محفوظ في قاعدة البيانات</span></div></div>
+          <div class="tl"><div class="tl-d now"></div><div class="tl-t"><strong>🔍 المراجعة الإدارية</strong><span>خلال 3 إلى 5 أيام عمل</span></div></div>
+          <div class="tl"><div class="tl-d wait"></div><div class="tl-t"><strong>🖨 الطباعة البيومترية</strong><span>خلال 10 إلى 20 يوم عمل</span></div></div>
+          <div class="tl"><div class="tl-d wait"></div><div class="tl-t"><strong>📦 الاستلام في <span id="pickup-place">مقر الولاية</span></strong><span>ستُخطَر عند الجاهزية</span></div></div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
+          <button class="btn btn-main" onclick="window.print()">🖨 طباعة الإيصال</button>
+
+          <button class="btn btn-back" onclick="location.reload()">تقديم طلب آخر</button>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
