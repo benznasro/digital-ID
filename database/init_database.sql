@@ -1,12 +1,123 @@
 -- DROP SCHEMA public;
 
-CREATE SCHEMA public AUTHORIZATION pg_database_owner;
+CREATE SCHEMA IF NOT EXISTS public AUTHORIZATION pg_database_owner;
 
 COMMENT ON SCHEMA public IS 'standard public schema';
 
+-- Bootstrap trigger functions so trigger creation works on first pass.
+-- Full implementations are defined later and will replace these stubs.
+
+CREATE OR REPLACE FUNCTION public.inherit_father_last_name()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.handle_person_death()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.block_dead_employment()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.audit_salary_changes()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.check_max_wives()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.check_incest_prevention()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.log_marriage_changes()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.check_passport_overlap()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.log_birth_record_changes()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
 -- DROP SEQUENCE public.assets_id_seq;
 
-CREATE SEQUENCE public.assets_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.assets_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -21,7 +132,7 @@ GRANT ALL ON SEQUENCE public.assets_id_seq TO postgres;
 
 -- DROP SEQUENCE public.assets_id_seq1;
 
-CREATE SEQUENCE public.assets_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.assets_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -36,7 +147,7 @@ GRANT ALL ON SEQUENCE public.assets_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.birth_records_id_seq;
 
-CREATE SEQUENCE public.birth_records_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.birth_records_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -51,7 +162,7 @@ GRANT ALL ON SEQUENCE public.birth_records_id_seq TO postgres;
 
 -- DROP SEQUENCE public.birth_records_id_seq1;
 
-CREATE SEQUENCE public.birth_records_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.birth_records_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -66,7 +177,7 @@ GRANT ALL ON SEQUENCE public.birth_records_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.birth_records_log_id_seq;
 
-CREATE SEQUENCE public.birth_records_log_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.birth_records_log_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -81,7 +192,7 @@ GRANT ALL ON SEQUENCE public.birth_records_log_id_seq TO postgres;
 
 -- DROP SEQUENCE public.birth_records_log_id_seq1;
 
-CREATE SEQUENCE public.birth_records_log_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.birth_records_log_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -96,7 +207,7 @@ GRANT ALL ON SEQUENCE public.birth_records_log_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.criminal_records_id_seq;
 
-CREATE SEQUENCE public.criminal_records_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.criminal_records_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -111,7 +222,7 @@ GRANT ALL ON SEQUENCE public.criminal_records_id_seq TO postgres;
 
 -- DROP SEQUENCE public.criminal_records_id_seq1;
 
-CREATE SEQUENCE public.criminal_records_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.criminal_records_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -126,7 +237,7 @@ GRANT ALL ON SEQUENCE public.criminal_records_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.death_records_id_seq;
 
-CREATE SEQUENCE public.death_records_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.death_records_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -141,7 +252,7 @@ GRANT ALL ON SEQUENCE public.death_records_id_seq TO postgres;
 
 -- DROP SEQUENCE public.death_records_id_seq1;
 
-CREATE SEQUENCE public.death_records_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.death_records_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -156,7 +267,7 @@ GRANT ALL ON SEQUENCE public.death_records_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.education_id_seq;
 
-CREATE SEQUENCE public.education_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.education_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -171,7 +282,7 @@ GRANT ALL ON SEQUENCE public.education_id_seq TO postgres;
 
 -- DROP SEQUENCE public.education_id_seq1;
 
-CREATE SEQUENCE public.education_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.education_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -186,7 +297,7 @@ GRANT ALL ON SEQUENCE public.education_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.employment_id_seq;
 
-CREATE SEQUENCE public.employment_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.employment_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -201,7 +312,7 @@ GRANT ALL ON SEQUENCE public.employment_id_seq TO postgres;
 
 -- DROP SEQUENCE public.employment_id_seq1;
 
-CREATE SEQUENCE public.employment_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.employment_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -216,7 +327,7 @@ GRANT ALL ON SEQUENCE public.employment_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.marriage_audit_id_seq;
 
-CREATE SEQUENCE public.marriage_audit_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.marriage_audit_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -231,7 +342,7 @@ GRANT ALL ON SEQUENCE public.marriage_audit_id_seq TO postgres;
 
 -- DROP SEQUENCE public.marriage_audit_id_seq1;
 
-CREATE SEQUENCE public.marriage_audit_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.marriage_audit_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -246,7 +357,7 @@ GRANT ALL ON SEQUENCE public.marriage_audit_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.marriage_contract_no_seq;
 
-CREATE SEQUENCE public.marriage_contract_no_seq
+CREATE SEQUENCE IF NOT EXISTS public.marriage_contract_no_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -261,7 +372,7 @@ GRANT ALL ON SEQUENCE public.marriage_contract_no_seq TO postgres;
 
 -- DROP SEQUENCE public.marriage_contract_no_seq1;
 
-CREATE SEQUENCE public.marriage_contract_no_seq1
+CREATE SEQUENCE IF NOT EXISTS public.marriage_contract_no_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -276,7 +387,7 @@ GRANT ALL ON SEQUENCE public.marriage_contract_no_seq1 TO postgres;
 
 -- DROP SEQUENCE public.marriage_id_seq;
 
-CREATE SEQUENCE public.marriage_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.marriage_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -291,7 +402,7 @@ GRANT ALL ON SEQUENCE public.marriage_id_seq TO postgres;
 
 -- DROP SEQUENCE public.marriage_id_seq1;
 
-CREATE SEQUENCE public.marriage_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.marriage_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -306,7 +417,7 @@ GRANT ALL ON SEQUENCE public.marriage_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.medical_records_id_seq;
 
-CREATE SEQUENCE public.medical_records_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.medical_records_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -321,7 +432,7 @@ GRANT ALL ON SEQUENCE public.medical_records_id_seq TO postgres;
 
 -- DROP SEQUENCE public.medical_records_id_seq1;
 
-CREATE SEQUENCE public.medical_records_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.medical_records_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -336,7 +447,7 @@ GRANT ALL ON SEQUENCE public.medical_records_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.national_id_seq;
 
-CREATE SEQUENCE public.national_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.national_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -351,7 +462,7 @@ GRANT ALL ON SEQUENCE public.national_id_seq TO postgres;
 
 -- DROP SEQUENCE public.passports_id_seq;
 
-CREATE SEQUENCE public.passports_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.passports_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -366,7 +477,7 @@ GRANT ALL ON SEQUENCE public.passports_id_seq TO postgres;
 
 -- DROP SEQUENCE public.person_id_seq;
 
-CREATE SEQUENCE public.person_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.person_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -381,7 +492,7 @@ GRANT ALL ON SEQUENCE public.person_id_seq TO postgres;
 
 -- DROP SEQUENCE public.person_id_seq1;
 
-CREATE SEQUENCE public.person_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.person_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -396,7 +507,7 @@ GRANT ALL ON SEQUENCE public.person_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.roles_id_seq;
 
-CREATE SEQUENCE public.roles_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.roles_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -411,7 +522,7 @@ GRANT ALL ON SEQUENCE public.roles_id_seq TO postgres;
 
 -- DROP SEQUENCE public.roles_id_seq1;
 
-CREATE SEQUENCE public.roles_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.roles_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -426,7 +537,7 @@ GRANT ALL ON SEQUENCE public.roles_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.salary_audit_id_seq;
 
-CREATE SEQUENCE public.salary_audit_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.salary_audit_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -441,7 +552,7 @@ GRANT ALL ON SEQUENCE public.salary_audit_id_seq TO postgres;
 
 -- DROP SEQUENCE public.salary_audit_id_seq1;
 
-CREATE SEQUENCE public.salary_audit_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.salary_audit_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -456,7 +567,7 @@ GRANT ALL ON SEQUENCE public.salary_audit_id_seq1 TO postgres;
 
 -- DROP SEQUENCE public.users_id_seq;
 
-CREATE SEQUENCE public.users_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.users_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -471,7 +582,7 @@ GRANT ALL ON SEQUENCE public.users_id_seq TO postgres;
 
 -- DROP SEQUENCE public.users_id_seq1;
 
-CREATE SEQUENCE public.users_id_seq1
+CREATE SEQUENCE IF NOT EXISTS public.users_id_seq1
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 2147483647
@@ -489,7 +600,7 @@ GRANT ALL ON SEQUENCE public.users_id_seq1 TO postgres;
 
 -- DROP TABLE public.act_number_tracker;
 
-CREATE TABLE public.act_number_tracker ( wilaya_code bpchar(2) NOT NULL, commune_code bpchar(4) NOT NULL, birth_year bpchar(2) NOT NULL, last_act_no int4 DEFAULT 0 NOT NULL, CONSTRAINT act_number_tracker_pkey PRIMARY KEY (wilaya_code, commune_code, birth_year));
+CREATE TABLE IF NOT EXISTS public.act_number_tracker ( wilaya_code bpchar(2) NOT NULL, commune_code bpchar(4) NOT NULL, birth_year bpchar(2) NOT NULL, last_act_no int4 DEFAULT 0 NOT NULL, CONSTRAINT act_number_tracker_pkey PRIMARY KEY (wilaya_code, commune_code, birth_year));
 
 -- Permissions
 
@@ -503,7 +614,7 @@ GRANT ALL ON TABLE public.act_number_tracker TO postgres;
 
 -- DROP TABLE public.roles;
 
-CREATE TABLE public.roles ( id serial4 NOT NULL, "name" varchar(50) NOT NULL, CONSTRAINT roles_name_key UNIQUE (name), CONSTRAINT roles_pkey PRIMARY KEY (id));
+CREATE TABLE IF NOT EXISTS public.roles ( id serial4 NOT NULL, "name" varchar(50) NOT NULL, CONSTRAINT roles_name_key UNIQUE (name), CONSTRAINT roles_pkey PRIMARY KEY (id));
 
 -- Permissions
 
@@ -517,10 +628,11 @@ GRANT ALL ON TABLE public.roles TO postgres;
 
 -- DROP TABLE public.person;
 
-CREATE TABLE public.person ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, national_id int8 NOT NULL, first_name varchar(255) NOT NULL, last_name varchar(255) NOT NULL, email varchar(255) NULL, date_of_birth date NOT NULL, phone_number varchar(20) NULL, gender bool NOT NULL, dad_id int8 NULL, mom_id int8 NULL, marital_status varchar(20) DEFAULT 'single'::character varying NOT NULL, CONSTRAINT check_lineage CHECK (((id <> dad_id) AND (id <> mom_id) AND (dad_id <> mom_id))), CONSTRAINT person_email_key UNIQUE (email), CONSTRAINT person_national_id_key UNIQUE (national_id), CONSTRAINT person_pkey PRIMARY KEY (id), CONSTRAINT person_dad_id_fkey FOREIGN KEY (dad_id) REFERENCES public.person(id), CONSTRAINT person_mom_id_fkey FOREIGN KEY (mom_id) REFERENCES public.person(id));
+CREATE TABLE IF NOT EXISTS public.person ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, national_id int8 NOT NULL, first_name varchar(255) NOT NULL, last_name varchar(255) NOT NULL, email varchar(255) NULL, date_of_birth date NOT NULL, phone_number varchar(20) NULL, gender bool NOT NULL, dad_id int8 NULL, mom_id int8 NULL, marital_status varchar(20) DEFAULT 'single'::character varying NOT NULL, CONSTRAINT check_lineage CHECK (((id <> dad_id) AND (id <> mom_id) AND (dad_id <> mom_id))), CONSTRAINT person_email_key UNIQUE (email), CONSTRAINT person_national_id_key UNIQUE (national_id), CONSTRAINT person_pkey PRIMARY KEY (id), CONSTRAINT person_dad_id_fkey FOREIGN KEY (dad_id) REFERENCES public.person(id), CONSTRAINT person_mom_id_fkey FOREIGN KEY (mom_id) REFERENCES public.person(id));
 
 -- Table Triggers
 
+DROP TRIGGER IF EXISTS trg_inherit_father_last_name ON public.person;
 create trigger trg_inherit_father_last_name before
 insert
     on
@@ -538,8 +650,8 @@ GRANT ALL ON TABLE public.person TO postgres;
 
 -- DROP TABLE public.users;
 
-CREATE TABLE public.users ( id serial4 NOT NULL, username varchar(100) NOT NULL, "password" varchar(255) NOT NULL, role_id int4 DEFAULT 1 NULL, person_id int8 NULL, created_at timestamptz DEFAULT now() NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, refresh_token text NULL, CONSTRAINT users_person_id_key UNIQUE (person_id), CONSTRAINT users_pkey PRIMARY KEY (id), CONSTRAINT users_username_key UNIQUE (username), CONSTRAINT users_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id), CONSTRAINT users_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(id));
-CREATE INDEX idx_users_role_id ON public.users USING btree (role_id);
+CREATE TABLE IF NOT EXISTS public.users ( id serial4 NOT NULL, username varchar(100) NOT NULL, "password" varchar(255) NOT NULL, role_id int4 DEFAULT 1 NULL, person_id int8 NULL, created_at timestamptz DEFAULT now() NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, refresh_token text NULL, CONSTRAINT users_person_id_key UNIQUE (person_id), CONSTRAINT users_pkey PRIMARY KEY (id), CONSTRAINT users_username_key UNIQUE (username), CONSTRAINT users_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id), CONSTRAINT users_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(id));
+CREATE INDEX IF NOT EXISTS idx_users_role_id ON public.users USING btree (role_id);
 
 -- Permissions
 
@@ -553,7 +665,7 @@ GRANT ALL ON TABLE public.users TO postgres;
 
 -- DROP TABLE public.assets;
 
-CREATE TABLE public.assets ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, owner_id int8 NOT NULL, asset_type varchar(100) NULL, registration_number varchar(255) NULL, date_owned timestamptz DEFAULT now() NULL, estimated_value numeric(15, 2) NULL, CONSTRAINT assets_pkey PRIMARY KEY (id), CONSTRAINT assets_registration_number_key UNIQUE (registration_number), CONSTRAINT assets_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.person(id));
+CREATE TABLE IF NOT EXISTS public.assets ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, owner_id int8 NOT NULL, asset_type varchar(100) NULL, registration_number varchar(255) NULL, date_owned timestamptz DEFAULT now() NULL, estimated_value numeric(15, 2) NULL, CONSTRAINT assets_pkey PRIMARY KEY (id), CONSTRAINT assets_registration_number_key UNIQUE (registration_number), CONSTRAINT assets_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.person(id));
 
 -- Permissions
 
@@ -567,9 +679,9 @@ GRANT ALL ON TABLE public.assets TO postgres;
 
 -- DROP TABLE public.birth_records_log;
 
-CREATE TABLE public.birth_records_log ( id bigserial NOT NULL, birth_record_id int8 NULL, operation varchar(10) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by varchar(100) DEFAULT CURRENT_USER NULL, changed_by_user_id int8 NULL, old_birth_certificate_no int8 NULL, old_child_id int8 NULL, old_doctor_name varchar(255) NULL, old_birth_weight_kg numeric(4, 2) NULL, new_birth_certificate_no int8 NULL, new_child_id int8 NULL, new_doctor_name varchar(255) NULL, new_birth_weight_kg numeric(4, 2) NULL, old_birth_date_time timestamptz NULL, new_birth_date_time timestamptz NULL, old_marriage_id int8 NULL, new_marriage_id int8 NULL, CONSTRAINT birth_records_log_pkey PRIMARY KEY (id), CONSTRAINT birth_records_log_changed_by_user_id_fkey FOREIGN KEY (changed_by_user_id) REFERENCES public.users(id));
-CREATE INDEX idx_birth_records_log_changed_user_time ON public.birth_records_log USING btree (changed_by_user_id, changed_at DESC);
-CREATE INDEX idx_birth_records_log_record_time ON public.birth_records_log USING btree (birth_record_id, changed_at DESC);
+CREATE TABLE IF NOT EXISTS public.birth_records_log ( id bigserial NOT NULL, birth_record_id int8 NULL, operation varchar(10) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by varchar(100) DEFAULT CURRENT_USER NULL, changed_by_user_id int8 NULL, old_birth_certificate_no int8 NULL, old_child_id int8 NULL, old_doctor_name varchar(255) NULL, old_birth_weight_kg numeric(4, 2) NULL, new_birth_certificate_no int8 NULL, new_child_id int8 NULL, new_doctor_name varchar(255) NULL, new_birth_weight_kg numeric(4, 2) NULL, old_birth_date_time timestamptz NULL, new_birth_date_time timestamptz NULL, old_marriage_id int8 NULL, new_marriage_id int8 NULL, CONSTRAINT birth_records_log_pkey PRIMARY KEY (id), CONSTRAINT birth_records_log_changed_by_user_id_fkey FOREIGN KEY (changed_by_user_id) REFERENCES public.users(id));
+CREATE INDEX IF NOT EXISTS idx_birth_records_log_changed_user_time ON public.birth_records_log USING btree (changed_by_user_id, changed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_birth_records_log_record_time ON public.birth_records_log USING btree (birth_record_id, changed_at DESC);
 
 -- Permissions
 
@@ -583,9 +695,9 @@ GRANT ALL ON TABLE public.birth_records_log TO postgres;
 
 -- DROP TABLE public.criminal_records;
 
-CREATE TABLE public.criminal_records ( id bigserial NOT NULL, person_id int8 NOT NULL, case_number varchar(50) NOT NULL, status bool DEFAULT true NULL, violation_type text NOT NULL, disposition varchar(100) NULL, description text NULL, occurrence_date timestamptz NULL, filing_date timestamptz DEFAULT CURRENT_TIMESTAMP NULL, fine_amount numeric(12, 2) DEFAULT 0.00 NULL, sentence_details text NULL, location_details text NULL, is_expunged bool DEFAULT false NULL, CONSTRAINT criminal_records_case_number_key UNIQUE (case_number), CONSTRAINT criminal_records_pkey PRIMARY KEY (id), CONSTRAINT fk_person FOREIGN KEY (person_id) REFERENCES public.person(id) ON DELETE CASCADE);
-CREATE INDEX idx_criminal_case_number ON public.criminal_records USING btree (case_number);
-CREATE INDEX idx_criminal_person_id ON public.criminal_records USING btree (person_id);
+CREATE TABLE IF NOT EXISTS public.criminal_records ( id bigserial NOT NULL, person_id int8 NOT NULL, case_number varchar(50) NOT NULL, status bool DEFAULT true NULL, violation_type text NOT NULL, disposition varchar(100) NULL, description text NULL, occurrence_date timestamptz NULL, filing_date timestamptz DEFAULT CURRENT_TIMESTAMP NULL, fine_amount numeric(12, 2) DEFAULT 0.00 NULL, sentence_details text NULL, location_details text NULL, is_expunged bool DEFAULT false NULL, CONSTRAINT criminal_records_case_number_key UNIQUE (case_number), CONSTRAINT criminal_records_pkey PRIMARY KEY (id), CONSTRAINT fk_person FOREIGN KEY (person_id) REFERENCES public.person(id) ON DELETE CASCADE);
+CREATE INDEX IF NOT EXISTS idx_criminal_case_number ON public.criminal_records USING btree (case_number);
+CREATE INDEX IF NOT EXISTS idx_criminal_person_id ON public.criminal_records USING btree (person_id);
 
 -- Permissions
 
@@ -599,11 +711,12 @@ GRANT ALL ON TABLE public.criminal_records TO postgres;
 
 -- DROP TABLE public.death_records;
 
-CREATE TABLE public.death_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, death_date timestamptz NOT NULL, place_of_death varchar(255) NULL, cause_of_death text NULL, doctor_id int8 NULL, icd_10_code varchar(10) NULL, kin_contact_id int8 NULL, notified_next_of_kin bool DEFAULT false NULL, hospital_user_id int4 NULL, CONSTRAINT death_records_person_id_key UNIQUE (person_id), CONSTRAINT death_records_pkey PRIMARY KEY (id), CONSTRAINT death_records_doctor_id_fkey FOREIGN KEY (doctor_id) REFERENCES public.person(id), CONSTRAINT death_records_hospital_user_id_fkey FOREIGN KEY (hospital_user_id) REFERENCES public.users(id), CONSTRAINT death_records_kin_contact_id_fkey FOREIGN KEY (kin_contact_id) REFERENCES public.person(id), CONSTRAINT death_records_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
-CREATE INDEX idx_death_records_hospital_user_id ON public.death_records USING btree (hospital_user_id);
+CREATE TABLE IF NOT EXISTS public.death_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, death_date timestamptz NOT NULL, place_of_death varchar(255) NULL, cause_of_death text NULL, doctor_id int8 NULL, icd_10_code varchar(10) NULL, kin_contact_id int8 NULL, notified_next_of_kin bool DEFAULT false NULL, hospital_user_id int4 NULL, CONSTRAINT death_records_person_id_key UNIQUE (person_id), CONSTRAINT death_records_pkey PRIMARY KEY (id), CONSTRAINT death_records_doctor_id_fkey FOREIGN KEY (doctor_id) REFERENCES public.person(id), CONSTRAINT death_records_hospital_user_id_fkey FOREIGN KEY (hospital_user_id) REFERENCES public.users(id), CONSTRAINT death_records_kin_contact_id_fkey FOREIGN KEY (kin_contact_id) REFERENCES public.person(id), CONSTRAINT death_records_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
+CREATE INDEX IF NOT EXISTS idx_death_records_hospital_user_id ON public.death_records USING btree (hospital_user_id);
 
 -- Table Triggers
 
+DROP TRIGGER IF EXISTS trg_on_dath_deactivate_all ON public.death_records;
 create trigger trg_on_dath_deactivate_all after
 insert
     on
@@ -621,9 +734,9 @@ GRANT ALL ON TABLE public.death_records TO postgres;
 
 -- DROP TABLE public.education;
 
-CREATE TABLE public.education ( id bigserial NOT NULL, person_id int8 NOT NULL, university_name varchar(255) NOT NULL, major varchar(150) NOT NULL, degree_type varchar(50) NULL, gpa numeric(4, 2) NULL, study_mode varchar(50) NULL, start_date date NULL, graduation_date date NULL, certificate_url varchar(255) NULL, is_verified bool DEFAULT false NULL, created_at timestamptz DEFAULT CURRENT_TIMESTAMP NULL, CONSTRAINT education_pkey PRIMARY KEY (id), CONSTRAINT fk_person_education FOREIGN KEY (person_id) REFERENCES public.person(id) ON DELETE CASCADE);
-CREATE INDEX idx_education_degree ON public.education USING btree (degree_type);
-CREATE INDEX idx_education_person_id ON public.education USING btree (person_id);
+CREATE TABLE IF NOT EXISTS public.education ( id bigserial NOT NULL, person_id int8 NOT NULL, university_name varchar(255) NOT NULL, major varchar(150) NOT NULL, degree_type varchar(50) NULL, gpa numeric(4, 2) NULL, study_mode varchar(50) NULL, start_date date NULL, graduation_date date NULL, certificate_url varchar(255) NULL, is_verified bool DEFAULT false NULL, created_at timestamptz DEFAULT CURRENT_TIMESTAMP NULL, CONSTRAINT education_pkey PRIMARY KEY (id), CONSTRAINT fk_person_education FOREIGN KEY (person_id) REFERENCES public.person(id) ON DELETE CASCADE);
+CREATE INDEX IF NOT EXISTS idx_education_degree ON public.education USING btree (degree_type);
+CREATE INDEX IF NOT EXISTS idx_education_person_id ON public.education USING btree (person_id);
 
 -- Permissions
 
@@ -637,17 +750,19 @@ GRANT ALL ON TABLE public.education TO postgres;
 
 -- DROP TABLE public.employment;
 
-CREATE TABLE public.employment ( id bigserial NOT NULL, person_id int8 NOT NULL, company_id int8 NOT NULL, job_title varchar(150) NOT NULL, department varchar(100) NULL, employment_type varchar(50) NULL, salary numeric(15, 2) DEFAULT 0.00 NULL, is_active bool DEFAULT true NULL, start_date date NOT NULL, end_date date NULL, manager_id int8 NULL, work_location varchar(255) NULL, CONSTRAINT employment_pkey PRIMARY KEY (id), CONSTRAINT fk_manager FOREIGN KEY (manager_id) REFERENCES public.person(id) ON DELETE SET NULL, CONSTRAINT fk_person_employment FOREIGN KEY (person_id) REFERENCES public.person(id) ON DELETE CASCADE);
-CREATE INDEX idx_employment_active ON public.employment USING btree (is_active);
-CREATE INDEX idx_employment_company_id ON public.employment USING btree (company_id);
-CREATE INDEX idx_employment_person_id ON public.employment USING btree (person_id);
+CREATE TABLE IF NOT EXISTS public.employment ( id bigserial NOT NULL, person_id int8 NOT NULL, company_id int8 NOT NULL, job_title varchar(150) NOT NULL, department varchar(100) NULL, employment_type varchar(50) NULL, salary numeric(15, 2) DEFAULT 0.00 NULL, is_active bool DEFAULT true NULL, start_date date NOT NULL, end_date date NULL, manager_id int8 NULL, work_location varchar(255) NULL, CONSTRAINT employment_pkey PRIMARY KEY (id), CONSTRAINT fk_manager FOREIGN KEY (manager_id) REFERENCES public.person(id) ON DELETE SET NULL, CONSTRAINT fk_person_employment FOREIGN KEY (person_id) REFERENCES public.person(id) ON DELETE CASCADE);
+CREATE INDEX IF NOT EXISTS idx_employment_active ON public.employment USING btree (is_active);
+CREATE INDEX IF NOT EXISTS idx_employment_company_id ON public.employment USING btree (company_id);
+CREATE INDEX IF NOT EXISTS idx_employment_person_id ON public.employment USING btree (person_id);
 
 -- Table Triggers
 
+DROP TRIGGER IF EXISTS trg_check_death_before_job ON public.employment;
 create trigger trg_check_death_before_job before
 insert
     on
     public.employment for each row execute function block_dead_employment();
+DROP TRIGGER IF EXISTS trg_salary_audit ON public.employment;
 create trigger trg_salary_audit after
 update
     of salary on
@@ -665,21 +780,24 @@ GRANT ALL ON TABLE public.employment TO postgres;
 
 -- DROP TABLE public.marriage;
 
-CREATE TABLE public.marriage ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, contract_no int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, husband_id int8 NOT NULL, wife_id int8 NOT NULL, marriage_date timestamptz NOT NULL, "valid" bool DEFAULT true NULL, end_marriage_time timestamptz NULL, end_reason varchar(50) NULL, witness_1_id int8 NULL, witness_2_id int8 NULL, dowry_amount numeric(12, 2) NULL, notary_id int8 NULL, CONSTRAINT check_not_self_marriage CHECK ((husband_id <> wife_id)), CONSTRAINT marriage_contract_no_key UNIQUE (contract_no), CONSTRAINT marriage_end_reason_check CHECK (((end_reason)::text = ANY (ARRAY[('divorce'::character varying)::text, ('death'::character varying)::text, ('annulment'::character varying)::text, ('Khula'::character varying)::text]))), CONSTRAINT marriage_pkey PRIMARY KEY (id), CONSTRAINT marriage_husband_id_fkey FOREIGN KEY (husband_id) REFERENCES public.person(id), CONSTRAINT marriage_notary_id_fkey FOREIGN KEY (notary_id) REFERENCES public.users(id), CONSTRAINT marriage_wife_id_fkey FOREIGN KEY (wife_id) REFERENCES public.person(id), CONSTRAINT marriage_witness_1_id_fkey FOREIGN KEY (witness_1_id) REFERENCES public.person(id), CONSTRAINT marriage_witness_2_id_fkey FOREIGN KEY (witness_2_id) REFERENCES public.person(id));
-CREATE INDEX idx_marriage_husband_valid ON public.marriage USING btree (husband_id) WHERE (valid = true);
-CREATE INDEX idx_marriage_wife_valid ON public.marriage USING btree (wife_id) WHERE (valid = true);
-CREATE UNIQUE INDEX idx_single_active_husband ON public.marriage USING btree (wife_id) WHERE (valid = true);
+CREATE TABLE IF NOT EXISTS public.marriage ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, contract_no int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, husband_id int8 NOT NULL, wife_id int8 NOT NULL, marriage_date timestamptz NOT NULL, "valid" bool DEFAULT true NULL, end_marriage_time timestamptz NULL, end_reason varchar(50) NULL, witness_1_id int8 NULL, witness_2_id int8 NULL, dowry_amount numeric(12, 2) NULL, notary_id int8 NULL, CONSTRAINT check_not_self_marriage CHECK ((husband_id <> wife_id)), CONSTRAINT marriage_contract_no_key UNIQUE (contract_no), CONSTRAINT marriage_end_reason_check CHECK (((end_reason)::text = ANY (ARRAY[('divorce'::character varying)::text, ('death'::character varying)::text, ('annulment'::character varying)::text, ('Khula'::character varying)::text]))), CONSTRAINT marriage_pkey PRIMARY KEY (id), CONSTRAINT marriage_husband_id_fkey FOREIGN KEY (husband_id) REFERENCES public.person(id), CONSTRAINT marriage_notary_id_fkey FOREIGN KEY (notary_id) REFERENCES public.users(id), CONSTRAINT marriage_wife_id_fkey FOREIGN KEY (wife_id) REFERENCES public.person(id), CONSTRAINT marriage_witness_1_id_fkey FOREIGN KEY (witness_1_id) REFERENCES public.person(id), CONSTRAINT marriage_witness_2_id_fkey FOREIGN KEY (witness_2_id) REFERENCES public.person(id));
+CREATE INDEX IF NOT EXISTS idx_marriage_husband_valid ON public.marriage USING btree (husband_id) WHERE (valid = true);
+CREATE INDEX IF NOT EXISTS idx_marriage_wife_valid ON public.marriage USING btree (wife_id) WHERE (valid = true);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_single_active_husband ON public.marriage USING btree (wife_id) WHERE (valid = true);
 
 -- Table Triggers
 
+DROP TRIGGER IF EXISTS trg_limit_wives ON public.marriage;
 create trigger trg_limit_wives before
 insert
     on
     public.marriage for each row execute function check_max_wives();
+DROP TRIGGER IF EXISTS trg_prevent_incest ON public.marriage;
 create trigger trg_prevent_incest before
 insert
     on
     public.marriage for each row execute function check_incest_prevention();
+DROP TRIGGER IF EXISTS trg_marriage_audit ON public.marriage;
 create trigger trg_marriage_audit after
 insert
     or
@@ -701,8 +819,8 @@ GRANT ALL ON TABLE public.marriage TO postgres;
 
 -- DROP TABLE public.marriage_audit;
 
-CREATE TABLE public.marriage_audit ( id bigserial NOT NULL, marriage_id int8 NULL, operation varchar(10) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by varchar(100) DEFAULT CURRENT_USER NULL, old_husband_id int8 NULL, old_wife_id int8 NULL, old_marriage_date timestamptz NULL, old_valid bool NULL, old_end_reason varchar(50) NULL, old_end_marriage_time timestamp NULL, new_husband_id int8 NULL, new_wife_id int8 NULL, new_marriage_date timestamptz NULL, new_valid bool NULL, new_end_reason varchar(50) NULL, new_end_marriage_time timestamp NULL, changed_by_user_id int8 NULL, CONSTRAINT marriage_audit_pkey PRIMARY KEY (id), CONSTRAINT marriage_audit_changed_by_user_id_fkey FOREIGN KEY (changed_by_user_id) REFERENCES public.users(id));
-CREATE INDEX idx_marriage_audit_changed_user_time ON public.marriage_audit USING btree (changed_by_user_id, changed_at DESC);
+CREATE TABLE IF NOT EXISTS public.marriage_audit ( id bigserial NOT NULL, marriage_id int8 NULL, operation varchar(10) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by varchar(100) DEFAULT CURRENT_USER NULL, old_husband_id int8 NULL, old_wife_id int8 NULL, old_marriage_date timestamptz NULL, old_valid bool NULL, old_end_reason varchar(50) NULL, old_end_marriage_time timestamp NULL, new_husband_id int8 NULL, new_wife_id int8 NULL, new_marriage_date timestamptz NULL, new_valid bool NULL, new_end_reason varchar(50) NULL, new_end_marriage_time timestamp NULL, changed_by_user_id int8 NULL, CONSTRAINT marriage_audit_pkey PRIMARY KEY (id), CONSTRAINT marriage_audit_changed_by_user_id_fkey FOREIGN KEY (changed_by_user_id) REFERENCES public.users(id));
+CREATE INDEX IF NOT EXISTS idx_marriage_audit_changed_user_time ON public.marriage_audit USING btree (changed_by_user_id, changed_at DESC);
 
 -- Permissions
 
@@ -716,7 +834,7 @@ GRANT ALL ON TABLE public.marriage_audit TO postgres;
 
 -- DROP TABLE public.medical_records;
 
-CREATE TABLE public.medical_records ( id bigserial NOT NULL, person_id int8 NOT NULL, blood_type varchar(3) NULL, height_cm numeric(4, 1) NULL, weight_kg numeric(5, 1) NULL, smoker bool NULL, chronic_conditions text NULL, last_checkup_date date NULL, CONSTRAINT medical_records_pkey PRIMARY KEY (id), CONSTRAINT medical_records_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
+CREATE TABLE IF NOT EXISTS public.medical_records ( id bigserial NOT NULL, person_id int8 NOT NULL, blood_type varchar(3) NULL, height_cm numeric(4, 1) NULL, weight_kg numeric(5, 1) NULL, smoker bool NULL, chronic_conditions text NULL, last_checkup_date date NULL, CONSTRAINT medical_records_pkey PRIMARY KEY (id), CONSTRAINT medical_records_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
 
 -- Permissions
 
@@ -730,11 +848,12 @@ GRANT ALL ON TABLE public.medical_records TO postgres;
 
 -- DROP TABLE public.passports;
 
-CREATE TABLE public.passports ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, passport_number varchar(20) NOT NULL, issue_date date NULL, expiry_date date NULL, is_active bool DEFAULT true NULL, CONSTRAINT passports_passport_number_key UNIQUE (passport_number), CONSTRAINT passports_pkey PRIMARY KEY (id), CONSTRAINT passports_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
-CREATE INDEX idx_passports_person_active ON public.passports USING btree (person_id) WHERE (is_active = true);
+CREATE TABLE IF NOT EXISTS public.passports ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, person_id int8 NOT NULL, passport_number varchar(20) NOT NULL, issue_date date NULL, expiry_date date NULL, is_active bool DEFAULT true NULL, CONSTRAINT passports_passport_number_key UNIQUE (passport_number), CONSTRAINT passports_pkey PRIMARY KEY (id), CONSTRAINT passports_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id));
+CREATE INDEX IF NOT EXISTS idx_passports_person_active ON public.passports USING btree (person_id) WHERE (is_active = true);
 
 -- Table Triggers
 
+DROP TRIGGER IF EXISTS trg_no_passport_overlap ON public.passports;
 create trigger trg_no_passport_overlap before
 insert
     on
@@ -752,7 +871,7 @@ GRANT ALL ON TABLE public.passports TO postgres;
 
 -- DROP TABLE public.salary_audit;
 
-CREATE TABLE public.salary_audit ( id serial4 NOT NULL, employment_id int8 NULL, old_salary numeric(15, 2) NULL, new_salary numeric(15, 2) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by_user varchar(100) DEFAULT CURRENT_USER NULL, CONSTRAINT salary_audit_pkey PRIMARY KEY (id), CONSTRAINT salary_audit_employment_id_fkey FOREIGN KEY (employment_id) REFERENCES public.employment(id) ON DELETE CASCADE);
+CREATE TABLE IF NOT EXISTS public.salary_audit ( id serial4 NOT NULL, employment_id int8 NULL, old_salary numeric(15, 2) NULL, new_salary numeric(15, 2) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by_user varchar(100) DEFAULT CURRENT_USER NULL, CONSTRAINT salary_audit_pkey PRIMARY KEY (id), CONSTRAINT salary_audit_employment_id_fkey FOREIGN KEY (employment_id) REFERENCES public.employment(id) ON DELETE CASCADE);
 
 -- Permissions
 
@@ -766,11 +885,12 @@ GRANT ALL ON TABLE public.salary_audit TO postgres;
 
 -- DROP TABLE public.birth_records;
 
-CREATE TABLE public.birth_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, birth_certificate_no int8 NOT NULL, child_id int8 NOT NULL, marriage_id int8 NULL, hospital_name varchar(255) NULL, doctor_name varchar(255) NULL, birth_weight_kg numeric(4, 2) NULL, birth_date_time timestamptz NOT NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, apgar_score int2 NULL, CONSTRAINT birth_records_birth_certificate_no_key UNIQUE (birth_certificate_no), CONSTRAINT birth_records_child_id_key UNIQUE (child_id), CONSTRAINT birth_records_pkey PRIMARY KEY (id), CONSTRAINT birth_records_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.person(id), CONSTRAINT birth_records_marriage_id_fkey FOREIGN KEY (marriage_id) REFERENCES public.marriage(id));
-CREATE INDEX idx_birth_records_marriage_id ON public.birth_records USING btree (marriage_id);
+CREATE TABLE IF NOT EXISTS public.birth_records ( id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, birth_certificate_no int8 NOT NULL, child_id int8 NOT NULL, marriage_id int8 NULL, hospital_name varchar(255) NULL, doctor_name varchar(255) NULL, birth_weight_kg numeric(4, 2) NULL, birth_date_time timestamptz NOT NULL, wilaya_code bpchar(2) NULL, commune_code bpchar(4) NULL, apgar_score int2 NULL, CONSTRAINT birth_records_birth_certificate_no_key UNIQUE (birth_certificate_no), CONSTRAINT birth_records_child_id_key UNIQUE (child_id), CONSTRAINT birth_records_pkey PRIMARY KEY (id), CONSTRAINT birth_records_child_id_fkey FOREIGN KEY (child_id) REFERENCES public.person(id), CONSTRAINT birth_records_marriage_id_fkey FOREIGN KEY (marriage_id) REFERENCES public.marriage(id));
+CREATE INDEX IF NOT EXISTS idx_birth_records_marriage_id ON public.birth_records USING btree (marriage_id);
 
 -- Table Triggers
 
+DROP TRIGGER IF EXISTS trg_birth_records_audit ON public.birth_records;
 create trigger trg_birth_records_audit after
 insert
     or

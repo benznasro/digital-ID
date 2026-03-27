@@ -2,7 +2,6 @@ node_modules/
 .env
 .env
 *.cmd
-*.ps1
 nodemon
 nodetouch
 semver
