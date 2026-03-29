@@ -113,15 +113,22 @@ function renderMedical(medical) {
   setText("medicalCheckup", formatDate(medical?.last_checkup_date));
 }
 function renderMarriage(marriage) {
-  setText("Contract_no", fmt(marriage?.contract_no));
-  setText("Valid", fmt(marriage?.valid));
-  setText("DivorceDate", formatDate(marriage?.end_reason));
-  setText("MarriageDate", formatDate(marriage?.marriagedate));
-  setText("EndMarriageTime", formatDate(marriage?.end_marriage_time));
-  setText("Witness_1", fmt(marriage?.fullwitness_1));
-  setText("Witness_2", fmt(marriage?.fullwitness_1));
-  setText("Dowry_amount", fmt(marriage?.dowry_amount));
-  setText("Notary", fmt(marriage?.fullNamenotary));
+  const infocard=``;
+          for(let i=0;i<length.marriage;i++){
+            const marriageindx=marriage[i];
+  document.querySelector(".info-card").innerHTML=
+  infocard+`<div class="info-row"><span>Full Hesbend</span><strong id="FullHesbend">${fmt(marriageindx?.fullNamehesbend)}</strong></div>
+  <div class="info-row"><span>Full Wife</span><strong id="FullWife">${fmt(marriageindx?.fullNamewife)}</strong></div>
+  <div class="info-row"><span>Contract</span><strong id="Contract_no">${fmt(marriageindx?.contract_no)}</strong></div>
+  <div class="info-row"><span>Valid </span><strong id="Valid">${ fmt(marriageindx?.valid)}</strong></div>
+  <div class="info-row"><span>Divorce Date</span><strong id="DivorceDate">${formatDate(marriageindx?.end_reason)}</strong></div>
+  <div class="info-row"><span>Marriage Date</span><strong id="MarriageDate">${formatDate(marriageindx?.marriagedate)}</strong></div>
+  <div class="info-row"><span>End Marriage Time</span><strong id="EndMarriageTime">${formatDate(marriageindx?.end_marriage_time)}</strong></div>
+  <div class="info-row"><span>Witness 1</span><strong id="Witness_1">${fmt(marriageindx?.fullwitness_1)}</strong></div>
+  <div class="info-row"><span>Witness 2</span><strong id="Witness_2">${fmt(marriageindx?.fullwitness_2)}</strong></div>
+  <div class="info-row"><span>Dowry amount</span><strong id="Dowry_amount">${fmt(marriageindx?.dowry_amount)}</strong></div>
+  <div class="info-row"><span>Notary</span><strong id="Notary">${fmt(marriageindx?.fullNamenotary)}</strong></div>`
+}
 }
 function renderEducation(education) {
   setText("FullNameStudent", fmt(education?.fullNamestudent));
