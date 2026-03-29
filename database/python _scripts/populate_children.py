@@ -1,74 +1,73 @@
 """
-Populate the Digital ID PostgreSQL schema with realistic dummy data.
+Populate the Digital ID PostgreSQL schema with realistic linked data.
 
-What this script fills:
-- roles
-- person
-- users
-- marriage
-- birth_records
-- medical_records
-- education
-- employment
-- salary_audit (via salary updates trigger)
-- assets
-- passports
-- criminal_records
-- death_records (with side-effects via death trigger)
-- act_number_tracker
-- marriage_audit / birth_records_log (via triggers)
+Highlights:
+- Generates a 10-generation family graph with parent-child lineage.
+- Ensures every generated child gets a matching birth record.
+- Populates all major domain tables with non-trivial, realistic data.
+- Works with existing triggers (marriage/birth/death/salary audit).
 
 Run:
     pip install faker psycopg2-binary
     python "database\\python _scripts\\populate_children.py"
 """
 
+from __future__ import annotations
+
 import os
-import sys
 import random
+import sys
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
-from collections import defaultdict
+from typing import Dict, List, Optional, Sequence, Tuple
 
 import psycopg2
-from psycopg2.extras import execute_values
 from faker import Faker
+from psycopg2.extras import execute_values
 
 
 DATABASE = {
     "host": os.getenv("DB_HOST", "localhost"),
     "port": int(os.getenv("DB_PORT", "5432")),
-    "dbname": os.getenv("DB_NAME", "digital_id"),
+    "dbname": os.getenv("DB_NAME", "try2"),
     "user": os.getenv("DB_USER", "postgres"),
     "password": os.getenv("DB_PASSWORD", ""),
 }
 
-# bcrypt hash for plain password: password
+# bcrypt hash for plaintext password: password
 DEFAULT_PASSWORD_HASH = "$2b$12$jL0MZV.okNAMo8YO2Wpa.OmLHWLCZPuST42JePt2oWD7L.NBdSTnG"
 
 FAKE = Faker(["fr_FR", "en_US"])
 TODAY = date.today()
 
-ROLE_NAMES = [
-    "citizen",
-    "hospital",
-    "police",
-    "government",
-    "admin",
-    "Marriage_Notary",
-]
-
+ROLE_NAMES = ["citizen", "hospital", "police", "government", "admin", "Marriage_Notary"]
 WILAYA_CODES = [f"{i:02d}" for i in range(1, 59)]
 COMMUNE_CODES = [f"{i:04d}" for i in range(1, 200)]
+
+GENERATIONS = 10
+FOUNDER_COUPLES = 220
+TARGET_COUPLES_PER_GENERATION = [220, 205, 190, 175, 165, 155, 145, 135, 120, 95]
+BASE_BIRTH_YEAR = 1740
 
 
 @dataclass
 class PersonRow:
     id: int
-    gender: bool
+    gender: bool  # True male, False female
     dob: date
     first_name: str
     last_name: str
+    dad_id: Optional[int]
+    mom_id: Optional[int]
+
+
+@dataclass
+class MarriageRow:
+    id: int
+    husband_id: int
+    wife_id: int
+    marriage_date: datetime
+    valid: bool
 
 
 def random_date(start: date, end: date) -> date:
@@ -99,17 +98,39 @@ def choose_blood_type() -> str:
     return random.choice(weighted)
 
 
-def ensure_roles(cur) -> dict:
-    execute_values(
-        cur,
-        "INSERT INTO roles (name) VALUES %s ON CONFLICT (name) DO NOTHING",
-        [(r,) for r in ROLE_NAMES],
-    )
-    cur.execute("SELECT id, name FROM roles")
-    return {name: role_id for role_id, name in cur.fetchall()}
+def ensure_required_tables(cur) -> None:
+    required = [
+        "roles",
+        "person",
+        "users",
+        "marriage",
+        "marriage_audit",
+        "birth_records",
+        "birth_records_log",
+        "medical_records",
+        "education",
+        "employment",
+        "salary_audit",
+        "assets",
+        "passports",
+        "criminal_records",
+        "death_records",
+        "act_number_tracker",
+    ]
+
+    missing = []
+    for table_name in required:
+        cur.execute("SELECT to_regclass(%s)", (f"public.{table_name}",))
+        if cur.fetchone()[0] is None:
+            missing.append(table_name)
+
+    if missing:
+        raise RuntimeError(
+            "Schema is incomplete. Missing required tables: " + ", ".join(missing)
+        )
 
 
-def truncate_all(cur):
+def truncate_all(cur) -> None:
     ordered_tables = [
         "birth_records_log",
         "marriage_audit",
@@ -135,71 +156,33 @@ def truncate_all(cur):
             existing.append(table_name)
 
     if existing:
-        cur.execute(f"TRUNCATE TABLE {', '.join(existing)} RESTART IDENTITY CASCADE;")
+        cur.execute(f"TRUNCATE TABLE {', '.join(existing)} RESTART IDENTITY CASCADE")
 
 
-def ensure_required_tables(cur):
-    required_tables = [
-        "roles",
-        "person",
-        "users",
-        "marriage",
-        "marriage_audit",
-        "birth_records",
-        "birth_records_log",
-        "medical_records",
-        "education",
-        "employment",
-        "salary_audit",
-        "assets",
-        "passports",
-        "criminal_records",
-        "death_records",
-        "act_number_tracker",
-    ]
-
-    missing = []
-    for table_name in required_tables:
-        cur.execute("SELECT to_regclass(%s)", (f"public.{table_name}",))
-        if cur.fetchone()[0] is None:
-            missing.append(table_name)
-
-    if missing:
-        missing_text = ", ".join(missing)
-        raise RuntimeError(
-            "Schema is incomplete. Missing required tables: "
-            f"{missing_text}. Initialize database first, then run seeder."
-        )
+def ensure_roles(cur) -> Dict[str, int]:
+    execute_values(
+        cur,
+        "INSERT INTO roles (name) VALUES %s ON CONFLICT (name) DO NOTHING",
+        [(r,) for r in ROLE_NAMES],
+    )
+    cur.execute("SELECT id, name FROM roles")
+    return {name: rid for rid, name in cur.fetchall()}
 
 
-def create_people(cur, target_adults: int = 3200):
-    national_id = 1_000_000_000
+def split_by_gender(people: Sequence[PersonRow]) -> Tuple[List[PersonRow], List[PersonRow]]:
+    males = [p for p in people if p.gender]
+    females = [p for p in people if not p.gender]
+    random.shuffle(males)
+    random.shuffle(females)
+    return males, females
 
-    rows = []
-    for i in range(target_adults):
-        is_male = (i % 2 == 0)
-        first = FAKE.first_name_male() if is_male else FAKE.first_name_female()
-        last = FAKE.last_name()
-        dob = random_date(date(1950, 1, 1), date(2005, 12, 31))
 
-        email = maybe_null(f"{slug(first)}.{slug(last)}.{i}@mail.dz", 0.1)
-        phone = maybe_null(f"0{random.randint(500000000, 799999999)}", 0.08)
-
-        rows.append(
-            (
-                national_id,
-                first,
-                last,
-                email,
-                dob,
-                phone,
-                is_male,
-                None,
-                None,
-                "single",
-            )
-        )
-        national_id += 1
+def insert_people(
+    cur,
+    rows: Sequence[Tuple[int, str, str, Optional[str], date, Optional[str], bool, Optional[int], Optional[int], str]],
+) -> List[PersonRow]:
+    if not rows:
+        return []
 
     execute_values(
         cur,
@@ -208,164 +191,217 @@ def create_people(cur, target_adults: int = 3200):
             national_id, first_name, last_name, email, date_of_birth,
             phone_number, gender, dad_id, mom_id, marital_status
         ) VALUES %s
-        RETURNING id, gender, date_of_birth, first_name, last_name
+        RETURNING id, gender, date_of_birth, first_name, last_name, dad_id, mom_id
         """,
         rows,
         page_size=1000,
     )
 
-    adults = [PersonRow(*r) for r in cur.fetchall()]
-    males = [p for p in adults if p.gender]
-    females = [p for p in adults if not p.gender]
-
-    random.shuffle(males)
-    random.shuffle(females)
-
-    return adults, males, females, national_id
+    return [PersonRow(*r) for r in cur.fetchall()]
 
 
-def create_users(cur, role_map: dict, adults: list[PersonRow]):
-    system_users = []
+def create_founders(cur, national_id_start: int) -> Tuple[List[PersonRow], int]:
+    rows = []
+    for i in range(FOUNDER_COUPLES * 2):
+        is_male = i % 2 == 0
+        first = FAKE.first_name_male() if is_male else FAKE.first_name_female()
+        last = FAKE.last_name()
 
-    # admin
-    system_users.append((
-        "admin_main",
-        DEFAULT_PASSWORD_HASH,
-        role_map["admin"],
-        None,
-        None,
-        None,
-    ))
+        # Founder generation centered around 1740-1755.
+        dob = random_date(date(BASE_BIRTH_YEAR, 1, 1), date(BASE_BIRTH_YEAR + 15, 12, 31))
 
-    # government + police
-    for i in range(1, 4):
-        system_users.append((
-            f"gov_{i}",
-            DEFAULT_PASSWORD_HASH,
-            role_map["government"],
-            None,
-            random.choice(WILAYA_CODES),
-            random.choice(COMMUNE_CODES),
-        ))
-        system_users.append((
-            f"police_{i}",
-            DEFAULT_PASSWORD_HASH,
-            role_map["police"],
-            None,
-            random.choice(WILAYA_CODES),
-            random.choice(COMMUNE_CODES),
-        ))
+        rows.append(
+            (
+                national_id_start,
+                first,
+                last,
+                maybe_null(f"{slug(first)}.{slug(last)}.{national_id_start}@mail.dz", 0.85),
+                dob,
+                None,
+                is_male,
+                None,
+                None,
+                "single",
+            )
+        )
+        national_id_start += 1
 
-    # hospitals + notaries
-    for i in range(1, 9):
-        system_users.append((
-            f"hospital_{i}",
-            DEFAULT_PASSWORD_HASH,
-            role_map["hospital"],
-            None,
-            random.choice(WILAYA_CODES),
-            random.choice(COMMUNE_CODES),
-        ))
-    for i in range(1, 8):
-        system_users.append((
-            f"notary_{i}",
-            DEFAULT_PASSWORD_HASH,
-            role_map["Marriage_Notary"],
-            None,
-            random.choice(WILAYA_CODES),
-            random.choice(COMMUNE_CODES),
-        ))
+    founders = insert_people(cur, rows)
+    return founders, national_id_start
+
+
+def pair_generation(males: Sequence[PersonRow], females: Sequence[PersonRow], max_pairs: int) -> List[Tuple[PersonRow, PersonRow]]:
+    available_females = list(females)
+    random.shuffle(available_females)
+
+    used_female_ids = set()
+    pairs: List[Tuple[PersonRow, PersonRow]] = []
+
+    for husband in males:
+        if len(pairs) >= max_pairs:
+            break
+
+        h_parents = (husband.dad_id, husband.mom_id)
+
+        wife_choice = None
+        for wife in available_females:
+            if wife.id in used_female_ids:
+                continue
+            w_parents = (wife.dad_id, wife.mom_id)
+            # Avoid sibling marriages to satisfy incest prevention trigger.
+            if h_parents[0] is not None and h_parents == w_parents:
+                continue
+            wife_choice = wife
+            break
+
+        if wife_choice is None:
+            continue
+
+        used_female_ids.add(wife_choice.id)
+        pairs.append((husband, wife_choice))
+
+    return pairs
+
+
+def create_users(cur, role_map: Dict[str, int], all_people: Sequence[PersonRow]) -> Tuple[List[int], List[int]]:
+    system_users = [
+        ("admin_main", DEFAULT_PASSWORD_HASH, role_map["admin"], None, None, None),
+    ]
+
+    for i in range(1, 5):
+        system_users.append(
+            (
+                f"gov_{i}",
+                DEFAULT_PASSWORD_HASH,
+                role_map["government"],
+                None,
+                random.choice(WILAYA_CODES),
+                random.choice(COMMUNE_CODES),
+            )
+        )
+        system_users.append(
+            (
+                f"police_{i}",
+                DEFAULT_PASSWORD_HASH,
+                role_map["police"],
+                None,
+                random.choice(WILAYA_CODES),
+                random.choice(COMMUNE_CODES),
+            )
+        )
+
+    for i in range(1, 13):
+        system_users.append(
+            (
+                f"hospital_{i}",
+                DEFAULT_PASSWORD_HASH,
+                role_map["hospital"],
+                None,
+                random.choice(WILAYA_CODES),
+                random.choice(COMMUNE_CODES),
+            )
+        )
+
+    for i in range(1, 11):
+        system_users.append(
+            (
+                f"notary_{i}",
+                DEFAULT_PASSWORD_HASH,
+                role_map["Marriage_Notary"],
+                None,
+                random.choice(WILAYA_CODES),
+                random.choice(COMMUNE_CODES),
+            )
+        )
 
     execute_values(
         cur,
         """
         INSERT INTO users (username, password, role_id, person_id, wilaya_code, commune_code)
         VALUES %s
-        RETURNING id, username, role_id
+        RETURNING id, role_id
         """,
         system_users,
     )
+
     created = cur.fetchall()
+    hospital_ids = [uid for uid, rid in created if rid == role_map["hospital"]]
+    notary_ids = [uid for uid, rid in created if rid == role_map["Marriage_Notary"]]
 
-    hospitals = [u for u in created if u[2] == role_map["hospital"]]
-    notaries = [u for u in created if u[2] == role_map["Marriage_Notary"]]
-
-    # citizen users linked to people
-    citizen_sample = random.sample(adults, min(500, len(adults)))
+    candidate_citizens = [p for p in all_people if TODAY >= p.dob + timedelta(days=18 * 365)]
+    citizen_count = min(1200, len(candidate_citizens))
     citizen_rows = []
-    for i, p in enumerate(citizen_sample, start=1):
-        citizen_rows.append((
-            f"citizen_{p.id}_{i}",
-            DEFAULT_PASSWORD_HASH,
-            role_map["citizen"],
-            p.id,
-            None,
-            None,
-        ))
 
-    execute_values(
-        cur,
-        """
-        INSERT INTO users (username, password, role_id, person_id, wilaya_code, commune_code)
-        VALUES %s
-        ON CONFLICT (username) DO NOTHING
-        """,
-        citizen_rows,
-        page_size=500,
-    )
+    for idx, p in enumerate(random.sample(candidate_citizens, citizen_count), start=1):
+        citizen_rows.append(
+            (
+                f"citizen_{p.id}_{idx}",
+                DEFAULT_PASSWORD_HASH,
+                role_map["citizen"],
+                p.id,
+                None,
+                None,
+            )
+        )
 
-    return hospitals, notaries
+    if citizen_rows:
+        execute_values(
+            cur,
+            """
+            INSERT INTO users (username, password, role_id, person_id, wilaya_code, commune_code)
+            VALUES %s
+            ON CONFLICT (username) DO NOTHING
+            """,
+            citizen_rows,
+            page_size=1000,
+        )
+
+    return hospital_ids, notary_ids
 
 
-def create_marriages(cur, males: list[PersonRow], females: list[PersonRow], notary_ids: list[int]):
-    couples = min(len(males), len(females), 1300)
-    marriages = []
+def create_marriages(
+    cur,
+    pairs: Sequence[Tuple[PersonRow, PersonRow]],
+    notary_user_ids: Sequence[int],
+    witness_pool_ids: Sequence[int],
+    generation_index: int,
+) -> List[MarriageRow]:
+    if not pairs:
+        return []
 
-    female_pool = females[:]
-    random.shuffle(female_pool)
-    wife_idx = 0
-    candidate_witness_ids = [p.id for p in males] + [p.id for p in females]
+    rows = []
+    for husband, wife in pairs:
+        min_date = max(
+            husband.dob + timedelta(days=18 * 365),
+            wife.dob + timedelta(days=18 * 365),
+        )
 
-    for h in males[:couples]:
-        if wife_idx >= len(female_pool):
-            break
+        # Keep generation progression stable while preserving age realism.
+        gen_center_year = BASE_BIRTH_YEAR + generation_index * 28 + 23
+        gen_target_date = date(gen_center_year, random.randint(1, 12), random.randint(1, 28))
+        start = max(min_date, gen_target_date - timedelta(days=3 * 365))
+        end = min(TODAY, gen_target_date + timedelta(days=3 * 365))
+        marriage_date = random_date(start, end)
 
-        w = female_pool[wife_idx]
-        wife_idx += 1
+        witness_candidates = [pid for pid in witness_pool_ids if pid not in (husband.id, wife.id)]
+        random.shuffle(witness_candidates)
+        witness_1 = witness_candidates[0] if witness_candidates else None
+        witness_2 = witness_candidates[1] if len(witness_candidates) > 1 else None
 
-        min_date = max(h.dob + timedelta(days=18 * 365), w.dob + timedelta(days=18 * 365))
-        marriage_date = random_date(min_date, min(TODAY, min_date + timedelta(days=20 * 365)))
-
-        is_divorced = random.random() < 0.18
-        is_death_ended = False
-
-        end_marriage_time = None
-        end_reason = None
-        valid = True
-
-        if is_divorced:
-            valid = False
-            end_marriage_time = random_date(marriage_date + timedelta(days=180), TODAY)
-            end_reason = random.choice(["divorce", "annulment", "Khula"])
-
-        witness_choices = [pid for pid in candidate_witness_ids if pid not in (h.id, w.id)]
-        witness_1 = random.choice(witness_choices) if witness_choices and random.random() > 0.25 else None
-        witness_2_pool = [pid for pid in witness_choices if pid != witness_1]
-        witness_2 = random.choice(witness_2_pool) if witness_2_pool and random.random() > 0.35 else None
-
-        marriages.append((
-            h.id,
-            w.id,
-            marriage_date,
-            valid,
-            end_marriage_time,
-            end_reason,
-            witness_1,
-            witness_2,
-            round(random.uniform(10000, 900000), 2),
-            random.choice(notary_ids),
-            is_death_ended,
-        ))
+        rows.append(
+            (
+                husband.id,
+                wife.id,
+                datetime.combine(marriage_date, datetime.min.time()) + timedelta(hours=random.randint(8, 16)),
+                True,
+                None,
+                None,
+                witness_1,
+                witness_2,
+                round(random.uniform(15000, 950000), 2),
+                random.choice(notary_user_ids),
+            )
+        )
 
     execute_values(
         cur,
@@ -377,111 +413,90 @@ def create_marriages(cur, males: list[PersonRow], females: list[PersonRow], nota
         ) VALUES %s
         RETURNING id, husband_id, wife_id, marriage_date, valid
         """,
-        [m[:-1] for m in marriages],
+        rows,
         page_size=500,
     )
 
-    created = cur.fetchall()
-
-    cur.execute(
-        """
-        UPDATE person p
-        SET marital_status = CASE
-            WHEN m.valid = true THEN 'married'
-            ELSE 'divorced'
-        END
-        FROM marriage m
-        WHERE p.id = m.husband_id OR p.id = m.wife_id
-        """
-    )
-
-    return created
+    return [MarriageRow(*r) for r in cur.fetchall()]
 
 
-def create_children_and_births(cur, marriages, next_nid: int, hospital_ids: list[int]):
-    child_rows = []
+def create_children_and_births(
+    cur,
+    marriages: Sequence[MarriageRow],
+    generation_index: int,
+    next_national_id: int,
+    hospital_user_ids: Sequence[int],
+) -> Tuple[List[PersonRow], int]:
+    if not marriages:
+        return [], next_national_id
+
+    # Fixed offset per generation keeps certificate numbers globally unique and readable.
+    birth_certificate_base = 5_000_000_000 + generation_index * 1_000_000
+
+    child_insert_rows = []
+    child_meta: List[Tuple[int, datetime]] = []  # (marriage_id, birth_datetime)
+
+    for marriage in marriages:
+        # 1-4 children, weighted toward 2-3.
+        child_count = random.choice([1, 2, 2, 3, 3, 4])
+        marriage_day = marriage.marriage_date.date()
+
+        for _ in range(child_count):
+            birth_start = marriage_day + timedelta(days=260)
+            birth_end = min(TODAY, marriage_day + timedelta(days=12 * 365))
+            child_dob = random_date(birth_start, birth_end)
+            child_is_male = random.random() < 0.51
+            first = FAKE.first_name_male() if child_is_male else FAKE.first_name_female()
+
+            child_insert_rows.append(
+                (
+                    next_national_id,
+                    first,
+                    FAKE.last_name(),
+                    maybe_null(f"{slug(first)}.{next_national_id}@mail.dz", 0.985),
+                    child_dob,
+                    None,
+                    child_is_male,
+                    marriage.husband_id,
+                    marriage.wife_id,
+                    "single",
+                )
+            )
+
+            birth_dt = datetime.combine(child_dob, datetime.min.time()) + timedelta(
+                hours=random.randint(0, 23), minutes=random.randint(0, 59)
+            )
+            child_meta.append((marriage.id, birth_dt))
+            next_national_id += 1
+
+    children = insert_people(cur, child_insert_rows)
+
     birth_rows = []
-
-    birth_cert = 5_000_000_000
-
-    for marriage_id, husband_id, wife_id, marriage_date, valid in marriages:
-        if isinstance(marriage_date, datetime):
-            marriage_date = marriage_date.date()
-
-        r = random.random()
-        if r < 0.08:
-            count = 0
-        elif r < 0.28:
-            count = 1
-        elif r < 0.54:
-            count = 2
-        elif r < 0.76:
-            count = 3
-        elif r < 0.90:
-            count = 4
-        else:
-            count = random.randint(5, 7)
-
-        for _ in range(count):
-            dob = random_date(marriage_date + timedelta(days=260), min(TODAY, marriage_date + timedelta(days=22 * 365)))
-            is_male = random.random() < 0.51
-            first = FAKE.first_name_male() if is_male else FAKE.first_name_female()
-            last = FAKE.last_name()
-
-            child_rows.append((
-                next_nid,
-                first,
-                last,
-                maybe_null(f"{slug(first)}.{slug(last)}.{next_nid}@mail.dz", 0.97),
-                dob,
-                maybe_null(f"0{random.randint(500000000, 799999999)}", 0.995),
-                is_male,
-                husband_id,
-                wife_id,
-                "single",
+    for idx, child in enumerate(children):
+        marriage_id, birth_dt = child_meta[idx]
+        birth_rows.append(
+            (
+                birth_certificate_base + idx,
+                child.id,
                 marriage_id,
-            ))
-            next_nid += 1
-
-    if not child_rows:
-        return next_nid
-
-    execute_values(
-        cur,
-        """
-        INSERT INTO person (
-            national_id, first_name, last_name, email, date_of_birth,
-            phone_number, gender, dad_id, mom_id, marital_status
-        ) VALUES %s
-        RETURNING id
-        """,
-        [row[:-1] for row in child_rows],
-        page_size=1000,
-    )
-    child_ids = [r[0] for r in cur.fetchall()]
-
-    for inserted_id, src in zip(child_ids, child_rows):
-        marriage_id = src[-1]
-        dob = src[4]
-        birth_rows.append((
-            birth_cert,
-            inserted_id,
-            marriage_id,
-            random.choice([
-                "CHU Oran",
-                "CHU Bab El Oued",
-                "Mustapha Pacha Hospital",
-                "EHS Mother and Child",
-                "Regional General Hospital",
-            ]),
-            f"Dr. {FAKE.last_name()}",
-            round(random.uniform(2.2, 4.7), 2),
-            datetime.combine(dob, datetime.min.time()) + timedelta(hours=random.randint(0, 23), minutes=random.randint(0, 59)),
-            random.choice(WILAYA_CODES),
-            random.choice(COMMUNE_CODES),
-            random.randint(6, 10),
-        ))
-        birth_cert += 1
+                random.choice(
+                    [
+                        "CHU Oran",
+                        "CHU Bab El Oued",
+                        "Mustapha Pacha Hospital",
+                        "EHS Mother and Child",
+                        "Regional General Hospital",
+                        "Ibn Sina Medical Center",
+                    ]
+                ),
+                f"Dr. {FAKE.last_name()}",
+                round(random.uniform(2.3, 4.5), 2),
+                birth_dt,
+                random.choice(WILAYA_CODES),
+                random.choice(COMMUNE_CODES),
+                random.randint(7, 10),
+            )
+        )
 
     execute_values(
         cur,
@@ -496,65 +511,78 @@ def create_children_and_births(cur, marriages, next_nid: int, hospital_ids: list
         page_size=1000,
     )
 
-    # Trigger some UPDATE audit records
+    # Generate birth update audits as well.
     cur.execute(
         """
         UPDATE birth_records
-        SET doctor_name = doctor_name || ' (reviewed)'
+        SET doctor_name = doctor_name || ' (verified)'
         WHERE id IN (
-          SELECT id FROM birth_records ORDER BY random() LIMIT 120
+          SELECT id FROM birth_records ORDER BY random() LIMIT 250
         )
         """
     )
 
-    # Stamp app user ids for birth logs when missing
-    if hospital_ids:
+    if hospital_user_ids:
         cur.execute(
             """
             UPDATE birth_records_log
             SET changed_by_user_id = %s
             WHERE changed_by_user_id IS NULL
             """,
-            (random.choice(hospital_ids),),
+            (random.choice(hospital_user_ids),),
         )
 
-    return next_nid
+    return children, next_national_id
 
 
-def create_medical_records(cur):
+def dissolve_some_marriages(cur) -> None:
+    # Produce realistic divorce records and marriage audit updates.
+    cur.execute(
+        """
+        UPDATE marriage m
+        SET valid = false,
+            end_marriage_time = m.marriage_date + (interval '365 days' * (2 + (random() * 18)::int)),
+            end_reason = CASE WHEN random() < 0.75 THEN 'divorce' ELSE 'Khula' END
+        WHERE m.valid = true
+          AND m.marriage_date < NOW() - interval '8 years'
+          AND random() < 0.18
+        """
+    )
+
+
+def create_medical_records(cur) -> None:
     cur.execute("SELECT id, gender, date_of_birth FROM person")
     people = cur.fetchall()
 
     rows = []
-    for pid, gender, dob in people:
-        age = max(0, int((TODAY - dob).days / 365.25)) if dob else random.randint(0, 90)
+    chronic = ["hypertension", "asthma", "diabetes type 2", "thyroid disorder", "none"]
 
-        if gender is True:
-            height = round(random.uniform(160, 193), 1)
-            weight = round(random.uniform(55, 110), 1)
-        else:
-            height = round(random.uniform(148, 182), 1)
-            weight = round(random.uniform(45, 95), 1)
+    for pid, gender, dob in people:
+        age = max(0, int((TODAY - dob).days / 365.25))
 
         if age < 12:
-            height = round(random.uniform(70, 150), 1)
-            weight = round(random.uniform(8, 50), 1)
+            height = round(random.uniform(72, 150), 1)
+            weight = round(random.uniform(9, 52), 1)
+        elif gender is True:
+            height = round(random.uniform(160, 194), 1)
+            weight = round(random.uniform(55, 112), 1)
+        else:
+            height = round(random.uniform(148, 183), 1)
+            weight = round(random.uniform(45, 98), 1)
 
-        rows.append((
-            pid,
-            choose_blood_type(),
-            height,
-            weight,
-            random.random() < (0.25 if age > 20 else 0.01),
-            maybe_null(random.choice([
-                "hypertension",
-                "asthma",
-                "diabetes type 2",
-                "thyroid disorder",
-                "none",
-            ]), 0.6),
-            random_date(max(dob + timedelta(days=3650), date(2010, 1, 1)) if dob else date(2010, 1, 1), TODAY),
-        ))
+        last_checkup = random_date(max(date(2008, 1, 1), dob + timedelta(days=365 * 3)), TODAY)
+
+        rows.append(
+            (
+                pid,
+                choose_blood_type(),
+                height,
+                weight,
+                random.random() < (0.28 if age > 20 else 0.01),
+                maybe_null(random.choice(chronic), 0.58),
+                last_checkup,
+            )
+        )
 
     execute_values(
         cur,
@@ -569,7 +597,7 @@ def create_medical_records(cur):
     )
 
 
-def create_education(cur):
+def create_education(cur) -> None:
     cur.execute(
         """
         SELECT id, date_of_birth
@@ -587,6 +615,7 @@ def create_education(cur):
         "University of Constantine",
         "University of Tlemcen",
         "ENSA",
+        "Ecole Nationale Polytechnique",
     ]
 
     majors = [
@@ -604,25 +633,26 @@ def create_education(cur):
 
     rows = []
     for pid, dob in adults:
-        if random.random() > 0.64:
+        if random.random() > 0.73:
             continue
 
-        start_year = max(dob.year + 18, 1990)
-        start = random_date(date(start_year, 9, 1), min(TODAY, date(start_year + 8, 9, 1)))
-        grad = maybe_null(random_date(start + timedelta(days=3 * 365), min(TODAY, start + timedelta(days=7 * 365))), 0.18)
+        start = random_date(max(date(1960, 9, 1), dob + timedelta(days=18 * 365)), TODAY)
+        grad = maybe_null(random_date(start + timedelta(days=3 * 365), min(TODAY, start + timedelta(days=8 * 365))), 0.16)
 
-        rows.append((
-            pid,
-            random.choice(universities),
-            random.choice(majors),
-            random.choice(["Bachelor", "Master", "PhD", "Licence", "Engineer"]),
-            round(random.uniform(2.1, 4.0), 2),
-            random.choice(["full-time", "part-time", "distance"]),
-            start,
-            grad,
-            maybe_null(f"https://certificates.example/{pid}", 0.55),
-            random.random() < 0.72,
-        ))
+        rows.append(
+            (
+                pid,
+                random.choice(universities),
+                random.choice(majors),
+                random.choice(["Bachelor", "Master", "PhD", "Licence", "Engineer"]),
+                round(random.uniform(2.1, 4.0), 2),
+                random.choice(["full-time", "part-time", "distance"]),
+                start,
+                grad,
+                maybe_null(f"https://certificates.example/{pid}", 0.52),
+                random.random() < 0.76,
+            )
+        )
 
     if rows:
         execute_values(
@@ -638,10 +668,11 @@ def create_education(cur):
         )
 
 
-def create_employment_and_audit(cur):
+def create_employment_and_audit(cur) -> None:
     cur.execute(
         """
-        SELECT id, date_of_birth FROM person
+        SELECT id, date_of_birth
+        FROM person
         WHERE date_of_birth <= %s
         """,
         (date(TODAY.year - 18, TODAY.month, TODAY.day),),
@@ -657,36 +688,36 @@ def create_employment_and_audit(cur):
         "Doctor",
         "Project Manager",
         "Police Officer",
-        "Analyst",
+        "Data Analyst",
         "HR Specialist",
     ]
-
     departments = ["IT", "Health", "Finance", "Education", "Operations", "Legal", "Public Service"]
     work_types = ["full-time", "part-time", "contract", "temporary"]
 
-    employed_ids = []
     rows = []
     for pid, dob in adults:
-        if random.random() > 0.72:
+        if random.random() > 0.68:
             continue
 
-        start = random_date(max(dob + timedelta(days=18 * 365), date(2000, 1, 1)), TODAY)
-        active = random.random() < 0.78
-        end_d = None if active else maybe_null(random_date(start + timedelta(days=120), TODAY), 0.1)
+        start = random_date(max(date(1960, 1, 1), dob + timedelta(days=18 * 365)), TODAY)
+        active = random.random() < 0.8
+        end_date = None if active else maybe_null(random_date(start + timedelta(days=100), TODAY), 0.1)
 
-        rows.append((
-            pid,
-            random.randint(1, 400),
-            random.choice(titles),
-            random.choice(departments),
-            random.choice(work_types),
-            round(random.uniform(30000, 420000), 2),
-            active,
-            start,
-            end_d,
-            None,
-            random.choice(["Algiers", "Oran", "Annaba", "Constantine", "Blida", "Setif"]),
-        ))
+        rows.append(
+            (
+                pid,
+                random.randint(1, 700),
+                random.choice(titles),
+                random.choice(departments),
+                random.choice(work_types),
+                round(random.uniform(32000, 520000), 2),
+                active,
+                start,
+                end_date,
+                None,
+                random.choice(["Algiers", "Oran", "Annaba", "Constantine", "Blida", "Setif"]),
+            )
+        )
 
     if not rows:
         return
@@ -705,20 +736,18 @@ def create_employment_and_audit(cur):
     )
     employment_ids = [r[0] for r in cur.fetchall()]
 
-    # Trigger salary_audit by changing salaries in a subset
-    if employment_ids:
-        sample = random.sample(employment_ids, min(420, len(employment_ids)))
-        cur.execute(
-            """
-            UPDATE employment
-            SET salary = salary * (1 + (random() * 0.15)::numeric)
-            WHERE id = ANY(%s)
-            """,
-            (sample,),
-        )
+    sample = random.sample(employment_ids, min(700, len(employment_ids)))
+    cur.execute(
+        """
+        UPDATE employment
+        SET salary = salary * (1 + (random() * 0.18)::numeric)
+        WHERE id = ANY(%s)
+        """,
+        (sample,),
+    )
 
 
-def ensure_salary_audit_not_empty(cur):
+def ensure_salary_audit_not_empty(cur) -> None:
     cur.execute("SELECT to_regclass('public.salary_audit')")
     if cur.fetchone()[0] is None:
         return
@@ -727,7 +756,6 @@ def ensure_salary_audit_not_empty(cur):
     if cur.fetchone()[0] > 0:
         return
 
-    # Fallback for DB instances where salary audit trigger is missing.
     cur.execute(
         """
         INSERT INTO salary_audit (employment_id, old_salary, new_salary, changed_at, changed_by_user)
@@ -744,29 +772,32 @@ def ensure_salary_audit_not_empty(cur):
     )
 
 
-def create_assets(cur):
+def create_assets(cur) -> None:
     cur.execute("SELECT id, date_of_birth FROM person")
     people = cur.fetchall()
 
-    types = ["car", "land", "house", "apartment", "shop", "farm equipment", "motorbike"]
+    asset_types = ["car", "land", "house", "apartment", "shop", "farm equipment", "motorbike"]
     rows = []
-    reg_counter = 10_000
+    reg_no = 10_000
 
     for pid, dob in people:
-        if random.random() > 0.42:
+        age = int((TODAY - dob).days / 365.25)
+        if age < 18 or random.random() > 0.5:
             continue
 
-        asset_count = 1 if random.random() < 0.8 else random.randint(2, 4)
-        for _ in range(asset_count):
-            date_owned = random_date(max(dob + timedelta(days=18 * 365), date(1995, 1, 1)), TODAY)
-            rows.append((
-                pid,
-                random.choice(types),
-                f"REG-{reg_counter}",
-                datetime.combine(date_owned, datetime.min.time()),
-                round(random.uniform(80000, 8_000_000), 2),
-            ))
-            reg_counter += 1
+        count = 1 if random.random() < 0.78 else random.randint(2, 4)
+        for _ in range(count):
+            owned = random_date(max(date(1960, 1, 1), dob + timedelta(days=18 * 365)), TODAY)
+            rows.append(
+                (
+                    pid,
+                    random.choice(asset_types),
+                    f"REG-{reg_no}",
+                    datetime.combine(owned, datetime.min.time()),
+                    round(random.uniform(90000, 9_000_000), 2),
+                )
+            )
+            reg_no += 1
 
     if rows:
         execute_values(
@@ -781,24 +812,22 @@ def create_assets(cur):
         )
 
 
-def create_passports(cur):
+def create_passports(cur) -> None:
     cur.execute("SELECT id, date_of_birth FROM person")
     people = cur.fetchall()
 
     rows = []
     seq = 100000
+
     for pid, dob in people:
-        if random.random() > 0.56:
+        age = int((TODAY - dob).days / 365.25)
+        if age < 16 or random.random() > 0.66:
             continue
-        issue = random_date(max(dob + timedelta(days=16 * 365), date(2000, 1, 1)), TODAY)
+
+        issue = random_date(max(date(1960, 1, 1), dob + timedelta(days=16 * 365)), TODAY)
         expiry = issue + timedelta(days=random.choice([5 * 365, 10 * 365]))
-        rows.append((
-            pid,
-            f"P{seq}",
-            issue,
-            expiry,
-            True,
-        ))
+
+        rows.append((pid, f"P{seq}", issue, expiry, True))
         seq += 1
 
     if rows:
@@ -813,45 +842,41 @@ def create_passports(cur):
         )
 
 
-def create_criminal_records(cur):
+def create_criminal_records(cur) -> None:
     cur.execute("SELECT id, date_of_birth FROM person")
     people = cur.fetchall()
 
-    violations = [
-        "traffic offense",
-        "theft",
-        "fraud",
-        "public disturbance",
-        "property damage",
-        "tax evasion",
-    ]
+    violations = ["traffic offense", "theft", "fraud", "public disturbance", "property damage", "tax evasion"]
     dispositions = ["pending", "closed", "convicted", "dismissed", "under review"]
 
     rows = []
-    cno = 200000
+    case_no = 200000
+
     for pid, dob in people:
         age = int((TODAY - dob).days / 365.25)
-        if age < 18 or random.random() > 0.055:
+        if age < 18 or random.random() > 0.06:
             continue
 
-        occ = random_date(date(max(2000, dob.year + 18), 1, 1), TODAY)
+        occ = random_date(max(date(1960, 1, 1), dob + timedelta(days=18 * 365)), TODAY)
         filing = random_date(occ, TODAY)
 
-        rows.append((
-            pid,
-            f"CR-{cno}",
-            random.random() > 0.18,
-            random.choice(violations),
-            random.choice(dispositions),
-            FAKE.sentence(nb_words=random.randint(7, 16)),
-            datetime.combine(occ, datetime.min.time()),
-            datetime.combine(filing, datetime.min.time()),
-            round(random.uniform(0, 200000), 2),
-            maybe_null(FAKE.sentence(nb_words=10), 0.5),
-            random.choice(["Algiers", "Oran", "Constantine", "Annaba", "Setif", "Blida"]),
-            random.random() < 0.09,
-        ))
-        cno += 1
+        rows.append(
+            (
+                pid,
+                f"CR-{case_no}",
+                random.random() > 0.16,
+                random.choice(violations),
+                random.choice(dispositions),
+                FAKE.sentence(nb_words=random.randint(8, 18)),
+                datetime.combine(occ, datetime.min.time()),
+                datetime.combine(filing, datetime.min.time()),
+                round(random.uniform(0, 250000), 2),
+                maybe_null(FAKE.sentence(nb_words=10), 0.45),
+                random.choice(["Algiers", "Oran", "Constantine", "Annaba", "Setif", "Blida"]),
+                random.random() < 0.08,
+            )
+        )
+        case_no += 1
 
     if rows:
         execute_values(
@@ -868,7 +893,7 @@ def create_criminal_records(cur):
         )
 
 
-def create_death_records(cur, hospital_user_ids: list[int]):
+def create_death_records(cur, hospital_user_ids: Sequence[int]) -> None:
     cur.execute(
         """
         SELECT p.id, p.date_of_birth
@@ -879,9 +904,10 @@ def create_death_records(cur, hospital_user_ids: list[int]):
     )
     people = cur.fetchall()
 
-    doctor_candidates = [r[0] for r in random.sample(people, min(200, len(people)))] if people else []
-    rows = []
+    person_ids = [p[0] for p in people]
+    doctor_candidates = random.sample(person_ids, min(300, len(person_ids))) if person_ids else []
 
+    rows = []
     for pid, dob in people:
         age = int((TODAY - dob).days / 365.25)
         if age < 18:
@@ -890,27 +916,33 @@ def create_death_records(cur, hospital_user_ids: list[int]):
         if age < 40:
             p_dead = 0.01
         elif age < 60:
-            p_dead = 0.04
+            p_dead = 0.05
         elif age < 80:
-            p_dead = 0.15
+            p_dead = 0.18
         else:
-            p_dead = 0.42
+            p_dead = 0.5
 
         if random.random() > p_dead:
             continue
 
-        death_day = random_date(max(dob + timedelta(days=18 * 365), date(2000, 1, 1)), TODAY)
-        rows.append((
-            pid,
-            datetime.combine(death_day, datetime.min.time()) + timedelta(hours=random.randint(0, 23), minutes=random.randint(0, 59)),
-            random.choice(["Algiers", "Oran", "Annaba", "Constantine", "Setif"]),
-            random.choice(["heart disease", "stroke", "cancer", "road accident", "respiratory failure", "natural causes"]),
-            maybe_null(random.choice(doctor_candidates), 0.55) if doctor_candidates else None,
-            maybe_null(random.choice(["I21.9", "I64", "C80", "J96", "V89", "R54"]), 0.35),
-            None,
-            random.random() < 0.7,
-            random.choice(hospital_user_ids) if hospital_user_ids else None,
-        ))
+        death_day = random_date(max(date(1960, 1, 1), dob + timedelta(days=18 * 365)), TODAY)
+        kin = random.choice(person_ids) if random.random() < 0.7 and person_ids else None
+
+        rows.append(
+            (
+                pid,
+                datetime.combine(death_day, datetime.min.time()) + timedelta(
+                    hours=random.randint(0, 23), minutes=random.randint(0, 59)
+                ),
+                random.choice(["Algiers", "Oran", "Annaba", "Constantine", "Setif"]),
+                random.choice(["heart disease", "stroke", "cancer", "road accident", "respiratory failure", "natural causes"]),
+                maybe_null(random.choice(doctor_candidates), 0.55) if doctor_candidates else None,
+                maybe_null(random.choice(["I21.9", "I64", "C80", "J96", "V89", "R54"]), 0.35),
+                kin,
+                random.random() < 0.72,
+                random.choice(hospital_user_ids) if hospital_user_ids else None,
+            )
+        )
 
     if rows:
         execute_values(
@@ -928,7 +960,7 @@ def create_death_records(cur, hospital_user_ids: list[int]):
         )
 
 
-def populate_act_number_tracker(cur):
+def populate_act_number_tracker(cur) -> None:
     cur.execute(
         """
         INSERT INTO act_number_tracker (wilaya_code, commune_code, birth_year, last_act_no)
@@ -945,7 +977,7 @@ def populate_act_number_tracker(cur):
     )
 
 
-def print_counts(cur):
+def print_counts(cur) -> None:
     tables = [
         "roles",
         "person",
@@ -968,8 +1000,36 @@ def print_counts(cur):
     print("\n=== Seeded Row Counts ===")
     for t in tables:
         cur.execute(f"SELECT COUNT(*) FROM {t}")
-        count = cur.fetchone()[0]
-        print(f"{t:20s} : {count}")
+        print(f"{t:20s} : {cur.fetchone()[0]}")
+
+
+def assert_tables_populated(cur) -> None:
+    required_non_empty = [
+        "roles",
+        "person",
+        "users",
+        "marriage",
+        "birth_records",
+        "birth_records_log",
+        "medical_records",
+        "education",
+        "employment",
+        "salary_audit",
+        "assets",
+        "passports",
+        "criminal_records",
+        "death_records",
+        "act_number_tracker",
+    ]
+
+    empties = []
+    for t in required_non_empty:
+        cur.execute(f"SELECT COUNT(*) FROM {t}")
+        if cur.fetchone()[0] == 0:
+            empties.append(t)
+
+    if empties:
+        raise RuntimeError("Seed completed but some required tables are empty: " + ", ".join(empties))
 
 
 def main() -> None:
@@ -985,29 +1045,63 @@ def main() -> None:
     try:
         with conn:
             with conn.cursor() as cur:
-                print("Resetting and seeding tables...")
+                print("Resetting and seeding tables with 10 generations...")
                 ensure_required_tables(cur)
                 truncate_all(cur)
                 role_map = ensure_roles(cur)
 
-                adults, males, females, next_nid = create_people(cur, target_adults=3200)
-                hospitals, notaries = create_users(cur, role_map, adults)
+                all_people: List[PersonRow] = []
+                generation_people: Dict[int, List[PersonRow]] = {}
 
-                hospital_ids = [u[0] for u in hospitals]
-                notary_ids = [u[0] for u in notaries]
+                next_national_id = 1_000_000_000
+                founders, next_national_id = create_founders(cur, next_national_id)
+                generation_people[0] = founders
+                all_people.extend(founders)
 
+                hospital_ids, notary_ids = create_users(cur, role_map, all_people)
                 if not notary_ids:
                     raise RuntimeError("No notary users available for marriage generation")
 
-                # marriage audit user context
-                cur.execute("SELECT set_config('app.current_user_id', %s, false)", (str(random.choice(notary_ids)),))
-                marriages = create_marriages(cur, males, females, notary_ids)
+                generation_marriages: Dict[int, List[MarriageRow]] = {}
 
-                # birth audit user context
-                if hospital_ids:
-                    cur.execute("SELECT set_config('app.current_user_id', %s, false)", (str(random.choice(hospital_ids)),))
-                next_nid = create_children_and_births(cur, marriages, next_nid, hospital_ids)
+                for gen in range(GENERATIONS):
+                    current_people = generation_people.get(gen, [])
+                    males, females = split_by_gender(current_people)
 
+                    target_pairs = TARGET_COUPLES_PER_GENERATION[gen]
+                    pairs = pair_generation(males, females, max_pairs=target_pairs)
+                    if not pairs:
+                        raise RuntimeError(f"No eligible pairs found for generation {gen}")
+
+                    # Ensure marriage audit trigger can capture a valid actor.
+                    cur.execute(
+                        "SELECT set_config('app.current_user_id', %s, false)",
+                        (str(random.choice(notary_ids)),),
+                    )
+
+                    witness_pool = [p.id for p in all_people if TODAY >= p.dob + timedelta(days=18 * 365)]
+                    marriages = create_marriages(cur, pairs, notary_ids, witness_pool, generation_index=gen)
+                    generation_marriages[gen] = marriages
+
+                    # Ensure birth log trigger can capture a valid hospital actor.
+                    if hospital_ids:
+                        cur.execute(
+                            "SELECT set_config('app.current_user_id', %s, false)",
+                            (str(random.choice(hospital_ids)),),
+                        )
+
+                    if gen < GENERATIONS - 1:
+                        children, next_national_id = create_children_and_births(
+                            cur,
+                            marriages,
+                            generation_index=gen + 1,
+                            next_national_id=next_national_id,
+                            hospital_user_ids=hospital_ids,
+                        )
+                        generation_people[gen + 1] = children
+                        all_people.extend(children)
+
+                dissolve_some_marriages(cur)
                 create_medical_records(cur)
                 create_education(cur)
                 create_employment_and_audit(cur)
@@ -1018,9 +1112,16 @@ def main() -> None:
                 create_death_records(cur, hospital_ids)
                 populate_act_number_tracker(cur)
 
+                assert_tables_populated(cur)
                 print_counts(cur)
 
-                print("\nDone. Dummy data generation completed successfully.")
+                print("\n=== Generation Stats ===")
+                for gen in range(GENERATIONS):
+                    pcount = len(generation_people.get(gen, []))
+                    mcount = len(generation_marriages.get(gen, []))
+                    print(f"generation_{gen:02d} people={pcount} marriages={mcount}")
+
+                print("\nDone. Realistic multi-generation dummy data generated successfully.")
                 print("Default login password for seeded users: password")
 
     except Exception as exc:
