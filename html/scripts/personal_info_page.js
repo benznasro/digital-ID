@@ -113,8 +113,6 @@ function renderMedical(medical) {
   setText("medicalCheckup", formatDate(medical?.last_checkup_date));
 }
 function renderMarriage(marriage) {
-  setText("FullHesbend", fmt(marriage?.fullNameHesbend));
-  setText("FullWife", fmt(marriage?.fullNameWife));
   setText("Contract_no", fmt(marriage?.contract_no));
   setText("Valid", fmt(marriage?.valid));
   setText("DivorceDate", formatDate(marriage?.end_reason));
@@ -174,7 +172,7 @@ document.addEventListener("click", (e) => {
 async function loadProfileData() {
   setBanner("Loading your data...");
 
-  const [personRes, birthRes, medicalRes, marriageRes] =
+  const [personRes, birthRes, medicalRes, marriageRes, educationRes] =
     await Promise.allSettled([
       apiFetch("/api/person/me", "GET", null),
       apiFetch("/api/birth_records/me", "GET", null),
@@ -182,6 +180,7 @@ async function loadProfileData() {
       apiFetch("/api/marriage/me", "GET", null),
       apiFetch("/api/education/me", "GET", null),
     ]);
+    console.log({ personRes, birthRes, medicalRes, marriageRes, educationRes });
 
   const errors = [];
 
@@ -208,13 +207,13 @@ async function loadProfileData() {
     renderMarriage(marriageRes.value);
   } else {
     renderMarriage(null);
-    errors.push("marriage ");
+    errors.push("marriage");
   }
   if (educationRes.status === "fulfilled" && !educationRes.value?.error) {
     renderEducation(educationRes.value);
   } else {
     renderEducation(null);
-    errors.push("education ");
+    errors.push("education");
   }
   if (errors.length === 0) {
     setBanner("Your records are loaded successfully.", "success");

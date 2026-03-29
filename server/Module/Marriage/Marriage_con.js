@@ -112,3 +112,24 @@ export const get_My_AuditLogs = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+export const get_my_marriage = async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT
+                *
+            FROM marriage m
+
+            WHERE m.husband_id = $1 OR m.wife_id = $1
+
+            ORDER BY m.marriage_date DESC
+        `, [req.user.id]);
+
+        res.status(200).json(result.rows);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+    
+};
