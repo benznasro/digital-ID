@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Marriage & Divorce Registration</title>
+	<link rel="stylesheet" href="style/criminal_records.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+	<header class="page-header">
+		<div class="header-content">
+			<button class="sidebar-toggle" id="sidebarToggle" aria-label="Open Menu">
+				<i class="fas fa-bars"></i>
+			</button>
+			<div class="header-text">
+				<h1>Digital ID Portal</h1>
+				<p class="subtitle">Criminal Records & Divorce Registration System</p>
+			</div>
+		</div>
+	</header>
+
+	<div class="main-layout">
+		<!-- Sidebar -->
+		<aside class="sidebar" id="sidebar">
+			<div class="sidebar-header">
+				<span class="sidebar-title"><i class="fas fa-scale-balanced"></i> Notary Panel</span>
+			</div>
+			<nav class="sidebar-nav">
+				<ul>
+					<!-- Recent Logs -->
+					<li class="sidebar-item">
+						<a href="#" class="sidebar-link" id="logsLink">
+							<i class="fa-regular fa-clock"></i>
+							<span>Recent Logs</span>
+						</a>
+						<div class="sidebar-logs" id="sidebarLogs">
+							<div class="log-entry"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
+						</div>
+					</li>
+
+					<!-- My Contracts -->
+					<li class="sidebar-item">
+						<a href="#" class="sidebar-link" id="contractsLink">
+							<i class="fa-regular fa-file-lines"></i>
+							<span>My Contracts</span>
+							<span class="count-badge" id="contractCount">0</span>
+						</a>
+
+						<div class="sidebar-contracts" id="sidebarContracts">
+
+							<!-- Search -->
+							<div class="contracts-search">
+								<input type="text" id="contractSearch" placeholder="Search name or ID...">
+								<button id="contractClear" title="Reset all filters">
+									<i class="fa-solid fa-arrows-rotate"></i>
+								</button>
+							</div>
+
+							<!--Type filter -->
+							<div class="filter-row">
+								<select id="filterType" class="filter-select">
+									<option value="all">All Types</option>
+									<option value="INSERT"> Marriages only</option>
+									<option value="UPDATE"> Divorces only</option>
+								</select>
+							</div>
+
+							<!--Date range filter-->
+							<div class="filter-row date-range">
+								<div class="date-field">
+									<label class="date-label">From</label>
+									<input type="date" id="filterDateFrom" class="filter-date">
+								</div>
+								<div class="date-field">
+									<label class="date-label">To</label>
+									<input type="date" id="filterDateTo" class="filter-date">
+								</div>
+							</div>
+
+							<!-- Results -->
+							<ul class="contracts-list" id="contractsList">
+								<li class="contract-item">
+									<i class="fa-solid fa-spinner fa-spin"></i> Loading...
+								</li>
+							</ul>
+						</div>
+					</li>
+				</ul>
+			</nav>
+		</aside>
+
+		<!-- Main Content -->
+		<main class="main-content">
+
+			<!-- Criminal Records Tab -->
+			<div id="criminal_records_form" class="tab-content">
+				<div class="form-header">
+					<h2>Criminal Records Registration</h2>
+					<p class="section-desc">Register a new criminal records contract. Please fill all fields accurately and confirm all information before submission.</p>
+				</div>
+				<form id="criminal_recordsForm" autocomplete="off">
+					<fieldset class="form-section">
+						<legend class="section-title">Parties Information</legend>
+						<label class="form-field">
+							<span class="field-label">The officer ID</span>
+							<input type="number" name="officerId" required placeholder="Enter officer's national ID">
+							<small class="helper-text">National ID number</small>
+						</label>
+						<label class="form-field">
+							<span class="field-label">The violator ID</span>
+							<input type="number" name="personId" required placeholder="Enter violator's national ID">
+							<small class="helper-text">National ID number</small>
+						</label>
+                        <label class="form-field">
+							<span class="field-label">The case Number </span>
+							<input type="number" name="caseNumber" required placeholder="Enter case Number">
+							<small class="helper-text">Enter The  case Number</small>
+						</label>
+                        <label class="form-field">
+							<span class="field-label">The  status </span>
+							<input type="text" name="status" required placeholder="Enter status">
+							<small class="helper-text">Enter The  status</small>
+						</label>
+                        <label class="form-field">
+							<span class="field-label">The  violation Type </span>
+							<input type="text" name="violationType" required placeholder="Enter violation Type">
+							<small class="helper-text">Enter The  violation</small>
+						</label>
+                        <label class="form-field">
+							<span class="field-label">The  disposition</span>
+							<input type="text" name="disposition" required placeholder="Enter disposition">
+							<small class="helper-text">Enter The  disposition</small>
+						</label>
+                        <label class="form-field">
+							<span class="field-label">The  description </span>
+							<input type="text" name="description" required placeholder="Enter description">
+							<small class="helper-text">Enter The  disposition</small>
+						</label
+					</fieldset>
+					<fieldset class="form-section">
+						<legend class="section-title">Marriage Details</legend>
+						<label class="form-field">
+							<span class="field-label">occurrence Date</span>
+							<input type="date" name="occurrenceDate" required>
+							<small class="helper-text">Date of occurrence ceremony</small>
+						</label>
+                        <label class="form-field">
+							<span class="field-label">filing date</span>
+							<input type="date" name="filing_date" required>
+							<small class="helper-text">Date of filing ceremony</small>
+						</label>
+						<label class="form-field">
+							<span class="field-label"> fine Amount</span>
+							<input type="number"  name="fineAmount" required placeholder="fine Amount">
+							<small class="helper-text">Enter fine Amount in DZD</small>
+						</label>
+					</fieldset>
+					<fieldset class="form-section">
+						<legend class="section-title">Witnesses</legend>
+						<label class="form-field">
+							<span class="field-label">sentence De tails</span>
+							<input type="text" name="sentenceDetails" required placeholder="sentence De tails">
+							<small class="helper-text">Enter sentence De tails</small>
+						</label>
+						<label class="form-field">
+							<span class="field-label">location De tails</span>
+							<input type="text" name="locationDetails" required placeholder="location De tails">
+							<small class="helper-text">Enter location De tails</small>
+						</label>
+                        <label class="form-field">
+							<span class="field-label">is Expunged</span>
+							<input type="text" name="isExpunged" required placeholder="is Expunged">
+							<small class="helper-text">Enter location De tails</small>
+						</label>
+					</fieldset>
+					<button type="submit" class="submit-btn">
+						<i class="fas fa-check-circle"></i> Register Marriage
+					</button>
+				</form>
+				<div id="marriageResult" class="result-container"></div>
+			</div>
+		</main>
+	</div>
+
+	<script type="module" src="scripts/criminal_records.js"></script>
+</body>
+</html>
