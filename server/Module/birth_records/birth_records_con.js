@@ -46,8 +46,6 @@ export const get_My_birth_record= async (req ,res)=>{
   try {
     const result=await pool.query(`select * from birth_records where child_id = ${req.user.person_id};`);
     res.json(result.rows[0]);
-    console.log(result.rows[0]);
-    console.log(req.user.person_id);
     
   } catch (error) {
     res.status(500).json({ error: error.message });
