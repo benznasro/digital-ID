@@ -113,6 +113,19 @@ function renderMedical(medical) {
   setText("medicalCheckup", formatDate(medical?.last_checkup_date));
 }
 function renderMarriage(marriage) {
+  if(marriage[0] === null || marriage[0] === undefined || marriage[0] === ""){
+    setText("FullHesbend", fmt(marriage[0]?.fullNamehesbend));
+    setText("FullWife", formatDate(marriage[0]?.fullNamewife));
+    setText("Contract_no", fmt(marriage[0]?.contract_no));
+    setText("Valid", fmt(marriage[0]?.valid));
+    setText("DivorceDate", fmt(marriage[0]?.end_reason));
+    setText("MarriageDate", fmt(marriage[0]?.marriagedate));
+    setText("EndMarriageTime", smokerLabel(marriage[0]?.end_marriage_time));
+    setText("Witness_1", fmt(marriage[0]?.fullNamewitness_1));
+    setText("Witness_2", formatDate(marriage[0]?.fullNamewitness_2));
+    setText("Dowry_amount", formatDate(marriage[0]?.dowry_amount));
+    setText("Notary", formatDate(marriage[0]?.fullNamenotary));
+  }else{
   let infocard=``;
   for(let i=0;i<marriage.length;i++){
     const marriageindx=marriage[i];
@@ -125,28 +138,72 @@ function renderMarriage(marriage) {
     <div class="info-row"><span>Divorce Date</span><strong id="DivorceDate">${formatDate(marriageindx?.end_reason)}</strong></div>
     <div class="info-row"><span>Marriage Date</span><strong id="MarriageDate">${formatDate(marriageindx?.marriagedate)}</strong></div>
     <div class="info-row"><span>End Marriage Time</span><strong id="EndMarriageTime">${formatDate(marriageindx?.end_marriage_time)}</strong></div>
-    <div class="info-row"><span>Witness 1</span><strong id="Witness_1">${fmt(marriageindx?.fullwitness_1)}</strong></div>
-    <div class="info-row"><span>Witness 2</span><strong id="Witness_2">${fmt(marriageindx?.fullwitness_2)}</strong></div>
+    <div class="info-row"><span>Witness 1</span><strong id="Witness_1">${fmt(marriageindx?.fullNamewitness_1)}</strong></div>
+    <div class="info-row"><span>Witness 2</span><strong id="Witness_2">${fmt(marriageindx?.fullNamewitness_2)}</strong></div>
     <div class="info-row"><span>Dowry amount</span><strong id="Dowry_amount">${fmt(marriageindx?.dowry_amount)}</strong></div>
     <div class="info-row"><span>Notary</span><strong id="Notary">${fmt(marriageindx?.fullNamenotary)}</strong></div>
     `
   }
   document.getElementById("marriageInfo").innerHTML=infocard;
-  console.log(infocard);
+  }
 }
 function renderEducation(education) {
-  setText("FullNameStudent", fmt(education?.fullNamestudent));
-  setText("UniversityName", fmt(education?.university_name));
-  setText("Major", fmt(education?.major));
-  setText("DegreeType", fmt(education?.degree_type));
-  setText("StudyMode", fmt(education?.study_mode));
-  setText("StartDate", formatDate(education?.start_date));
-  setText("GraduationDate", formatDate(education?.graduation_date));
-  setText("Certificate", fmt(education?.certificate_url));
-  setText("GPA", fmt(education?.gpa));
-  setText("Is_Verified", fmt(education?.is_verified));
-  setText("Created_at", fmt(education?.created_at));
-}
+  if(education[0] === null || education[0] === undefined || education[0] === ""){
+    setText("FullNameStudent", fmt(education[0]?.fullNamestudent));
+    setText("UniversityName", formatDate(education[0]?.university_name));
+    setText("Major", fmt(education[0]?.major));
+    setText("DegreeType", fmt(education[0]?.degree_type));
+    setText("StudyMode", fmt(education[0]?.study_mode));
+    setText("StartDate", smokerLabel(education[0]?.start_date));
+    setText("GraduationDate", fmt(education[0]?.graduation_date));
+    setText("GPA", formatDate(education[0]?.gpa));
+    setText("Certificate", formatDate(education[0]?.certificate_url));
+    setText("Is_Verified", formatDate(education[0]?.is_verified));
+    setText("Created_at", formatDate(education[0]?.created_at));
+  }else{
+  let infocard=``;
+  for(let i=0;i<education.length;i++){
+    const educationindx=education[i];
+    infocard = infocard +
+    `
+    <div class="info-row"><span>Full Name Student</span><strong id="FullNameStudent">${fmt(educationindx?.fullNamestudent)}</strong></div>
+					<div class="info-row"><span>University Name</span><strong id="UniversityName">${fmt(educationindx?.university_name)}</strong></div>
+					<div class="info-row"><span>Major</span><strong id="Major">${fmt(educationindx?.major)}</strong></div>
+					<div class="info-row"><span>Degree Type</span><strong id="DegreeType">${fmt(educationindx?.degree_type)}</strong></div>
+					<div class="info-row"><span>Study Mode</span><strong id="StudyMode">${fmt(educationindx?.study_mode)}</strong></div>
+					<div class="info-row"><span>Start Date</span><strong id="StartDate">${formatDate(educationindx?.start_date)}</strong></div>
+					<div class="info-row"><span>Graduation Date</span><strong id="GraduationDate">${formatDate(education?.graduation_date)}</strong></div>
+					<div class="info-row"><span>GPA</span><strong id="GPA">${fmt(educationindx?.gpa)}</strong></div>
+					<div class="info-row"><span>Certificate</span><strong id="Certificate">${fmt(educationindx?.certificate_url)}</strong></div>
+					<div class="info-row"><span>Is Verified</span><strong id="Is_Verified">${fmt(educationindx?.is_verified)}</strong></div>
+					<div class="info-row"><span>Created at</span><strong id="Created_at">${fmt(educationindx?.created_at)}</strong></div>
+          `
+  }
+  document.getElementById("educationInfo").innerHTML=infocard
+}}
+function renderPassport(passport) {
+  if(passport[0] === null || passport[0] === undefined || passport[0] === ""){
+    setText("FullNamePerson", fmt(passport[0]?.fullNameperson));
+    setText("PassportNumber", fmt(passport[0]?.passport_number));
+    setText("IssueDate", formatDate(passport[0]?.issue_date));
+    setText("ExpiryDate", formatDate(passport[0]?.expiry_date));
+    setText("IsActive", fmt(passport[0]?.is_active));
+  }else{
+  let infocard=``;
+  for(let i=0;i<passport.length;i++){
+    console.log(passport[i]);
+    const passportindx=passport[i];
+    infocard = infocard +
+    `
+          <div class="info-row"><span>Full Name Student</span><strong id="FullNamePerson">${fmt(passportindx?.fullNameperson)}</strong></div>
+					<div class="info-row"><span>University Name</span><strong id="PassportNumber">${fmt(passportindx?.passport_number)}</strong></div>
+					<div class="info-row"><span>Major</span><strong id="IssueDate">${fmt(passportindx?.issue_date)}</strong></div>
+					<div class="info-row"><span>Degree Type</span><strong id="ExpiryDate">${fmt(passportindx?.expiry_date)}</strong></div>
+					<div class="info-row"><span>Study Mode</span><strong id="IsActive">${fmt(passportindx?.is_active)}</strong></div>
+          `
+  }
+  document.getElementById("passportInfo").innerHTML=infocard;
+}}
 function activateSection(sectionName) {
   sidebarLinks.forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.section === sectionName);
@@ -183,15 +240,16 @@ document.addEventListener("click", (e) => {
 async function loadProfileData() {
   setBanner("Loading your data...");
 
-  const [personRes, birthRes, medicalRes, marriageRes, educationRes] =
+  const [personRes, birthRes, medicalRes, marriageRes, educationRes,passportRes] =
     await Promise.allSettled([
       apiFetch("/api/person/me", "GET", null),
       apiFetch("/api/birth_records/me", "GET", null),
       apiFetch("/api/medical_records/me", "GET", null),
       apiFetch("/api/marriage/me", "GET", null),
       apiFetch("/api/education/me", "GET", null),
+      apiFetch("/api/passport/me", "GET", null),
     ]);
-    console.log({ personRes, birthRes, medicalRes, marriageRes, educationRes });
+    console.log({ personRes, birthRes, medicalRes, marriageRes, educationRes,passportRes });
 
   const errors = [];
 
@@ -226,6 +284,13 @@ async function loadProfileData() {
     renderEducation(null);
     errors.push("education");
   }
+  if (passportRes.status === "fulfilled" && !passportRes.value?.error) {
+    renderPassport(passportRes.value);
+  } else {
+    renderPassport(null);
+    errors.push("passport");
+  }
+  
   if (errors.length === 0) {
     setBanner("Your records are loaded successfully.", "success");
     return;
