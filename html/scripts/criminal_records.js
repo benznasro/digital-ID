@@ -16,11 +16,6 @@ document.addEventListener('click', (e) => {
 	}
 });
 
-//  Tabs 
-
-	document.getElementById('criminal_records').style.display = tab === 'criminal_records' ? '' : 'none';
-
-
 //  Result Helper 
 function showResult(elementId, res) {
 	const div = document.getElementById(elementId);
@@ -33,7 +28,7 @@ function showResult(elementId, res) {
 async function loadSidebarLogs() {
 	const logsDiv = document.getElementById('sidebarLogs');
 	try {
-		const logs = await apiFetch('/api/criminal_records/my_logs', 'GET', null);
+		const logs = await apiFetch('/api/criminal_records/:id', 'GET', null);
 
 		if (!logs || !logs.length) {
 			logsDiv.innerHTML = '<div class="log-entry"><i class="fa-solid fa-circle-dot"></i> No logs yet.</div>';
@@ -61,7 +56,7 @@ async function loadSidebarContracts() {
 	const list = document.getElementById('contractsList');
 	list.innerHTML = '<li class="contract-item"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</li>';
 	try {
-		const logs = await apiFetch('/api/criminal_records/my_logs', 'GET', null);
+		const logs = await apiFetch('/api/criminal_records/:id', 'GET', null);
 		allContracts = logs || [];
 		applyFilters();
 	} catch (err) {
@@ -80,7 +75,7 @@ function renderContracts(contracts) {
 		return;
 	}
 
-	list.innerHTML = contracts.map(c => {
+	l/*ist.innerHTML = contracts.map(c => {
 		const iscriminal_records = c.operation === 'INSERT';
 		const label      = iscriminal_records ? 'criminal_records' : 'Divorce';
 		const badgeClass = iscriminal_records ? 'badge-iscriminal_records' : 'badge-divorce';
@@ -95,7 +90,7 @@ function renderContracts(contracts) {
 			</div>
 			<div class="contract-date"><i class="fa-regular fa-calendar"></i> ${date}</div>
 		</li>`;
-	}).join('');
+	})*/.join('');
 }
 
 //  Apply All Filters 
@@ -159,39 +154,19 @@ document.getElementById('criminal_records_form').onsubmit = async function(e) {
 		personId:       Number(form.personId.value),
         caseNumber:       Number(form.caseNumber.value),
         status:       Number(form.status.value),
-        violationType:       Number(form.violationType.value),
-        disposition:       Number(form.disposition.value),
-        description:       Number(form.description.value),
+        violationType:       form.violationType.value,
+        disposition:       form.disposition.value,
+        description:       form.description.value,
 		occurrenceDate: form.occurrenceDate.value,
         filing_date: form.filing_date.value,
 		dowryAmount:  Number(form.dowryAmount.value),
 		fineAmount:   Number(form.fineAmount.value),
-        sentenceDetails:   Number(form.sentenceDetails.value),
-        locationDetails:   Number(form.locationDetails.value),
-		isExpunged:   Number(form.isExpunged.value)
+        sentenceDetails:   form.sentenceDetails.value,
+        locationDetails:   form.locationDetails.value,
 	};
 
-	const res = await apiFetch('/api/criminal_records/new_criminal_records', 'POST', data);
-	showResult('criminal_records_Result', res);
-
-	if (!res.error) {
-		loadSidebarLogs();
-		loadSidebarContracts();
-	}
-};
-
-//  Divorce Form 
-document.getElementById('divorceForm').onsubmit = async function(e) {
-	e.preventDefault();
-	const form = e.target;
-	const data = {
-		marriageId: Number(form.marriageId.value),
-		endReason:  form.endReason.value,
-		endDate:    form.endDate.value
-	};
-
-	const res = await apiFetch('/api/criminal_records/divorce', 'PATCH', data);
-	showResult('divorceResult', res);
+	const res = await apiFetch('/api/criminal_records/create', 'POST', data);
+	showResult('criminal_recordsResult', res);
 
 	if (!res.error) {
 		loadSidebarLogs();

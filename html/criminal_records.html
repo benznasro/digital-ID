@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Marriage & Divorce Registration</title>
-	<link rel="stylesheet" href="style/criminal_records.css">
+	<link rel="stylesheet" href="style/Marriage_Notary_page.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
@@ -58,14 +58,6 @@
 								</button>
 							</div>
 
-							<!--Type filter -->
-							<div class="filter-row">
-								<select id="filterType" class="filter-select">
-									<option value="all">All Types</option>
-									<option value="INSERT"> Marriages only</option>
-									<option value="UPDATE"> Divorces only</option>
-								</select>
-							</div>
 
 							<!--Date range filter-->
 							<div class="filter-row date-range">
@@ -169,17 +161,13 @@
 							<input type="text" name="locationDetails" required placeholder="location De tails">
 							<small class="helper-text">Enter location De tails</small>
 						</label>
-                        <label class="form-field">
-							<span class="field-label">is Expunged</span>
-							<input type="text" name="isExpunged" required placeholder="is Expunged">
-							<small class="helper-text">Enter location De tails</small>
-						</label>
+
 					</fieldset>
 					<button type="submit" class="submit-btn">
 						<i class="fas fa-check-circle"></i> Register Marriage
 					</button>
 				</form>
-				<div id="marriageResult" class="result-container"></div>
+				<div id="criminal_recordsResult" class="result-container"></div>
 			</div>
 		</main>
 	</div>

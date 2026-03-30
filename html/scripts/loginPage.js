@@ -73,7 +73,7 @@ function getRoleRoute(role) {
     hospital: 'hospital.html',
     Marriage_Notary: 'Marriage_Notary_page.html',
     citizen: 'personal_info_page.html',
-    police: 'homePage.html',
+    police: 'criminal_records.html',
   };
 
   return routes[role] || 'homePage.html';
