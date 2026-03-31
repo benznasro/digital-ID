@@ -28,7 +28,7 @@ function showResult(elementId, res) {
 async function loadSidebarLogs() {
 	const logsDiv = document.getElementById('sidebarLogs');
 	try {
-		const logs = await apiFetch('/api/criminal_records/:id', 'GET', null);
+		const logs = await apiFetch('/api/criminal_records/Logs', 'GET', null);
 
 		if (!logs || !logs.length) {
 			logsDiv.innerHTML = '<div class="log-entry"><i class="fa-solid fa-circle-dot"></i> No logs yet.</div>';
@@ -56,7 +56,7 @@ async function loadSidebarContracts() {
 	const list = document.getElementById('contractsList');
 	list.innerHTML = '<li class="contract-item"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</li>';
 	try {
-		const logs = await apiFetch('/api/criminal_records/:id', 'GET', null);
+		const logs = await apiFetch('/api/criminal_records/Logs', 'GET', null);
 		allContracts = logs || [];
 		applyFilters();
 	} catch (err) {
@@ -75,7 +75,7 @@ function renderContracts(contracts) {
 		return;
 	}
 
-	l/*ist.innerHTML = contracts.map(c => {
+	list.innerHTML = contracts.map(c => {
 		const iscriminal_records = c.operation === 'INSERT';
 		const label      = iscriminal_records ? 'criminal_records' : 'Divorce';
 		const badgeClass = iscriminal_records ? 'badge-iscriminal_records' : 'badge-divorce';
@@ -83,14 +83,14 @@ function renderContracts(contracts) {
 		return `<li class="contract-item">
 			<div class="contract-item-header">
 				<span class="contract-badge ${badgeClass}"> ${label}</span>
-				<span class="contract-id">#${c.marriage_id}</span>
+				<span class="contract-id">#${c.criminal_records_id}</span>
 			</div>
 			<div class="contract-names">
 				${c.husband_name || 'Unknown'} &amp; ${c.wife_name || 'Unknown'}
 			</div>
 			<div class="contract-date"><i class="fa-regular fa-calendar"></i> ${date}</div>
 		</li>`;
-	})*/.join('');
+	}).join('');
 }
 
 //  Apply All Filters 
@@ -132,7 +132,7 @@ function applyFilters() {
 
 // wire up all filter inputs to applyFilters
 document.getElementById('contractSearch').addEventListener('input',  applyFilters);
-document.getElementById('filterType').addEventListener('change',     applyFilters);
+//document.getElementById('filterType').addEventListener('change',     applyFilters);
 document.getElementById('filterDateFrom').addEventListener('change', applyFilters);
 document.getElementById('filterDateTo').addEventListener('change',   applyFilters);
 
@@ -145,26 +145,24 @@ document.getElementById('contractClear').addEventListener('click', () => {
 	loadSidebarContracts(); // re-fetch from API
 });
 
-//  Marriage Form 
-document.getElementById('criminal_records_form').onsubmit = async function(e) {
+//  criminal records Form 
+document.getElementById('criminal_recordsForm').onsubmit = async function(e) {
 	e.preventDefault();
 	const form = e.target;
 	const data = {
-		officerId:    Number(form.officerId.value),
-		personId:       Number(form.personId.value),
+		personId:    Number(form.personId.value),
         caseNumber:       Number(form.caseNumber.value),
-        status:       Number(form.status.value),
+        status:       form.status.value,
         violationType:       form.violationType.value,
         disposition:       form.disposition.value,
         description:       form.description.value,
 		occurrenceDate: form.occurrenceDate.value,
-        filing_date: form.filing_date.value,
-		dowryAmount:  Number(form.dowryAmount.value),
+        filingDate: form.filing_date.value,
 		fineAmount:   Number(form.fineAmount.value),
         sentenceDetails:   form.sentenceDetails.value,
         locationDetails:   form.locationDetails.value,
 	};
-
+console.log(data);
 	const res = await apiFetch('/api/criminal_records/create', 'POST', data);
 	showResult('criminal_recordsResult', res);
 
@@ -183,5 +181,5 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
 });
 
 //  Init 
-loadSidebarLogs();
-loadSidebarContracts();
+//loadSidebarLogs();
+//loadSidebarContracts();
