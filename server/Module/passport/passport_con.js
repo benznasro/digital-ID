@@ -38,7 +38,16 @@ export const getMyPassports = async (req, res) => {
     }
 
     const result = await pool.query(
-      'SELECT * FROM passports WHERE person_id = $1 ORDER BY issue_date DESC NULLS LAST, id DESC',
+      `SELECT
+         ps.passport_number,
+         ps.issue_date,
+         ps.expiry_date,
+         ps.is_active,
+         p.first_name || ' ' || p.last_name AS person_name
+       FROM passports ps
+       JOIN person p ON p.id = ps.person_id
+       WHERE ps.person_id = $1
+       ORDER BY ps.issue_date DESC NULLS LAST, ps.id DESC`,
       [personId]
     );
 

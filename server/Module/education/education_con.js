@@ -32,7 +32,21 @@ export const getMyEducation = async (req, res) => {
     if (!personId) return res.status(400).json({ error: 'No linked person profile for this user' });
 
     const result = await pool.query(
-      'SELECT * FROM education WHERE person_id = $1 ORDER BY start_date DESC NULLS LAST, id DESC',
+      `SELECT
+         e.university_name,
+         e.major,
+         e.degree_type,
+         e.gpa,
+         e.study_mode,
+         e.start_date,
+         e.graduation_date,
+         e.certificate_url,
+         e.is_verified,
+         p.first_name || ' ' || p.last_name AS person_name
+       FROM education e
+       JOIN person p ON p.id = e.person_id
+       WHERE e.person_id = $1
+       ORDER BY e.start_date DESC NULLS LAST, e.id DESC`,
       [personId]
     );
     res.json(result.rows);

@@ -24,7 +24,19 @@ export const getMyAssets = async (req, res) => {
     const personId = toPositiveInt(req.user.person_id);
     if (!personId) return res.status(400).json({ error: 'No linked person profile for this user' });
 
-    const result = await pool.query('SELECT * FROM assets WHERE owner_id = $1 ORDER BY id DESC', [personId]);
+    const result = await pool.query(
+      `SELECT
+         a.asset_type,
+         a.registration_number,
+         a.date_owned,
+         a.estimated_value,
+         p.first_name || ' ' || p.last_name AS owner_name
+       FROM assets a
+       JOIN person p ON p.id = a.owner_id
+       WHERE a.owner_id = $1
+       ORDER BY a.id DESC`,
+      [personId]
+    );
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });

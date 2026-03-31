@@ -132,7 +132,6 @@ function renderMarriage(marriage) {
     `
   }
   document.getElementById("marriageInfo").innerHTML=infocard;
-  console.log(infocard);
 }
 function renderEducation(education) {
   setText("FullNameStudent", fmt(education?.fullNamestudent));

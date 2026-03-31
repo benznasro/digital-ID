@@ -115,6 +115,18 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION public.log_criminal_record_changes()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
 -- DROP SEQUENCE public.assets_id_seq;
 
 CREATE SEQUENCE IF NOT EXISTS public.assets_id_seq
@@ -699,10 +711,38 @@ CREATE TABLE IF NOT EXISTS public.criminal_records ( id bigserial NOT NULL, pers
 CREATE INDEX IF NOT EXISTS idx_criminal_case_number ON public.criminal_records USING btree (case_number);
 CREATE INDEX IF NOT EXISTS idx_criminal_person_id ON public.criminal_records USING btree (person_id);
 
+-- Table Triggers
+
+DROP TRIGGER IF EXISTS trg_criminal_records_audit ON public.criminal_records;
+create trigger trg_criminal_records_audit after
+insert
+    or
+delete
+    or
+update
+    on
+    public.criminal_records for each row execute function log_criminal_record_changes();
+
 -- Permissions
 
 ALTER TABLE public.criminal_records OWNER TO postgres;
 GRANT ALL ON TABLE public.criminal_records TO postgres;
+
+
+-- public.criminal_records_log definition
+
+-- Drop table
+
+-- DROP TABLE public.criminal_records_log;
+
+CREATE TABLE IF NOT EXISTS public.criminal_records_log ( id bigserial NOT NULL, criminal_record_id int8 NULL, operation varchar(10) NULL, changed_at timestamptz DEFAULT now() NULL, changed_by varchar(100) DEFAULT CURRENT_USER NULL, changed_by_user_id int8 NULL, old_person_id int8 NULL, old_case_number varchar(50) NULL, old_status bool NULL, old_violation_type text NULL, old_disposition varchar(100) NULL, old_description text NULL, old_occurrence_date timestamptz NULL, old_filing_date timestamptz NULL, old_fine_amount numeric(12, 2) NULL, old_sentence_details text NULL, old_location_details text NULL, old_is_expunged bool NULL, new_person_id int8 NULL, new_case_number varchar(50) NULL, new_status bool NULL, new_violation_type text NULL, new_disposition varchar(100) NULL, new_description text NULL, new_occurrence_date timestamptz NULL, new_filing_date timestamptz NULL, new_fine_amount numeric(12, 2) NULL, new_sentence_details text NULL, new_location_details text NULL, new_is_expunged bool NULL, CONSTRAINT criminal_records_log_pkey PRIMARY KEY (id), CONSTRAINT criminal_records_log_changed_by_user_id_fkey FOREIGN KEY (changed_by_user_id) REFERENCES public.users(id));
+CREATE INDEX IF NOT EXISTS idx_criminal_records_log_changed_user_time ON public.criminal_records_log USING btree (changed_by_user_id, changed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_criminal_records_log_record_time ON public.criminal_records_log USING btree (criminal_record_id, changed_at DESC);
+
+-- Permissions
+
+ALTER TABLE public.criminal_records_log OWNER TO postgres;
+GRANT ALL ON TABLE public.criminal_records_log TO postgres;
 
 
 -- public.death_records definition
@@ -1327,6 +1367,165 @@ $function$
 ALTER FUNCTION public.log_birth_record_changes() OWNER TO postgres;
 GRANT ALL ON FUNCTION public.log_birth_record_changes() TO public;
 GRANT ALL ON FUNCTION public.log_birth_record_changes() TO postgres;
+
+-- DROP FUNCTION public.log_criminal_record_changes();
+
+CREATE OR REPLACE FUNCTION public.log_criminal_record_changes()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_user_id bigint;
+BEGIN
+    BEGIN
+        v_user_id := current_setting('app.current_user_id')::bigint;
+    EXCEPTION WHEN OTHERS THEN
+        v_user_id := NULL;
+    END;
+
+    IF TG_OP = 'INSERT' THEN
+        INSERT INTO criminal_records_log (
+            criminal_record_id,
+            operation,
+            changed_by_user_id,
+            new_person_id,
+            new_case_number,
+            new_status,
+            new_violation_type,
+            new_disposition,
+            new_description,
+            new_occurrence_date,
+            new_filing_date,
+            new_fine_amount,
+            new_sentence_details,
+            new_location_details,
+            new_is_expunged
+        ) VALUES (
+            NEW.id,
+            'INSERT',
+            v_user_id,
+            NEW.person_id,
+            NEW.case_number,
+            NEW.status,
+            NEW.violation_type,
+            NEW.disposition,
+            NEW.description,
+            NEW.occurrence_date,
+            NEW.filing_date,
+            NEW.fine_amount,
+            NEW.sentence_details,
+            NEW.location_details,
+            NEW.is_expunged
+        );
+
+    ELSIF TG_OP = 'UPDATE' THEN
+        INSERT INTO criminal_records_log (
+            criminal_record_id,
+            operation,
+            changed_by_user_id,
+            old_person_id,
+            old_case_number,
+            old_status,
+            old_violation_type,
+            old_disposition,
+            old_description,
+            old_occurrence_date,
+            old_filing_date,
+            old_fine_amount,
+            old_sentence_details,
+            old_location_details,
+            old_is_expunged,
+            new_person_id,
+            new_case_number,
+            new_status,
+            new_violation_type,
+            new_disposition,
+            new_description,
+            new_occurrence_date,
+            new_filing_date,
+            new_fine_amount,
+            new_sentence_details,
+            new_location_details,
+            new_is_expunged
+        ) VALUES (
+            NEW.id,
+            'UPDATE',
+            v_user_id,
+            OLD.person_id,
+            OLD.case_number,
+            OLD.status,
+            OLD.violation_type,
+            OLD.disposition,
+            OLD.description,
+            OLD.occurrence_date,
+            OLD.filing_date,
+            OLD.fine_amount,
+            OLD.sentence_details,
+            OLD.location_details,
+            OLD.is_expunged,
+            NEW.person_id,
+            NEW.case_number,
+            NEW.status,
+            NEW.violation_type,
+            NEW.disposition,
+            NEW.description,
+            NEW.occurrence_date,
+            NEW.filing_date,
+            NEW.fine_amount,
+            NEW.sentence_details,
+            NEW.location_details,
+            NEW.is_expunged
+        );
+
+    ELSIF TG_OP = 'DELETE' THEN
+        INSERT INTO criminal_records_log (
+            criminal_record_id,
+            operation,
+            changed_by_user_id,
+            old_person_id,
+            old_case_number,
+            old_status,
+            old_violation_type,
+            old_disposition,
+            old_description,
+            old_occurrence_date,
+            old_filing_date,
+            old_fine_amount,
+            old_sentence_details,
+            old_location_details,
+            old_is_expunged
+        ) VALUES (
+            OLD.id,
+            'DELETE',
+            v_user_id,
+            OLD.person_id,
+            OLD.case_number,
+            OLD.status,
+            OLD.violation_type,
+            OLD.disposition,
+            OLD.description,
+            OLD.occurrence_date,
+            OLD.filing_date,
+            OLD.fine_amount,
+            OLD.sentence_details,
+            OLD.location_details,
+            OLD.is_expunged
+        );
+    END IF;
+
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    RETURN NEW;
+END;
+$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.log_criminal_record_changes() OWNER TO postgres;
+GRANT ALL ON FUNCTION public.log_criminal_record_changes() TO public;
+GRANT ALL ON FUNCTION public.log_criminal_record_changes() TO postgres;
 
 -- DROP FUNCTION public.log_marriage_changes();
 

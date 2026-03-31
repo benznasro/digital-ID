@@ -32,7 +32,26 @@ export const getMyEmployment = async (req, res) => {
     if (!personId) return res.status(400).json({ error: 'No linked person profile for this user' });
 
     const result = await pool.query(
-      'SELECT * FROM employment WHERE person_id = $1 ORDER BY start_date DESC NULLS LAST, id DESC',
+      `SELECT
+         e.company_id,
+         e.job_title,
+         e.department,
+         e.employment_type,
+         e.salary,
+         e.is_active,
+         e.start_date,
+         e.end_date,
+         e.work_location,
+         p.first_name || ' ' || p.last_name AS employee_name,
+         CASE
+           WHEN mgr.id IS NULL THEN NULL
+           ELSE mgr.first_name || ' ' || mgr.last_name
+         END AS manager_name
+       FROM employment e
+       JOIN person p ON p.id = e.person_id
+       LEFT JOIN person mgr ON mgr.id = e.manager_id
+       WHERE e.person_id = $1
+       ORDER BY e.start_date DESC NULLS LAST, e.id DESC`,
       [personId]
     );
     res.json(result.rows);

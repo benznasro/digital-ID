@@ -1,4 +1,5 @@
 import pool from '../../db.js';
+import { getFullNameById } from './person_name_helper.js';
 
 const toPositiveInt = (value) => {
   const parsed = Number.parseInt(value, 10);
@@ -73,12 +74,37 @@ export const getMyInfo =async (req ,res)=>{
       return res.status(400).json({ error: 'No linked person profile for this user' });
     }
 
-    const result = await pool.query('SELECT * FROM person WHERE id = $1', [personId]);
+    const result = await pool.query(
+      `SELECT
+         national_id,
+         first_name,
+         last_name,
+         email,
+         date_of_birth,
+         phone_number,
+         gender,
+         dad_id,
+         mom_id,
+         marital_status
+       FROM person
+       WHERE id = $1`,
+      [personId]
+    );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Person profile not found' });
     }
 
-    res.json(result.rows[0]);
+    const person = result.rows[0];
+    const fatherName = await getFullNameById(person.dad_id);
+    const motherName = await getFullNameById(person.mom_id);
+
+    delete person.dad_id;
+    delete person.mom_id;
+
+    person.father_name = fatherName;
+    person.mother_name = motherName;
+
+    res.json(person);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

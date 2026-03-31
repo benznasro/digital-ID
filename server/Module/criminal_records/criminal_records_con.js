@@ -25,7 +25,23 @@ export const getMyCriminalRecords = async (req, res) => {
     if (!personId) return res.status(400).json({ error: 'No linked person profile for this user' });
 
     const result = await pool.query(
-      'SELECT * FROM criminal_records WHERE person_id = $1 ORDER BY filing_date DESC NULLS LAST, id DESC',
+      `SELECT
+         c.case_number,
+         c.status,
+         c.violation_type,
+         c.disposition,
+         c.description,
+         c.occurrence_date,
+         c.filing_date,
+         c.fine_amount,
+         c.sentence_details,
+         c.location_details,
+         c.is_expunged,
+         p.first_name || ' ' || p.last_name AS person_name
+       FROM criminal_records c
+       JOIN person p ON p.id = c.person_id
+       WHERE c.person_id = $1
+       ORDER BY c.filing_date DESC NULLS LAST, c.id DESC`,
       [personId]
     );
 

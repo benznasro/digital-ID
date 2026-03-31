@@ -115,15 +115,35 @@ export const get_My_AuditLogs = async (req, res) => {
 
 export const get_my_marriage = async (req, res) => {
     try {
+        const personId = Number.parseInt(req.user.person_id, 10);
+        if (!Number.isInteger(personId) || personId <= 0) {
+            return res.status(400).json({ error: 'No linked person profile for this user' });
+        }
+
         const result = await pool.query(`
             SELECT
-                *
+                m.contract_no,
+                m.marriage_date,
+                m.valid,
+                m.end_marriage_time,
+                m.end_reason,
+                m.dowry_amount,
+                h.first_name || ' ' || h.last_name AS husband_name,
+                w.first_name || ' ' || w.last_name AS wife_name,
+                CASE WHEN w1.id IS NULL THEN NULL ELSE w1.first_name || ' ' || w1.last_name END AS witness_1_name,
+                CASE WHEN w2.id IS NULL THEN NULL ELSE w2.first_name || ' ' || w2.last_name END AS witness_2_name,
+                u.username AS notary_username
             FROM marriage m
+            JOIN person h ON h.id = m.husband_id
+            JOIN person w ON w.id = m.wife_id
+            LEFT JOIN person w1 ON w1.id = m.witness_1_id
+            LEFT JOIN person w2 ON w2.id = m.witness_2_id
+            LEFT JOIN users u ON u.id = m.notary_id
 
             WHERE m.husband_id = $1 OR m.wife_id = $1
 
             ORDER BY m.marriage_date DESC
-        `, [req.user.id]);
+        `, [personId]);
 
         res.status(200).json(result.rows);
 

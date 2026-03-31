@@ -43,8 +43,23 @@ export const get_All_Medical_records= async (req ,res)=>{
 
 export const get_My_Medical_record= async (req ,res)=>{
   try {
-    const result=await pool.query(`SELECT * from medical_records where person_id =${req.user.person_id}`);
-    res.json(result.rows[0]);
+    const result = await pool.query(
+      `SELECT
+         m.blood_type,
+         m.height_cm,
+         m.weight_kg,
+         m.smoker,
+         m.chronic_conditions,
+         m.last_checkup_date,
+         p.first_name || ' ' || p.last_name AS person_name
+       FROM medical_records m
+       JOIN person p ON p.id = m.person_id
+       WHERE m.person_id = $1
+       ORDER BY m.last_checkup_date DESC NULLS LAST
+       LIMIT 1`,
+      [req.user.person_id]
+    );
+    res.json(result.rows[0] ?? null);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
