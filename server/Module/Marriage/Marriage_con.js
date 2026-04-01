@@ -74,8 +74,7 @@ export const get_My_AuditLogs = async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT
-                ma.id,
-                ma.marriage_id,
+                m.contract_no,
                 ma.operation,
                 ma.changed_at,
 

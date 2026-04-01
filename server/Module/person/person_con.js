@@ -5,6 +5,29 @@ const toPositiveInt = (value) => {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 };
 
+const personBaseFields = `
+  p.id,
+  p.national_id,
+  p.first_name,
+  p.last_name,
+  p.email,
+  p.date_of_birth,
+  p.phone_number,
+  p.gender,
+  p.dad_id,
+  p.mom_id,
+  p.marital_status,
+  CASE WHEN f.id IS NULL THEN NULL ELSE f.first_name || ' ' || f.last_name END AS father_name,
+  CASE WHEN m.id IS NULL THEN NULL ELSE m.first_name || ' ' || m.last_name END AS mother_name
+`;
+
+const hideParentIds = (person) => {
+  if (!person) return person;
+  delete person.dad_id;
+  delete person.mom_id;
+  return person;
+};
+
 
 //get 
 export const getPersonById=async(req,res)=>{
@@ -14,12 +37,19 @@ export const getPersonById=async(req,res)=>{
       return res.status(400).json({ error: 'Invalid person id' });
     }
 
-    const result = await pool.query('SELECT * FROM person WHERE id = $1', [id]);
+    const result = await pool.query(
+      `SELECT ${personBaseFields}
+       FROM person p
+       LEFT JOIN person f ON f.id = p.dad_id
+       LEFT JOIN person m ON m.id = p.mom_id
+       WHERE p.id = $1`,
+      [id]
+    );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Person not found' });
     }
 
-    res.json(result.rows[0]);
+    res.json(hideParentIds(result.rows[0]));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -42,14 +72,19 @@ export const getSelectedUsers = async (req, res) => {
     const offset = (page - 1) * limit;
 
     const result = await pool.query(
-      'SELECT * FROM person ORDER BY id LIMIT $1 OFFSET $2',
+      `SELECT ${personBaseFields}
+       FROM person p
+       LEFT JOIN person f ON f.id = p.dad_id
+       LEFT JOIN person m ON m.id = p.mom_id
+       ORDER BY p.id
+       LIMIT $1 OFFSET $2`,
       [limit, offset]
     );
 
     res.json({
       page,
       limit,
-      data: result.rows,
+      data: result.rows.map(hideParentIds),
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -59,8 +94,15 @@ export const getSelectedUsers = async (req, res) => {
 export const getAllInfo =async (req ,res)=>{
   try {
     
-    const result = await pool.query('SELECT * FROM person ORDER BY id LIMIT 100');
-    res.json(result.rows);
+    const result = await pool.query(
+      `SELECT ${personBaseFields}
+       FROM person p
+       LEFT JOIN person f ON f.id = p.dad_id
+       LEFT JOIN person m ON m.id = p.mom_id
+       ORDER BY p.id
+       LIMIT 100`
+    );
+    res.json(result.rows.map(hideParentIds));
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -73,12 +115,29 @@ export const getMyInfo =async (req ,res)=>{
       return res.status(400).json({ error: 'No linked person profile for this user' });
     }
 
+<<<<<<< HEAD
     const result = await pool.query('SELECT * FROM person WHERE id = $1', [personId]);
+=======
+    const result = await pool.query(
+      `SELECT ${personBaseFields}
+       FROM person p
+       LEFT JOIN person f ON f.id = p.dad_id
+       LEFT JOIN person m ON m.id = p.mom_id
+       WHERE p.id = $1`,
+      [personId]
+    );
+>>>>>>> bc5ee328f9a697588a4699055d6681bd3814e70c
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Person profile not found' });
     }
 
+<<<<<<< HEAD
     res.json(result.rows[0]);
+=======
+    const person = hideParentIds(result.rows[0]);
+    delete person.id;
+    res.json(person);
+>>>>>>> bc5ee328f9a697588a4699055d6681bd3814e70c
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
