@@ -11,7 +11,9 @@
 	<header class="page-header">
 		<div class="header-content">
 			<button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu">
-				<i class="fas fa-bars"></i>
+				<i class="fas fa-bars">
+					
+				</i>
 			</button>
 			<div class="header-text">
 				<h1>Digital ID Portal</h1>
@@ -56,8 +58,12 @@
 					<span> Marriage</span>
 				</button>
 				<button class="sidebar-link" data-section="education">
-					<i class="fa-solid fa-user-graduate""></i>
+					<i class="fa-solid fa-user-graduate"></i>
 					<span> Education</span>
+				</button>
+				<button class="sidebar-link" data-section="passport">
+					<i class="fa-solid fa-passport" style="font-size: 24px;"></i>
+					<span> Passport</span>
 				</button>
 			</nav>
 		</aside>
@@ -175,9 +181,9 @@
 			<section class="content-section" id="section-marriage">
 				<div class="section-header">
 					<h2>Marriage Record</h2>
-					<p>Marriage registration details linked to your account.</p>
+					<p>Marital status and official marriage records associated with your profile.</p>
 				</div>
-				<div class="info-card">
+				<div class="info-card" id="marriageInfo">
 					<div class="info-row"><span>Full Hesbend</span><strong id="FullHesbend">-</strong></div>
 					<div class="info-row"><span>Full Wife</span><strong id="FullWife">-</strong></div>
 					<div class="info-row"><span>Contract</span><strong id="Contract_no">-</strong></div>
@@ -194,10 +200,10 @@
 			<section class="content-section" id="section-education">
 				<div class="section-header">
 					<h2>Education</h2>
-					<p>Education details available in your medical profile.</p>
+					<p>Academic qualifications and educational background on record.</p>
 				</div>
 
-				<div class="info-card">
+				<div class="info-card" id="educationInfo">
 					<div class="info-row"><span>Full Name Student</span><strong id="FullNameStudent">-</strong></div>
 					<div class="info-row"><span>University Name</span><strong id="UniversityName">-</strong></div>
 					<div class="info-row"><span>Major</span><strong id="Major">-</strong></div>
@@ -208,7 +214,20 @@
 					<div class="info-row"><span>GPA</span><strong id="GPA">-</strong></div>
 					<div class="info-row"><span>Certificate</span><strong id="Certificate">-</strong></div>
 					<div class="info-row"><span>Is Verified</span><strong id="Is_Verified">-</strong></div>
-					<div class="info-row"><span>Created at/span><strong id="Created_at">-</strong></div>
+					<div class="info-row"><span>Created at</span><strong id="Created_at">-</strong></div>
+				</div>
+			</section>
+			<section class="content-section" id="section-passport">
+				<div class="section-header">
+					<h2>passpor</h2>
+					<p>Official travel document details linked to your identity profile.</p>
+				</div>
+				<div class="info-card" id="passportInfo">
+					<div class="info-row"><span>Full Name Person</span><strong id="FullNamePerson">-</strong></div>
+					<div class="info-row"><span>Passport Number</span><strong id="PassportNumber">-</strong></div>
+					<div class="info-row"><span>Issue Date</span><strong id="IssueDate">-</strong></div>
+					<div class="info-row"><span>Expiry Date</span><strong id="ExpiryDate">-</strong></div>
+					<div class="info-row"><span>Is Active</span><strong id="IsActive">-</strong></div>
 				</div>
 			</section>
 		</main>

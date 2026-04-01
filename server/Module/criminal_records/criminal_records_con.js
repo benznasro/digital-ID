@@ -58,6 +58,7 @@ export const getSelectedCriminalRecords = async (req, res) => {
 };
 
 export const createCriminalRecord = async (req, res) => {
+  const client = await pool.connect();
   try {
     const personId = toPositiveInt(req.body.personId);
     const caseNumber = (req.body.caseNumber || '').trim();
@@ -76,7 +77,9 @@ export const createCriminalRecord = async (req, res) => {
       return res.status(400).json({ error: 'personId, caseNumber and violationType are required' });
     }
 
-    const result = await pool.query(
+    await client.query("SELECT set_config('app.current_user_id', $1, false)", [String(req.user.id)]);
+
+    const result = await client.query(
       `INSERT INTO criminal_records (
         person_id, case_number, status, violation_type, disposition,
         description, occurrence_date, filing_date, fine_amount,
@@ -104,10 +107,13 @@ export const createCriminalRecord = async (req, res) => {
     if (error.code === '23505') return res.status(409).json({ error: 'Case number already exists' });
     if (error.code === '23503') return res.status(400).json({ error: 'Invalid person id' });
     res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
   }
 };
 
 export const updateCriminalRecord = async (req, res) => {
+  const client = await pool.connect();
   try {
     const id = toPositiveInt(req.params.id);
     if (!id) return res.status(400).json({ error: 'Invalid criminal record id' });
@@ -138,7 +144,9 @@ export const updateCriminalRecord = async (req, res) => {
       return res.status(400).json({ error: 'No valid fields to update' });
     }
 
-    const result = await pool.query(
+    await client.query("SELECT set_config('app.current_user_id', $1, false)", [String(req.user.id)]);
+
+    const result = await client.query(
       `UPDATE criminal_records
        SET ${fields.join(', ')}
        WHERE id = $1
@@ -149,6 +157,93 @@ export const updateCriminalRecord = async (req, res) => {
     if (!result.rows.length) return res.status(404).json({ error: 'Criminal record not found' });
 
     res.json({ message: 'Criminal record updated successfully', record: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
+  }
+};
+
+export const getMyCriminalAuditLogs = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         cl.id,
+         cl.operation,
+         cl.changed_at,
+         cl.old_case_number,
+         cl.new_case_number,
+         cl.old_status,
+         cl.new_status,
+         cl.old_violation_type,
+         cl.new_violation_type,
+         cl.old_disposition,
+         cl.new_disposition,
+         cl.old_fine_amount,
+         cl.new_fine_amount,
+         CASE
+           WHEN old_p.id IS NULL THEN NULL
+           ELSE old_p.first_name || ' ' || old_p.last_name
+         END AS old_person_name,
+         CASE
+           WHEN new_p.id IS NULL THEN NULL
+           ELSE new_p.first_name || ' ' || new_p.last_name
+         END AS new_person_name
+       FROM criminal_records_log cl
+       LEFT JOIN person old_p ON old_p.id = cl.old_person_id
+       LEFT JOIN person new_p ON new_p.id = cl.new_person_id
+       WHERE cl.changed_by_user_id = $1
+       ORDER BY cl.changed_at DESC`,
+      [req.user.id]
+    );
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getSelectedCriminalAuditLogs = async (req, res) => {
+  try {
+    const page = toPositiveInt(req.query.page) || 1;
+    const limit = Math.min(toPositiveInt(req.query.limit) || 20, 100);
+    const offset = (page - 1) * limit;
+
+    const result = await pool.query(
+      `SELECT
+         cl.id,
+         cl.operation,
+         cl.changed_at,
+         cl.changed_by,
+         u.username AS changed_by_username,
+         cl.old_case_number,
+         cl.new_case_number,
+         cl.old_status,
+         cl.new_status,
+         cl.old_violation_type,
+         cl.new_violation_type,
+         cl.old_disposition,
+         cl.new_disposition,
+         cl.old_fine_amount,
+         cl.new_fine_amount,
+         CASE
+           WHEN old_p.id IS NULL THEN NULL
+           ELSE old_p.first_name || ' ' || old_p.last_name
+         END AS old_person_name,
+         CASE
+           WHEN new_p.id IS NULL THEN NULL
+           ELSE new_p.first_name || ' ' || new_p.last_name
+         END AS new_person_name
+       FROM criminal_records_log cl
+       LEFT JOIN users u ON u.id = cl.changed_by_user_id
+       LEFT JOIN person old_p ON old_p.id = cl.old_person_id
+       LEFT JOIN person new_p ON new_p.id = cl.new_person_id
+       ORDER BY cl.changed_at DESC
+       LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+
+    res.status(200).json({ page, limit, data: result.rows });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

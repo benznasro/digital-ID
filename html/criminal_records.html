@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Marriage & Divorce Registration</title>
-	<link rel="stylesheet" href="style/criminal_records.css">
+	<link rel="stylesheet" href="style/Marriage_Notary_page.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
@@ -58,14 +58,6 @@
 								</button>
 							</div>
 
-							<!--Type filter -->
-							<div class="filter-row">
-								<select id="filterType" class="filter-select">
-									<option value="all">All Types</option>
-									<option value="INSERT"> Marriages only</option>
-									<option value="UPDATE"> Divorces only</option>
-								</select>
-							</div>
 
 							<!--Date range filter-->
 							<div class="filter-row date-range">
@@ -95,7 +87,7 @@
 		<main class="main-content">
 
 			<!-- Criminal Records Tab -->
-			<div id="criminal_records_form" class="tab-content">
+			<div id="criminal_records" class="tab-content">
 				<div class="form-header">
 					<h2>Criminal Records Registration</h2>
 					<p class="section-desc">Register a new criminal records contract. Please fill all fields accurately and confirm all information before submission.</p>
@@ -103,11 +95,6 @@
 				<form id="criminal_recordsForm" autocomplete="off">
 					<fieldset class="form-section">
 						<legend class="section-title">Parties Information</legend>
-						<label class="form-field">
-							<span class="field-label">The officer ID</span>
-							<input type="number" name="officerId" required placeholder="Enter officer's national ID">
-							<small class="helper-text">National ID number</small>
-						</label>
 						<label class="form-field">
 							<span class="field-label">The violator ID</span>
 							<input type="number" name="personId" required placeholder="Enter violator's national ID">
@@ -169,17 +156,13 @@
 							<input type="text" name="locationDetails" required placeholder="location De tails">
 							<small class="helper-text">Enter location De tails</small>
 						</label>
-                        <label class="form-field">
-							<span class="field-label">is Expunged</span>
-							<input type="text" name="isExpunged" required placeholder="is Expunged">
-							<small class="helper-text">Enter location De tails</small>
-						</label>
+
 					</fieldset>
 					<button type="submit" class="submit-btn">
 						<i class="fas fa-check-circle"></i> Register Marriage
 					</button>
 				</form>
-				<div id="marriageResult" class="result-container"></div>
+				<div id="criminal_recordsResult" class="result-container"></div>
 			</div>
 		</main>
 	</div>
