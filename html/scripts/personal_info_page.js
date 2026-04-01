@@ -87,8 +87,9 @@ function renderPerson(person) {
   setText("contactEmail", fmt(person?.email));
   setText("contactPhone", fmt(person?.phone_number));
 
-  setText("familyDad", fmt(person?.dad_id));
-  setText("familyMom", fmt(person?.mom_id));
+  // API returns resolved parent names; fall back to legacy id fields if needed.
+  setText("familyDad", fmt(person?.father_name ?? person?.dad_id));
+  setText("familyMom", fmt(person?.mother_name ?? person?.mom_id));
 }
 
 function renderBirth(birth) {

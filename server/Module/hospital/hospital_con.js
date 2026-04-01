@@ -205,32 +205,34 @@ export const get_My_AuditLogs = async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT
-                bl.id,
-                bl.birth_record_id,
                 bl.operation,
                 bl.changed_at,
         ch.gender,
         ch.first_name || ' ' || ch.last_name AS child_name,
                 -- old values
                 bl.old_birth_certificate_no,
-                bl.old_child_id,
+        CASE WHEN old_ch.id IS NULL THEN NULL ELSE old_ch.first_name || ' ' || old_ch.last_name END AS old_child_name,
                 bl.old_doctor_name,
                 bl.old_birth_weight_kg,
                 bl.old_birth_date_time,
-                bl.old_marriage_id,
+        old_m.contract_no AS old_marriage_contract_no,
 
                 -- new values
                 bl.new_birth_certificate_no,
-                bl.new_child_id,
+        CASE WHEN new_ch.id IS NULL THEN NULL ELSE new_ch.first_name || ' ' || new_ch.last_name END AS new_child_name,
                 bl.new_doctor_name,
                 bl.new_birth_weight_kg,
                 bl.new_birth_date_time,
-                bl.new_marriage_id
+        new_m.contract_no AS new_marriage_contract_no
 
 
               FROM birth_records_log bl
             LEFT JOIN birth_records br ON br.id = bl.birth_record_id
             LEFT JOIN person ch ON ch.id = COALESCE(bl.new_child_id, bl.old_child_id)
+      LEFT JOIN person old_ch ON old_ch.id = bl.old_child_id
+      LEFT JOIN person new_ch ON new_ch.id = bl.new_child_id
+      LEFT JOIN marriage old_m ON old_m.id = bl.old_marriage_id
+      LEFT JOIN marriage new_m ON new_m.id = bl.new_marriage_id
             
 
             WHERE (
