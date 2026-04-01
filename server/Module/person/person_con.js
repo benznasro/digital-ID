@@ -23,9 +23,8 @@ const personBaseFields = `
 
 const hideParentIds = (person) => {
   if (!person) return person;
-  delete person.dad_id;
-  delete person.mom_id;
-  return person;
+  const { dad_id, mom_id, ...rest } = person;
+  return rest;
 };
 
 
@@ -115,9 +114,6 @@ export const getMyInfo =async (req ,res)=>{
       return res.status(400).json({ error: 'No linked person profile for this user' });
     }
 
-<<<<<<< HEAD
-    const result = await pool.query('SELECT * FROM person WHERE id = $1', [personId]);
-=======
     const result = await pool.query(
       `SELECT ${personBaseFields}
        FROM person p
@@ -126,18 +122,13 @@ export const getMyInfo =async (req ,res)=>{
        WHERE p.id = $1`,
       [personId]
     );
->>>>>>> bc5ee328f9a697588a4699055d6681bd3814e70c
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Person profile not found' });
     }
 
-<<<<<<< HEAD
-    res.json(result.rows[0]);
-=======
     const person = hideParentIds(result.rows[0]);
-    delete person.id;
-    res.json(person);
->>>>>>> bc5ee328f9a697588a4699055d6681bd3814e70c
+    const { id, ...myInfo } = person;
+    return res.json(myInfo);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
