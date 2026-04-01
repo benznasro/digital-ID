@@ -5,7 +5,7 @@ Implements:
 - Phase 1: founders (year 1724 context), born 1680-1710, parent IDs NULL.
 - Phase 2: recursive 25-year generational loop (1724..2024) with marriage, births, mortality.
 - Phase 3: legal/social complexity (divorce, education, crime, assets).
-- Phase 4: global constraints (10k+ total, 5k+ living target by 2024; uniqueness and relation safety).
+- Phase 4: global constraints (configurable total/living targets by 2024; uniqueness and relation safety).
 - Phase 5: workforce employment + salary audit trigger population.
 
 Run:
@@ -52,7 +52,7 @@ FOUNDER_COUNT = 200
 NATIONAL_ID_START = 1_000_000_000  # 10 digits
 PASSPORT_START = 4_000_000_000  # 10 digits
 BIRTH_CERT_START = 5_000_000_000
-TARGET_TOTAL_PERSONS = int(os.getenv("TARGET_TOTAL_PERSONS", "1000000"))
+TARGET_TOTAL_PERSONS = int(os.getenv("TARGET_TOTAL_PERSONS", "50000"))
 TARGET_LIVING_MIN = int(os.getenv("TARGET_LIVING_MIN", str(max(5000, TARGET_TOTAL_PERSONS // 2))))
 
 
@@ -116,6 +116,47 @@ def years_old(dob: date, at_date: date) -> int:
     return int((at_date - dob).days / 365.25)
 
 
+def marriage_probability_for_year(year: int) -> float:
+    # Gradual decline in marriage rates to mimic modern demographic transition.
+    if year <= 1800:
+        return 0.78
+    if year <= 1900:
+        return 0.72
+    if year <= 1975:
+        return 0.64
+    return 0.58
+
+
+def draw_children_count_for_year(year: int) -> int:
+    # Fertility declines over time: large families are common early, rarer recently.
+    r = random.random()
+    if year <= 1850:
+        if r < 0.10:
+            return random.randint(0, 1)
+        if r < 0.55:
+            return random.randint(2, 4)
+        if r < 0.90:
+            return random.randint(5, 7)
+        return random.randint(8, 10)
+
+    if year <= 1950:
+        if r < 0.15:
+            return random.randint(0, 1)
+        if r < 0.70:
+            return random.randint(2, 4)
+        if r < 0.95:
+            return random.randint(5, 6)
+        return random.randint(7, 8)
+
+    if r < 0.22:
+        return random.randint(0, 1)
+    if r < 0.80:
+        return random.randint(2, 3)
+    if r < 0.98:
+        return random.randint(4, 5)
+    return 6
+
+
 def ensure_required_tables(cur) -> None:
     required = [
         "roles",
@@ -125,6 +166,7 @@ def ensure_required_tables(cur) -> None:
         "marriage_audit",
         "birth_records",
         "birth_records_log",
+        "criminal_records_log",
         "medical_records",
         "education",
         "employment",
@@ -149,6 +191,7 @@ def ensure_required_tables(cur) -> None:
 def truncate_all(cur) -> None:
     ordered_tables = [
         "birth_records_log",
+        "criminal_records_log",
         "marriage_audit",
         "salary_audit",
         "death_records",
@@ -327,6 +370,9 @@ def pick_marriage_pairs(
     pairs: List[Tuple[PersonState, PersonState]] = []
 
     for husband in men:
+        if random.random() > marriage_probability_for_year(at_year):
+            continue
+
         h_age = years_old(husband.dob, at_date)
 
         compatible = []
@@ -410,15 +456,6 @@ def insert_marriages(
     return [MarriageState(*r) for r in cur.fetchall()]
 
 
-def draw_children_count() -> int:
-    r = random.random()
-    if r < 0.20:
-        return random.randint(1, 2)
-    if r < 0.90:
-        return random.randint(3, 6)
-    return random.randint(7, 9)
-
-
 def insert_children_birth_medical(
     cur,
     marriages: Sequence[MarriageState],
@@ -441,8 +478,8 @@ def insert_children_birth_medical(
         mom = people[m.wife_id]
         dad = people[m.husband_id]
 
-        n_children = draw_children_count()
         marriage_day = m.marriage_date.date()
+        n_children = draw_children_count_for_year(marriage_day.year)
 
         for _ in range(n_children):
             start = max(period_start, marriage_day + timedelta(days=260))
@@ -866,6 +903,68 @@ def create_criminal_records(cur, people: Dict[int, PersonState]) -> None:
             page_size=1000,
         )
 
+        # Generate UPDATE audit entries in criminal_records_log as well.
+        cur.execute(
+            """
+            UPDATE criminal_records
+            SET disposition = CASE
+                WHEN disposition = 'pending' THEN 'under review'
+                ELSE disposition
+            END
+            WHERE id IN (
+                SELECT id FROM criminal_records ORDER BY random() LIMIT 120
+            )
+            """
+        )
+
+
+def ensure_criminal_log_not_empty(cur) -> None:
+    cur.execute("SELECT COUNT(*) FROM criminal_records_log")
+    if cur.fetchone()[0] > 0:
+        return
+
+    # Fallback for DB instances where trigger is not installed yet.
+    cur.execute(
+        """
+        INSERT INTO criminal_records_log (
+            criminal_record_id,
+            operation,
+            changed_by_user_id,
+            new_person_id,
+            new_case_number,
+            new_status,
+            new_violation_type,
+            new_disposition,
+            new_description,
+            new_occurrence_date,
+            new_filing_date,
+            new_fine_amount,
+            new_sentence_details,
+            new_location_details,
+            new_is_expunged
+        )
+        SELECT
+            c.id,
+            'INSERT',
+            NULL,
+            c.person_id,
+            c.case_number,
+            c.status,
+            c.violation_type,
+            c.disposition,
+            c.description,
+            c.occurrence_date,
+            c.filing_date,
+            c.fine_amount,
+            c.sentence_details,
+            c.location_details,
+            c.is_expunged
+        FROM criminal_records c
+        ORDER BY c.id
+        LIMIT 500
+        """
+    )
+
 
 def create_assets(cur, people: Dict[int, PersonState]) -> None:
     living_adults = [p for p in people.values() if p.is_alive and years_old(p.dob, TODAY) >= 18]
@@ -1078,181 +1177,248 @@ def top_up_population_targets(
     next_nid: int,
     next_birth_cert: int,
     hospital_ids: Sequence[int],
+    notary_ids: Sequence[int],
     target_total: int = TARGET_TOTAL_PERSONS,
     target_living: int = TARGET_LIVING_MIN,
 ) -> Tuple[int, int]:
     total_now = len(people)
     living_now = sum(1 for p in people.values() if p.is_alive)
 
-    needed_total = max(0, target_total - total_now)
-    needed_living = max(0, target_living - living_now)
-    needed = max(needed_total, needed_living)
+    while total_now < target_total or living_now < target_living:
+        remaining_total = max(0, target_total - total_now)
+        remaining_living = max(0, target_living - living_now)
+        remaining = max(remaining_total, remaining_living)
+        if remaining <= 0:
+            break
 
-    if needed == 0:
-        return next_nid, next_birth_cert
+        # One household typically contributes 2 adults + 2..5 children.
+        family_count = min(12000, max(800, remaining // 5))
 
-    cur.execute("SELECT id, gender, date_of_birth FROM person")
-    db_people = cur.fetchall()
-    male_ids = [pid for pid, gender, _ in db_people if gender]
-    female_ids = [pid for pid, gender, _ in db_people if not gender]
+        adult_rows = []
+        family_meta: List[Tuple[date, date]] = []
 
-    cur.execute("SELECT id, husband_id, wife_id FROM marriage")
-    marriage_lookup = {(hid, wid): mid for mid, hid, wid in cur.fetchall()}
+        for _ in range(family_count):
+            husband_dob = random_date(date(1945, 1, 1), date(2000, 12, 31))
+            husband_age_2024 = years_old(husband_dob, TODAY)
 
-    cur.execute(
-        """
-        SELECT id, husband_id, wife_id
-        FROM marriage
-        WHERE valid = true
-        """
-    )
-    marriage_rows = cur.fetchall()
+            # 0..5 years age gap (husband older).
+            gap = random.randint(0, 5)
+            wife_age_2024 = max(20, husband_age_2024 - gap)
+            wife_birth_year = TODAY.year - wife_age_2024
+            wife_dob = random_date(date(wife_birth_year, 1, 1), date(wife_birth_year, 12, 31))
 
-    valid_marriages = []
-    for mid, hid, wid in marriage_rows:
-        hp = people.get(hid)
-        wp = people.get(wid)
-        if hp and wp and hp.is_alive and wp.is_alive:
-            valid_marriages.append((mid, hp, wp))
+            h_first = FAKE.first_name_male()
+            w_first = FAKE.first_name_female()
 
-    generated = 0
-    batch_size = 5000
-
-    while generated < needed:
-        current_target = min(batch_size, needed - generated)
-        person_rows = []
-        birth_rows = []
-        medical_rows = []
-
-        attempts = 0
-        max_attempts = current_target * 6
-
-        while len(person_rows) < current_target and attempts < max_attempts:
-            attempts += 1
-            marriage_id = None
-            father_id = None
-            mother_id = None
-
-            child_dob = random_date(date(1985, 1, 1), date(2024, 12, 31))
-
-            if valid_marriages:
-                marriage_id, father, mother = random.choice(valid_marriages)
-                mother_age = years_old(mother.dob, child_dob)
-                father_age = years_old(father.dob, child_dob)
-                if mother_age < 18 or mother_age > 45:
-                    continue
-                if father_age < 18 or father_age > 70:
-                    continue
-                father_id = father.id
-                mother_id = mother.id
-            else:
-                if not male_ids or not female_ids:
-                    break
-                father_id = random.choice(male_ids)
-                mother_id = random.choice(female_ids)
-                if father_id == mother_id:
-                    continue
-                marriage_id = marriage_lookup.get((father_id, mother_id))
-
-            is_male = random.random() < 0.51
-            first = FAKE.first_name_male() if is_male else FAKE.first_name_female()
-
-            person_rows.append(
+            adult_rows.append(
                 (
                     next_nid,
-                    first,
+                    h_first,
                     FAKE.last_name(),
-                    maybe_null(f"{slug(first)}.{next_nid}@mail.dz", 0.995),
-                    child_dob,
+                    maybe_null(f"{slug(h_first)}.{next_nid}@mail.dz", 0.95),
+                    husband_dob,
                     None,
-                    is_male,
-                    father_id,
-                    mother_id,
+                    True,
+                    None,
+                    None,
                     "single",
                 )
             )
+            next_nid += 1
 
-            birth_dt = datetime.combine(child_dob, datetime.min.time(), tzinfo=timezone.utc) + timedelta(
-                hours=random.randint(0, 23), minutes=random.randint(0, 59)
-            )
-            birth_rows.append(
+            adult_rows.append(
                 (
-                    next_birth_cert,
+                    next_nid,
+                    w_first,
+                    FAKE.last_name(),
+                    maybe_null(f"{slug(w_first)}.{next_nid}@mail.dz", 0.95),
+                    wife_dob,
                     None,
-                    marriage_id,
-                    random.choice(["CHU Oran", "CHU Bab El Oued", "Mustapha Pacha Hospital", "EHS Mother and Child", "Regional General Hospital"]),
-                    f"Dr. {FAKE.last_name()}",
-                    round(random.uniform(2.2, 4.7), 2),
-                    birth_dt,
-                    random.choice(WILAYA_CODES),
-                    random.choice(COMMUNE_CODES),
-                    random.randint(6, 10),
-                )
-            )
-
-            medical_rows.append(
-                (
-                    None,
-                    choose_blood_type(),
-                    round(random.uniform(48, 56), 1),
-                    round(random.uniform(2.4, 4.5), 1),
                     False,
                     None,
-                    child_dob,
+                    None,
+                    "single",
+                )
+            )
+            next_nid += 1
+
+            family_meta.append((husband_dob, wife_dob))
+
+        inserted_adults = insert_people(cur, adult_rows)
+        if not inserted_adults:
+            break
+
+        # Pair adults by insertion order: husband row then wife row.
+        adult_pairs = []
+        for i in range(0, len(inserted_adults), 2):
+            husband = inserted_adults[i]
+            wife = inserted_adults[i + 1]
+            husband_id, _, husband_dob, _, _ = husband
+            wife_id, _, wife_dob, _, _ = wife
+
+            people[husband_id] = PersonState(id=husband_id, gender=True, dob=husband_dob, dad_id=None, mom_id=None)
+            people[wife_id] = PersonState(id=wife_id, gender=False, dob=wife_dob, dad_id=None, mom_id=None)
+            adult_pairs.append((husband_id, wife_id, husband_dob, wife_dob))
+
+        total_now += len(inserted_adults)
+        living_now += len(inserted_adults)
+
+        witness_pool = [p.id for p in people.values() if p.is_alive and years_old(p.dob, TODAY) >= 18]
+
+        marriage_rows = []
+        for husband_id, wife_id, husband_dob, wife_dob in adult_pairs:
+            min_marriage_date = max(
+                husband_dob + timedelta(days=20 * 365),
+                wife_dob + timedelta(days=20 * 365),
+                date(1960, 1, 1),
+            )
+            marriage_date = random_date(min_marriage_date, TODAY)
+
+            candidate_witnesses = [pid for pid in witness_pool if pid not in (husband_id, wife_id)]
+            random.shuffle(candidate_witnesses)
+            w1 = candidate_witnesses[0] if candidate_witnesses else None
+            w2 = candidate_witnesses[1] if len(candidate_witnesses) > 1 else None
+
+            marriage_rows.append(
+                (
+                    husband_id,
+                    wife_id,
+                    datetime.combine(marriage_date, datetime.min.time(), tzinfo=timezone.utc),
+                    True,
+                    None,
+                    None,
+                    w1,
+                    w2,
+                    round(random.uniform(10000, 900000), 2),
+                    random.choice(notary_ids),
                 )
             )
 
-            next_nid += 1
-            next_birth_cert += 1
-
-        if not person_rows:
-            break
-
-        inserted = insert_people(cur, person_rows)
-        if not inserted:
-            break
-
-        fixed_birth_rows = []
-        fixed_medical_rows = []
-
-        for idx, (pid, gender, dob, dad_id, mom_id) in enumerate(inserted):
-            people[pid] = PersonState(id=pid, gender=gender, dob=dob, dad_id=dad_id, mom_id=mom_id)
-
-            b = list(birth_rows[idx])
-            b[1] = pid
-            fixed_birth_rows.append(tuple(b))
-
-            m = list(medical_rows[idx])
-            m[0] = pid
-            fixed_medical_rows.append(tuple(m))
-
+        cur.execute("SELECT set_config('app.current_user_id', %s, false)", (str(random.choice(notary_ids)),))
         execute_values(
             cur,
             """
-            INSERT INTO birth_records (
-                birth_certificate_no, child_id, marriage_id,
-                hospital_name, doctor_name, birth_weight_kg,
-                birth_date_time, wilaya_code, commune_code, apgar_score
+            INSERT INTO marriage (
+                husband_id, wife_id, marriage_date, valid,
+                end_marriage_time, end_reason,
+                witness_1_id, witness_2_id, dowry_amount, notary_id
             ) VALUES %s
+            RETURNING id, husband_id, wife_id, marriage_date
             """,
-            fixed_birth_rows,
+            marriage_rows,
             page_size=1000,
         )
+        inserted_marriages = cur.fetchall()
 
-        execute_values(
-            cur,
-            """
-            INSERT INTO medical_records (
-                person_id, blood_type, height_cm, weight_kg,
-                smoker, chronic_conditions, last_checkup_date
-            ) VALUES %s
-            ON CONFLICT DO NOTHING
-            """,
-            fixed_medical_rows,
-            page_size=1000,
-        )
+        child_rows = []
+        child_birth_meta: List[Tuple[int, datetime]] = []
+        child_medical_rows = []
 
-        generated += len(inserted)
+        for marriage_id, husband_id, wife_id, marriage_date in inserted_marriages:
+            marriage_day = marriage_date.date() if isinstance(marriage_date, datetime) else marriage_date
+            child_count = draw_children_count_for_year(marriage_day.year)
+
+            for _ in range(child_count):
+                dob_start = marriage_day + timedelta(days=260)
+                dob_end = TODAY
+                if dob_end <= dob_start:
+                    continue
+
+                child_dob = random_date(dob_start, dob_end)
+                is_male = random.random() < 0.51
+                first = FAKE.first_name_male() if is_male else FAKE.first_name_female()
+
+                child_rows.append(
+                    (
+                        next_nid,
+                        first,
+                        FAKE.last_name(),
+                        maybe_null(f"{slug(first)}.{next_nid}@mail.dz", 0.995),
+                        child_dob,
+                        None,
+                        is_male,
+                        husband_id,
+                        wife_id,
+                        "single",
+                    )
+                )
+
+                birth_dt = datetime.combine(child_dob, datetime.min.time(), tzinfo=timezone.utc) + timedelta(
+                    hours=random.randint(0, 23), minutes=random.randint(0, 59)
+                )
+                child_birth_meta.append((marriage_id, birth_dt))
+                child_medical_rows.append(
+                    (
+                        None,
+                        choose_blood_type(),
+                        round(random.uniform(48, 56), 1),
+                        round(random.uniform(2.4, 4.5), 1),
+                        False,
+                        None,
+                        child_dob,
+                    )
+                )
+                next_nid += 1
+
+        if child_rows:
+            inserted_children = insert_people(cur, child_rows)
+
+            birth_rows = []
+            fixed_medicals = []
+
+            for idx, (pid, gender, dob, dad_id, mom_id) in enumerate(inserted_children):
+                people[pid] = PersonState(id=pid, gender=gender, dob=dob, dad_id=dad_id, mom_id=mom_id)
+
+                marriage_id, birth_dt = child_birth_meta[idx]
+                birth_rows.append(
+                    (
+                        next_birth_cert,
+                        pid,
+                        marriage_id,
+                        random.choice(["CHU Oran", "CHU Bab El Oued", "Mustapha Pacha Hospital", "EHS Mother and Child", "Regional General Hospital"]),
+                        f"Dr. {FAKE.last_name()}",
+                        round(random.uniform(2.2, 4.7), 2),
+                        birth_dt,
+                        random.choice(WILAYA_CODES),
+                        random.choice(COMMUNE_CODES),
+                        random.randint(6, 10),
+                    )
+                )
+                next_birth_cert += 1
+
+                medical_tuple = list(child_medical_rows[idx])
+                medical_tuple[0] = pid
+                fixed_medicals.append(tuple(medical_tuple))
+
+            cur.execute("SELECT set_config('app.current_user_id', %s, false)", (str(random.choice(hospital_ids)),))
+            execute_values(
+                cur,
+                """
+                INSERT INTO birth_records (
+                    birth_certificate_no, child_id, marriage_id,
+                    hospital_name, doctor_name, birth_weight_kg,
+                    birth_date_time, wilaya_code, commune_code, apgar_score
+                ) VALUES %s
+                """,
+                birth_rows,
+                page_size=1000,
+            )
+
+            execute_values(
+                cur,
+                """
+                INSERT INTO medical_records (
+                    person_id, blood_type, height_cm, weight_kg,
+                    smoker, chronic_conditions, last_checkup_date
+                ) VALUES %s
+                ON CONFLICT DO NOTHING
+                """,
+                fixed_medicals,
+                page_size=1000,
+            )
+
+            total_now += len(inserted_children)
+            living_now += len(inserted_children)
 
     if hospital_ids:
         cur.execute(
@@ -1342,6 +1508,7 @@ def print_counts(cur) -> None:
         "marriage_audit",
         "birth_records",
         "birth_records_log",
+        "criminal_records_log",
         "medical_records",
         "education",
         "employment",
@@ -1441,6 +1608,7 @@ def main() -> None:
                     next_nid,
                     next_birth_cert,
                     hospital_ids,
+                    notary_ids,
                     target_total=TARGET_TOTAL_PERSONS,
                     target_living=TARGET_LIVING_MIN,
                 )
@@ -1451,6 +1619,7 @@ def main() -> None:
                 apply_divorce_phase(cur)
                 create_education(cur, people)
                 create_criminal_records(cur, people)
+                ensure_criminal_log_not_empty(cur)
                 create_assets(cur, people)
                 next_passport = create_passports(cur, people, next_passport)
                 create_employment_and_salary_audit(cur, people)
