@@ -151,7 +151,7 @@ document.getElementById('criminal_recordsForm').onsubmit = async function(e) {
 	const form = e.target;
 	const data = {
 		personId:    Number(form.personId.value),
-        caseNumber:       Number(form.caseNumber.value),
+        caseNumber:       form.caseNumber.value,
         status:       form.status.value,
         violationType:       form.violationType.value,
         disposition:       form.disposition.value,
