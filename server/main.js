@@ -11,6 +11,7 @@ import hospital_router from "./Module/hospital/hospital.js";
 import marriage_router from "./Module/Marriage/Marriage.js";
 import passport_router from "./Module/passport/passport.js";
 import education_router from "./Module/education/education.js";
+import criminal_records from "./Module/criminal_records/criminal_records.js";
 const app = express();
 const PORT = 5000;
 
@@ -33,4 +34,4 @@ app.use("/api/hospital",hospital_router);
 app.use("/api/Marriage",marriage_router);
 app.use("/api/passport", passport_router);
 app.use("/api/education", education_router);
-
+app.use("/api/criminal_records", criminal_records);
