@@ -68,15 +68,23 @@ function parseJwtPayload(token) {
   }
 }
 
+function normalizeRole(role) {
+  if (!role) return '';
+  return String(role).trim().toLowerCase();
+}
+
 function getRoleRoute(role) {
+  const normalized = normalizeRole(role);
   const routes = {
     hospital: 'hospital.html',
-    Marriage_Notary: 'Marriage_Notary_page.html',
+    marriage_notary: 'Marriage_Notary_page.html',
     citizen: 'personal_info_page.html',
     police: 'criminal_records.html',
+    government: 'government_page.html',
+    goverment: 'government_page.html'
   };
 
-  return routes[role] || 'homePage.html';
+  return routes[normalized] || 'homePage.html';
 }
 
 loginForm.addEventListener('submit', async (e) => {
@@ -113,13 +121,13 @@ loginForm.addEventListener('submit', async (e) => {
     localStorage.setItem('token', data.accessToken);
 
     const payload = parseJwtPayload(data.accessToken);
-    const role = payload?.role;
+    const role = normalizeRole(data?.role || payload?.role);
 
     if (role) {
       localStorage.setItem('role', role);
     }
-    if (payload?.id) {
-      localStorage.setItem('userId', String(payload.id));
+    if (data?.userId || payload?.id) {
+      localStorage.setItem('userId', String(data.userId || payload.id));
     }
 
     setMessage('Login successful. Redirecting...', 'success');
