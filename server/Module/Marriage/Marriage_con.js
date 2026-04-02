@@ -5,6 +5,26 @@ const toPositiveInt = (value) => {
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 };
 
+const getFullNameByUserId = async (userId) => {
+    const validUserId = toPositiveInt(userId);
+    if (!validUserId) return null;
+
+    const result = await pool.query(
+        `SELECT p.first_name, p.last_name
+         FROM users u
+         LEFT JOIN person p ON p.id = u.person_id
+         WHERE u.id = $1
+         LIMIT 1`,
+        [validUserId]
+    );
+
+    if (!result.rows.length) return null;
+    const row = result.rows[0];
+    if (!row.first_name || !row.last_name) return null;
+
+    return `${row.first_name} ${row.last_name}`;
+};
+
 
 export const new_Marriage = async (req, res) => {
     const { husbandId, wifeId, marriageDate, dowryAmount, witness1Id, witness2Id } = req.body;
@@ -132,25 +152,34 @@ export const get_my_marriage = async (req, res) => {
                 m.end_marriage_time,
                 m.end_reason,
                 m.dowry_amount,
+                m.notary_id,
                 h.first_name || ' ' || h.last_name AS husband_name,
                 w.first_name || ' ' || w.last_name AS wife_name,
                 w1.first_name || ' ' || w1.last_name AS witness_1_name,
-                w2.first_name || ' ' || w2.last_name AS witness_2_name,
-                np.first_name || ' ' || np.last_name AS notary_name
+                w2.first_name || ' ' || w2.last_name AS witness_2_name
             FROM marriage m
             LEFT JOIN person h ON h.id = m.husband_id
             LEFT JOIN person w ON w.id = m.wife_id
             LEFT JOIN person w1 ON w1.id = m.witness_1_id
             LEFT JOIN person w2 ON w2.id = m.witness_2_id
-            LEFT JOIN users nu ON nu.id = m.notary_id
-            LEFT JOIN person np ON np.id = nu.person_id
 
             WHERE m.husband_id = $1 OR m.wife_id = $1
 
             ORDER BY m.marriage_date DESC
         `, [personId]);
 
-        res.status(200).json(result.rows);
+        const rowsWithNotaryName = await Promise.all(
+            result.rows.map(async (row) => {
+                const notaryName = await getFullNameByUserId(row.notary_id);
+                const { notary_id, ...rest } = row;
+                return {
+                    ...rest,
+                    notary_name: notaryName,
+                };
+            })
+        );
+
+        res.status(200).json(rowsWithNotaryName);
 
     } catch (err) {
         console.error(err);
