@@ -52,7 +52,12 @@ export const login = async (req, res) => {
     [refreshToken, user.id]
     );
 
-    res.json({ accessToken,refreshToken});
+    res.json({
+      accessToken,
+      refreshToken,
+      role: user.role,
+      userId: user.id,
+    });
 
   } catch (error) {
     res.status(500).json({ error: error.message });

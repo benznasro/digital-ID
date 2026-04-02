@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Government Control Center</title>
+  <link rel="stylesheet" href="style/government_page.css" />
+</head>
+<body>
+  <div class="bg-grain"></div>
+  <header class="topbar">
+    <div>
+      <h1>Government Control Center</h1>
+      <p>Population intelligence, verification, and fast case navigation.</p>
+    </div>
+    <div class="topbar-actions">
+      <button id="refreshBtn" class="btn btn-secondary">Refresh</button>
+      <button id="logoutBtn" class="btn btn-primary">Logout</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="filters-panel">
+      <h2>Search Filters</h2>
+
+      <label>
+        Global Search
+        <input id="q" type="text" placeholder="Name, national ID, email, phone..." />
+      </label>
+
+      <div class="grid-2">
+        <label>
+          Gender
+          <select id="gender">
+            <option value="">All</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </label>
+
+        <label>
+          Marital Status
+          <select id="marital_status">
+            <option value="">All</option>
+            <option value="single">Single</option>
+            <option value="married">Married</option>
+            <option value="divorced">Divorced</option>
+            <option value="widowed">Widowed</option>
+            <option value="deceased">Deceased</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="grid-2">
+        <label>
+          Min Age
+          <input id="min_age" type="number" min="0" placeholder="0" />
+        </label>
+
+        <label>
+          Max Age
+          <input id="max_age" type="number" min="0" placeholder="120" />
+        </label>
+      </div>
+
+      <div class="grid-2">
+        <label>
+          Alive
+          <select id="is_alive">
+            <option value="">All</option>
+            <option value="true">Alive</option>
+            <option value="false">Deceased</option>
+          </select>
+        </label>
+
+        <label>
+          Active Passport
+          <select id="has_passport">
+            <option value="">All</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </label>
+      </div>
+
+      <label>
+        Criminal Record
+        <select id="has_criminal">
+          <option value="">All</option>
+          <option value="true">Has Record</option>
+          <option value="false">No Record</option>
+        </select>
+      </label>
+
+      <div class="grid-2">
+        <label>
+          Sort By
+          <select id="sort_by">
+            <option value="id">ID</option>
+            <option value="national_id">National ID</option>
+            <option value="first_name">First Name</option>
+            <option value="last_name">Last Name</option>
+            <option value="date_of_birth">Date of Birth</option>
+          </select>
+        </label>
+
+        <label>
+          Direction
+          <select id="sort_dir">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="grid-2">
+        <label>
+          Page Size
+          <select id="limit">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </label>
+
+        <label>
+          Page
+          <input id="page" type="number" min="1" value="1" />
+        </label>
+      </div>
+
+      <div class="filter-actions">
+        <button id="searchBtn" class="btn btn-primary">Search</button>
+        <button id="clearBtn" class="btn btn-secondary">Clear</button>
+      </div>
+
+      <section class="quick-nav">
+        <h3>Quick Navigate</h3>
+        <div class="quick-links">
+          <a href="hospital.html">Hospital Panel</a>
+          <a href="Marriage_Notary_page.html">Marriage & Notary</a>
+          <a href="criminal_records.html">Criminal Records</a>
+          <a href="personal_info_page.html">Citizen Profile View</a>
+        </div>
+      </section>
+    </aside>
+
+    <section class="results-panel">
+      <div class="results-header">
+        <h2>People Registry</h2>
+        <p id="resultsMeta">Run a search to load records.</p>
+      </div>
+
+      <div id="statusBanner" class="status-banner"></div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>National ID</th>
+              <th>Full Name</th>
+              <th>DOB</th>
+              <th>Status</th>
+              <th>Passport</th>
+              <th>Criminal</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="peopleRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <aside class="details-panel">
+      <h2>Person Details</h2>
+      <p class="hint">Select a record to inspect complete profile.</p>
+      <div id="detailsBody" class="details-body">No person selected.</div>
+    </aside>
+  </main>
+
+  <script type="module" src="scripts/government_page.js"></script>
+</body>
+</html>
