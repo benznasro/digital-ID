@@ -4,6 +4,7 @@ import multer from 'multer';
 import pool from '../../db.js';
 
 const UPLOAD_DIR = path.resolve(process.cwd(), '../uploads/person_photos');
+const DEFAULT_PHOTO_URL = '/uploads/deful%20pic.jfif';
 
 const ensureUploadDir = () => {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -156,7 +157,12 @@ export const getMyPhoto = async (req, res) => {
 
     const photo = await selectActivePhotoForPerson(personId);
     if (!photo) {
-      return res.status(404).json({ error: 'No active photo found' });
+      return res.json({
+        person_id: personId,
+        photo_url: DEFAULT_PHOTO_URL,
+        is_active: true,
+        is_default: true,
+      });
     }
 
     return res.json(photo);
@@ -174,7 +180,12 @@ export const getPhotoByPersonId = async (req, res) => {
 
     const photo = await selectActivePhotoForPerson(personId);
     if (!photo) {
-      return res.status(404).json({ error: 'No active photo found' });
+      return res.json({
+        person_id: personId,
+        photo_url: DEFAULT_PHOTO_URL,
+        is_active: true,
+        is_default: true,
+      });
     }
 
     return res.json(photo);

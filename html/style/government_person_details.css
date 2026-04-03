@@ -35,6 +35,21 @@ body {
   backdrop-filter: blur(4px);
 }
 
+.person-head-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.person-photo {
+  width: 110px;
+  height: 150px;
+  border-radius: 9px;
+  object-fit: cover;
+  border: 2px solid #cfdcf1;
+  background: #eef3fa;
+}
+
 .topbar h1 {
   margin: 0;
   font-size: 1.3rem;

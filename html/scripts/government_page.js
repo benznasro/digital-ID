@@ -1,4 +1,4 @@
-import { apiFetch } from './utils.js';
+import { apiFetch, DEFAULT_PROFILE_PHOTO_URL, getPhotoUrlByPersonId } from './utils.js';
 
 const els = {
   q: document.getElementById('q'),
@@ -118,17 +118,29 @@ function buildQueryParams() {
   return params.toString();
 }
 
-function renderRows(rows) {
+async function prefetchPersonPhotos(rows) {
+  const photoPairs = await Promise.all(
+    rows.map(async (row) => {
+      const url = await getPhotoUrlByPersonId(row.id);
+      return [String(row.id), url || DEFAULT_PROFILE_PHOTO_URL];
+    })
+  );
+  return Object.fromEntries(photoPairs);
+}
+
+function renderRows(rows, photosByPersonId = {}) {
   if (!rows.length) {
-    els.peopleRows.innerHTML = '<tr><td colspan="8">No matching records.</td></tr>';
+    els.peopleRows.innerHTML = '<tr><td colspan="9">No matching records.</td></tr>';
     return;
   }
 
   els.peopleRows.innerHTML = rows
     .map((r) => {
       const fullName = `${fmt(r.first_name)} ${fmt(r.last_name)}`;
+      const photoUrl = photosByPersonId[String(r.id)] || DEFAULT_PROFILE_PHOTO_URL;
       return `
         <tr>
+          <td><img class="gov-row-photo" src="${photoUrl}" alt="${escapeHtml(fullName)}" onerror="this.onerror=null;this.src='${DEFAULT_PROFILE_PHOTO_URL}';"></td>
           <td>${fmt(r.id)}</td>
           <td>${fmt(r.national_id)}</td>
           <td>${fullName}</td>
@@ -150,7 +162,10 @@ function renderRows(rows) {
 async function loadPersonDetails(personId) {
   currentPersonId = String(personId);
   els.detailsBody.textContent = 'Loading person details...';
-  const data = await apiFetch(`/api/person/${personId}`, 'GET');
+  const [data, photoUrl] = await Promise.all([
+    apiFetch(`/api/person/${personId}`, 'GET'),
+    getPhotoUrlByPersonId(personId),
+  ]);
 
   if (data?.error) {
     els.detailsBody.textContent = `Error: ${data.error}`;
@@ -171,6 +186,9 @@ async function loadPersonDetails(personId) {
   ];
 
   els.detailsBody.innerHTML = `
+    <div class="details-avatar-wrap">
+      <img class="details-avatar" src="${photoUrl || DEFAULT_PROFILE_PHOTO_URL}" alt="${escapeHtml(fmt(data.first_name))} ${escapeHtml(fmt(data.last_name))}" onerror="this.onerror=null;this.src='${DEFAULT_PROFILE_PHOTO_URL}';">
+    </div>
     <div class="details-core">
       ${rows
         .map(([k, v]) => `<div class="details-row"><span>${escapeHtml(k)}</span><strong>${escapeHtml(v)}</strong></div>`)
@@ -231,7 +249,9 @@ async function runSearch() {
     return;
   }
 
-  renderRows(data.data || []);
+  const rows = data.data || [];
+  const photosByPersonId = await prefetchPersonPhotos(rows);
+  renderRows(rows, photosByPersonId);
 
   const page = data.page || 1;
   const total = data.total || 0;

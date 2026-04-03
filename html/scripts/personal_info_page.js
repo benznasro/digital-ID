@@ -1,10 +1,11 @@
-import { apiFetch } from "./utils.js";
+import { apiFetch, DEFAULT_PROFILE_PHOTO_URL, getMyPhotoUrl } from "./utils.js";
 
 const sidebar = document.getElementById("sidebar");
 const sidebarToggle = document.getElementById("sidebarToggle");
 const sidebarLinks = Array.from(document.querySelectorAll(".sidebar-link"));
 const sections = Array.from(document.querySelectorAll(".content-section"));
 const statusBanner = document.getElementById("statusBanner");
+const profilePhoto = document.getElementById("profilePhoto");
 
 function setBanner(message, type = "") {
   statusBanner.classList.remove("success", "error");
@@ -66,6 +67,16 @@ function setText(id, value) {
   if (el) {
     el.textContent = value;
   }
+}
+
+function renderProfilePhoto(photoUrl) {
+  if (!profilePhoto) {
+    return;
+  }
+  profilePhoto.onerror = () => {
+    profilePhoto.src = DEFAULT_PROFILE_PHOTO_URL;
+  };
+  profilePhoto.src = photoUrl || DEFAULT_PROFILE_PHOTO_URL;
 }
 
 function renderPerson(person) {
@@ -241,7 +252,7 @@ document.addEventListener("click", (e) => {
 async function loadProfileData() {
   setBanner("Loading your data...");
 
-  const [personRes, birthRes, medicalRes, marriageRes, educationRes,passportRes] =
+  const [personRes, birthRes, medicalRes, marriageRes, educationRes,passportRes, myPhotoUrlRes] =
     await Promise.allSettled([
       apiFetch("/api/person/me", "GET", null),
       apiFetch("/api/birth_records/me", "GET", null),
@@ -249,8 +260,15 @@ async function loadProfileData() {
       apiFetch("/api/marriage/me", "GET", null),
       apiFetch("/api/education/me", "GET", null),
       apiFetch("/api/passport/me", "GET", null),
+      getMyPhotoUrl(),
     ]);
-    console.log({ personRes, birthRes, medicalRes, marriageRes, educationRes,passportRes });
+    console.log({ personRes, birthRes, medicalRes, marriageRes, educationRes,passportRes, myPhotoUrlRes });
+
+  if (myPhotoUrlRes.status === "fulfilled") {
+    renderProfilePhoto(myPhotoUrlRes.value);
+  } else {
+    renderProfilePhoto(DEFAULT_PROFILE_PHOTO_URL);
+  }
 
   const errors = [];
 

@@ -14,5 +14,6 @@
       "database": "digital_id",
       "username": "root"
     }
-  ]
+  ],
+  "liveServer.settings.port": 5501
 }
