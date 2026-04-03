@@ -77,6 +77,7 @@ function renderProfilePhoto(photoUrl) {
     profilePhoto.src = DEFAULT_PROFILE_PHOTO_URL;
   };
   profilePhoto.src = photoUrl || DEFAULT_PROFILE_PHOTO_URL;
+}
 function buttonMarriage(marriageindx){
   document.getElementById("marriageInfo").innerHTML=
   `    
