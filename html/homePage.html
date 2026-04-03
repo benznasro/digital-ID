@@ -12,12 +12,12 @@
     <header class="header">
 <div class="left-head">DIGITAL ID</div>
       <nav class="nav-links">
-        <a href="">About</a>
-        <a href="">How it Works</a>
-        <a href="">Security</a>
+        <a href="#about">About</a>
+        <a href="#how-it-works">How it Works</a>
+        <a href="#security">Security</a>
       </nav>
       <div class="rigth-head">
-        <a href="" class="header-singup">Sing up</a>
+        <a href="loginPage.html" class="header-singup">Sign in</a>
       </div>
     </header>
     <main>
@@ -30,8 +30,8 @@
             ID for a world that expects things to just work.
           </p>
           <div class="hero-actions" id="get-started">
-            <a href="#" class="btn btn-primary">Get your ID</a>
-            <a href="#" class="btn btn-ghost">Verify an ID</a>
+            <a href="loginPage.html" class="btn btn-primary">Get your ID</a>
+            <a href="loginPage.html" class="btn btn-ghost">Verify an ID</a>
           </div>
           <p class="note">
             Fully digital • Zero physical clutter • Built for precision and privacy.
@@ -58,76 +58,71 @@
           </div>
         </div>
       </section>
-      <section class="why-digital-id">
+      <section class="why-digital-id" id="about">
         <h2>Why a digital ID?</h2>
         <p class="discreption-text">
-          Carry less, prove more. Your digital ID brings the details you
-           need into a clean, scannable format.
+          This project combines identity-related records in one platform so authorized users can access the right data quickly.
         </p>
 
         <div class="Why3">
           <div class="why-div">
-            <p class="Why-tital">Selective Disclosure</p>
-            <p class="discreption-text">Unlike a physical card that shows everything (address, full name, DOB), a Digital ID lets you share only what’s needed.</p>
+            <p class="Why-tital">Government Search</p>
+            <p class="discreption-text">Government users can filter and inspect person records with detailed profile views.</p>
           </div>
           <div class="why-div">
-            <p class="Why-tital">High-Level Encryption</p>
-            <p class="discreption-text">Physical IDs are easy to fake or steal. Digital IDs use cryptographic signatures and are stored in your 
-              phone’s Secure Enclave. Even if someone grabs your phone, they can't access your ID without your FaceID or passcode.
-            </p>
+            <p class="Why-tital">Connected Service Panels</p>
+            <p class="discreption-text">Hospital, marriage/notary, criminal records, passport, and citizen profile pages are all part of the same workflow.</p>
           </div>
           <div class="why-div">
-            <p class="Why-tital">Instant Verification</p>
-            <p class="discreption-text">No more waiting in lines or scanning paper documents. Because it’s 
-              linked to government databases in real-time, you can open bank accounts or sign official contracts instantly from your couch.
-            </p>
+            <p class="Why-tital">Role-Based Access</p>
+            <p class="discreption-text">Users sign in and are routed to the panel that matches their role and permissions.</p>
           </div>
         </div>
       </section>
 
-      <section class="how-it-works">
+      <section class="how-it-works" id="how-it-works">
         <h2>How it works</h2>
         <div class="how-it-works-sub">
           <div class="number-cercle">1</div>
           <div>
-            <p>Create your profile</p>
-            <p class="discreption-text-no-warp">Enter your basic details and upload your verification documents once.</p>
+            <p>Sign in</p>
+            <p class="discreption-text-no-warp">Use username, email, or phone with your passcode on the login page.</p>
           </div>
         </div>
 
         <div class="how-it-works-sub">
           <div class="number-cercle">2</div>
           <div>
-            <p>Get your digital card</p>
-            <p class="discreption-text-no-warp">Your identity is turned into a simple, scannable digital ID.</p>
+            <p>Open your assigned panel</p>
+            <p class="discreption-text-no-warp">After authentication, you are redirected to government, hospital, marriage/notary, police, or citizen panel.</p>
           </div>
         </div>
 
         <div class="how-it-works-sub">
           <div class="number-cercle">3</div>
           <div>
-            <p>Share when needed</p>
-            <p class="discreption-text-no-warp">Show your card or share a secure link whenever you need to prove who you are.</p>
+            <p>Search and manage records</p>
+            <p class="discreption-text-no-warp">Use the available tools to inspect records and continue official workflows based on your role.</p>
           </div>
         </div>
       </section>
-      <section class="security">
+      <section class="security" id="security">
         <h2>Security built in</h2>
         <p>
-          Advanced cryptographic protection. Full control over your data at all times.
+          Access to every panel is protected by login and role authorization.
         </p>
         <div class="Why3">
           <div class="why-div">
-            <p class="Why-tital">Private by default</p>
-            <p class="discreption-text">Your ID is never shared without your explicit action.</p>
+            <p class="Why-tital">Login Required</p>
+            <p class="discreption-text">Users must authenticate before opening protected pages.</p>
           </div>
           <div class="why-div">
-            <p class="Why-tital">Time-limited access</p>
-            <p class="discreption-text">Set how long a verification link stays valid.</p>
+            <p class="Why-tital">Role Permissions</p>
+            <p class="discreption-text">Each account can only use the panels and actions allowed for its role.</p>
           </div>
           <div class="why-div">
-            <p class="Why-tital">Audit-friendly</p>
-            <p class="discreption-text">Keep a clear record of when your ID was viewed and by whom.</p>
+            <p class="Why-tital">Session Safety</p>
+            <p class="discreption-text">Tokens are used for access and users can sign out to end active sessions.</p>
           </div>
         </div>
       </section>

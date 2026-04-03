@@ -1,22 +1,21 @@
 :root {
-  /* CSS Variables - Premium Digital Identity Theme */
-  --bg: #F1F5F9; /* Soft light gray background - calmness */
-  --bg-elevated: #FFFFFF; /* White for cards - trust layer 2 */
-  --fg: #0F172A; /* Dark primary text - readability */
-  --muted: #64748B; /* Secondary text - subtle info */
-  --primary: #0A2540; /* Deep blue - trustworthy authority */
+  --bg: #F1F5F9; 
+  --bg-elevated: #FFFFFF; 
+  --fg: #0F172A; 
+  --muted: #64748B;
+  --primary: #0A2540;
   --accent-start: #0A2540;
   --accent-mid: #1E3A8A;
-  --accent-end: #2563EB; /* Gradient for premium buttons/accents */
-  --border-soft: #E2E8F0; /* Soft borders - minimal separation */
+  --accent-end: #2563EB; 
+  --border-soft: #E2E8F0;
   --border-strong: #0A2540;
-  --success-soft: #10B98120; /* Soft green for Active status */
+  --success-soft: #10B98120;
   --success-fg: #059669;
-  --shadow-soft: 0 4px 12px rgba(0,0,0,0.08); /* Layer 1 depth */
-  --shadow-hover: 0 8px 24px rgba(0,0,0,0.12); /* Layer 3 interactive lift */
+  --shadow-soft: 0 4px 12px rgba(0,0,0,0.08); 
+  --shadow-hover: 0 8px 24px rgba(0,0,0,0.12);
   --radius-soft: 16px;
   --radius-large: 24px;
-  --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth micro-interactions */
+  --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 * {
@@ -31,16 +30,15 @@ html, body {
   color: var(--fg);
   line-height: 1.6;
   overflow-x: hidden;
-  /* UX: Calm, spacious foundation for emotional reassurance */
 }
 
 p {
   margin: 0 0 1rem;
-  max-width: 65ch; /* Readability limit */
+  max-width: 65ch; 
 }
 
 main {
-  padding: 10rem 6vw 6rem; /* Increased breathing room for effortless scroll */
+  padding: 10rem 6vw 6rem; 
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -51,7 +49,6 @@ h1, h2 {
   margin-bottom: 1.5rem;
 }
 
-/* HEADER - Sticky glass header for navigation control */
 .header {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
@@ -126,7 +123,6 @@ h1, h2 {
   box-shadow: var(--shadow-hover);
 }
 
-/* HERO - Emotional reassurance, strong hierarchy */
 .hero {
   position: relative;
   overflow: hidden;
@@ -135,19 +131,8 @@ h1, h2 {
   gap: 4rem;
   align-items: center;
   padding: 4rem 0;
-  /* UX: Visual separation for clarity */
 }
 
-.hero::before {
-  content: "";
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(37,99,235,0.15), transparent 70%);
-  top: -200px;
-  right: -200px;
-  z-index: 0;
-}
 
 .hero-contant,
 .hero-card {
@@ -166,7 +151,6 @@ h1, h2 {
 
 .hero h1 {
   font-size: clamp(2.5rem, 5vw, 4rem);
-  /* UX: Confident, trustworthy scale */
 }
 
 .discreption-text {
@@ -243,7 +227,6 @@ h1, h2 {
   font-style: italic;
 }
 
-/* HERO CARD - Premium digital identity object with 3D depth */
 .hero-card {
   backdrop-filter: blur(10px);
   background: var(--bg-elevated);
@@ -253,12 +236,12 @@ h1, h2 {
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-soft);
-  max-width: 340px;
+  max-width: 360px;
+  width: 100%;
   margin-left: auto;
   z-index: 2;
   transition: var(--transition);
   animation: cardFloat 4s ease-in-out infinite alternate;
-  /* UX: Feels like a real product, trustworthy, above gradient */
 }
 
 .hero-card::after {
@@ -292,17 +275,10 @@ h1, h2 {
   box-shadow: var(--shadow-hover), 0 0 0 1px rgba(10,37,64,0.1); /* Glow + lift - control feel */
 }
 
-@keyframes cardFloat {
-  0%, 50% { 
-    transform: translateY(0) rotateX(0deg) rotateY(0deg); 
+  @keyframes cardFloat {
+    0%, 100% { transform: translateY(0px) rotate(-1deg); }
+    50%       { transform: translateY(-8px) rotate(-2deg); }
   }
-  25% { 
-    transform: translateY(-20px) rotateX(8deg) rotateY(-8deg); 
-  }
-  75% { 
-    transform: translateY(-20px) rotateX(-8deg) rotateY(8deg); 
-  }
-}
 
 .card-1 {
   display: flex;
@@ -319,7 +295,6 @@ h1, h2 {
   color: var(--primary);
   font-size: 1rem;
   text-transform: uppercase;
-  /* UX: Government-level credibility */
 }
 
 .carde-active {
@@ -386,10 +361,9 @@ h1, h2 {
   opacity: 0.9;
 }
 
-/* CARDS SECTIONS - Why & Security: Soft elevated surfaces */
 .security {
-  margin-top: 12rem; /* Scroll rhythm - effortless flow */
-  background: linear-gradient(135deg, #F8FAFC, #F1F5F9); /* Subtle professional bg */
+  margin-top: 1rem; 
+  background: linear-gradient(135deg, #F8FAFC, #F1F5F9); 
   padding: 4rem 0;
   border-radius: var(--radius-large);
   box-shadow: var(--shadow-soft);
@@ -398,7 +372,6 @@ h1, h2 {
 .why-digital-id h2, .security h2 {
   font-size: 2.5rem;
   text-align: center;
-  /* UX: Structured, calm */
 }
 
 .why-digital-id .discreption-text, .security p {
@@ -421,7 +394,6 @@ h1, h2 {
   flex: 1;
   box-shadow: var(--shadow-soft);
   transition: var(--transition);
-  /* UX: Trustworthy info blocks */
 }
 
 .why-div:hover {
@@ -442,15 +414,13 @@ h1, h2 {
   font-size: 1rem;
 }
 
-/* HOW IT WORKS - Clear step-by-step guidance */
 .how-it-works {
-  margin-top: 12rem;
+  margin-top: 1rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border-soft);
   border-radius: 32px;
   padding: 4rem 3rem;
   box-shadow: var(--shadow-soft);
-  /* UX: Effortless understanding */
 }
 
 .how-it-works h2 {
@@ -493,7 +463,6 @@ h1, h2 {
   max-width: 50ch;
 }
 
-/* RESPONSIVE - Mobile control */
 @media (max-width: 768px) {
   .header {
     padding: 1rem 4vw;
@@ -605,5 +574,4 @@ section:nth-child(4) { animation-delay: 0.8s; }
   }
 }
 
-/* UX: Globally competitive, emotionally intelligent Digital ID homepage */
 
