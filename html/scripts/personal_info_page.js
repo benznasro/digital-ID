@@ -77,6 +77,47 @@ function renderProfilePhoto(photoUrl) {
     profilePhoto.src = DEFAULT_PROFILE_PHOTO_URL;
   };
   profilePhoto.src = photoUrl || DEFAULT_PROFILE_PHOTO_URL;
+function buttonMarriage(marriageindx){
+  document.getElementById("marriageInfo").innerHTML=
+  `    
+    <div class="info-row"><span>Full Hesbend</span><strong id="FullHesbend">${fmt(marriageindx?.husband_name)}</strong></div>
+    <div class="info-row"><span>Full Wife</span><strong id="FullWife">${fmt(marriageindx?.wife_name)}</strong></div>
+    <div class="info-row"><span>Contract</span><strong id="Contract_no">${fmt(marriageindx?.contract_no)}</strong></div>
+    <div class="info-row"><span>Valid </span><strong id="Valid">${ fmt(marriageindx?.valid)}</strong></div>
+    <div class="info-row"><span>Divorce Date</span><strong id="DivorceDate">${formatDate(marriageindx?.end_reason)}</strong></div>
+    <div class="info-row"><span>Marriage Date</span><strong id="MarriageDate">${formatDate(marriageindx?.marriage_date)}</strong></div>
+    <div class="info-row"><span>End Marriage Time</span><strong id="EndMarriageTime">${formatDate(marriageindx?.end_marriage_time)}</strong></div>
+    <div class="info-row"><span>Witness 1</span><strong id="Witness_1">${fmt(marriageindx?.witness_1_name)}</strong></div>
+    <div class="info-row"><span>Witness 2</span><strong id="Witness_2">${fmt(marriageindx?.witness_2_name)}</strong></div>
+    <div class="info-row"><span>Dowry amount</span><strong id="Dowry_amount">${fmt(marriageindx?.dowry_amount)}</strong></div>
+    <div class="info-row"><span>Notary</span><strong id="Notary">${fmt(marriageindx?.notary_name)}</strong></div> 
+  `;
+}
+function buttoneducation(educationindx){
+   document.getElementById("educationInfo").innerHTML=
+  `
+          <div class="info-row"><span>Full Name Student</span><strong id="FullNameStudent">${fmt(educationindx?.fullNamestudent)}</strong></div>
+					<div class="info-row"><span>University Name</span><strong id="UniversityName">${fmt(educationindx?.university_name)}</strong></div>
+					<div class="info-row"><span>Major</span><strong id="Major">${fmt(educationindx?.major)}</strong></div>
+					<div class="info-row"><span>Degree Type</span><strong id="DegreeType">${fmt(educationindx?.degree_type)}</strong></div>
+					<div class="info-row"><span>Study Mode</span><strong id="StudyMode">${fmt(educationindx?.study_mode)}</strong></div>
+					<div class="info-row"><span>Start Date</span><strong id="StartDate">${formatDate(educationindx?.start_date)}</strong></div>
+					<div class="info-row"><span>Graduation Date</span><strong id="GraduationDate">${formatDate(education?.graduation_date)}</strong></div>
+					<div class="info-row"><span>GPA</span><strong id="GPA">${fmt(educationindx?.gpa)}</strong></div>
+					<div class="info-row"><span>Certificate</span><strong id="Certificate">${fmt(educationindx?.certificate_url)}</strong></div>
+					<div class="info-row"><span>Is Verified</span><strong id="Is_Verified">${fmt(educationindx?.is_verified)}</strong></div>
+					<div class="info-row"><span>Created at</span><strong id="Created_at">${fmt(educationindx?.created_at)}</strong></div>
+  ` ;
+}
+function buttonpasspor(passporindx){
+document.getElementById("educationInfo").innerHTML=
+  `
+         <div class="info-row"><span>Full Name Student</span><strong id="FullNamePerson">${fmt(passportindx?.fullNameperson)}</strong></div>
+					<div class="info-row"><span>University Name</span><strong id="PassportNumber">${fmt(passportindx?.passport_number)}</strong></div>
+					<div class="info-row"><span>Major</span><strong id="IssueDate">${fmt(passportindx?.issue_date)}</strong></div>
+					<div class="info-row"><span>Degree Type</span><strong id="ExpiryDate">${fmt(passportindx?.expiry_date)}</strong></div>
+					<div class="info-row"><span>Study Mode</span><strong id="IsActive">${fmt(passportindx?.is_active)}</strong></div>
+  `;
 }
 
 function renderPerson(person) {
@@ -125,76 +166,87 @@ function renderMedical(medical) {
   setText("medicalCheckup", formatDate(medical?.last_checkup_date));
 }
 function renderMarriage(marriage) {
+
   if(marriage[0] === null || marriage[0] === undefined || marriage[0] === ""){
-    setText("FullHesbend", fmt(marriage[0]?.fullNamehesbend));
-    setText("FullWife", formatDate(marriage[0]?.fullNamewife));
+    document.getElementById("marriageInfo").innerHTML=`<div class="info-row"><p>you not marriage</p></div>`;
+  }else if(marriage.length === 1){
+    setText("FullHesbend", fmt(marriage[0]?.husband_name));
+    setText("FullWife", fmt(marriage[0]?.wife_name));
     setText("Contract_no", fmt(marriage[0]?.contract_no));
     setText("Valid", fmt(marriage[0]?.valid));
-    setText("DivorceDate", fmt(marriage[0]?.end_reason));
-    setText("MarriageDate", fmt(marriage[0]?.marriagedate));
-    setText("EndMarriageTime", smokerLabel(marriage[0]?.end_marriage_time));
-    setText("Witness_1", fmt(marriage[0]?.fullNamewitness_1));
-    setText("Witness_2", formatDate(marriage[0]?.fullNamewitness_2));
-    setText("Dowry_amount", formatDate(marriage[0]?.dowry_amount));
-    setText("Notary", formatDate(marriage[0]?.fullNamenotary));
+    
+    setText("MarriageDate", formatDate(marriage[0]?.marriage_date));
+   
+    setText("Witness_1", fmt(marriage[0]?.witness_1_name));
+    setText("Witness_2", fmt(marriage[0]?.witness_2_name));
+    setText("Dowry_amount", fmt(marriage[0]?.dowry_amount));
+    setText("Notary", fmt(marriage[0]?.notary_name));
+    if(marriage[0].end_reason === null || marriage[0].end_reason === undefined || marriage[0].end_reason === ""){
+      setText("DivorceDate", formatDate(marriage[0]?.end_reason)); 
+      setText("EndMarriageTime",formatDate(marriage[0]?.end_marriage_time));
+    }
   }else{
   let infocard=``;
   for(let i=0;i<marriage.length;i++){
     const marriageindx=marriage[i];
     infocard = infocard +
     `
-    <div class="info-row"><span>Full Hesbend</span><strong id="FullHesbend">${fmt(marriageindx?.fullNamehesbend)}</strong></div>
-    <div class="info-row"><span>Full Wife</span><strong id="FullWife">${fmt(marriageindx?.fullNamewife)}</strong></div>
-    <div class="info-row"><span>Contract</span><strong id="Contract_no">${fmt(marriageindx?.contract_no)}</strong></div>
-    <div class="info-row"><span>Valid </span><strong id="Valid">${ fmt(marriageindx?.valid)}</strong></div>
-    <div class="info-row"><span>Divorce Date</span><strong id="DivorceDate">${formatDate(marriageindx?.end_reason)}</strong></div>
-    <div class="info-row"><span>Marriage Date</span><strong id="MarriageDate">${formatDate(marriageindx?.marriagedate)}</strong></div>
-    <div class="info-row"><span>End Marriage Time</span><strong id="EndMarriageTime">${formatDate(marriageindx?.end_marriage_time)}</strong></div>
-    <div class="info-row"><span>Witness 1</span><strong id="Witness_1">${fmt(marriageindx?.fullNamewitness_1)}</strong></div>
-    <div class="info-row"><span>Witness 2</span><strong id="Witness_2">${fmt(marriageindx?.fullNamewitness_2)}</strong></div>
-    <div class="info-row"><span>Dowry amount</span><strong id="Dowry_amount">${fmt(marriageindx?.dowry_amount)}</strong></div>
-    <div class="info-row"><span>Notary</span><strong id="Notary">${fmt(marriageindx?.fullNamenotary)}</strong></div>
+    <div class="info-row">
+    <button  class="info-row" id="biometrucs${i}" >
+    <span>Full wife</span>
+    <strong id="Fullwife">${marriageindx.wife_name}</strong>
+      </button>
+      </div>
     `
+
   }
   document.getElementById("marriageInfo").innerHTML=infocard;
-  }
-}
+  marriage.forEach((marriageindx,i)=>{
+    document.querySelector(`#biometrucs${i}`).addEventListener('click',()=>{
+      buttonMarriage(marriageindx);
+    });
+  });
+  }}
 function renderEducation(education) {
   if(education[0] === null || education[0] === undefined || education[0] === ""){
+      document.getElementById("educationInfo").innerHTML=`<div class="info-row"><p>you not Study</p></div>`;
+  }else if(education.length === 1){
     setText("FullNameStudent", fmt(education[0]?.fullNamestudent));
     setText("UniversityName", formatDate(education[0]?.university_name));
     setText("Major", fmt(education[0]?.major));
     setText("DegreeType", fmt(education[0]?.degree_type));
     setText("StudyMode", fmt(education[0]?.study_mode));
-    setText("StartDate", smokerLabel(education[0]?.start_date));
-    setText("GraduationDate", fmt(education[0]?.graduation_date));
-    setText("GPA", formatDate(education[0]?.gpa));
-    setText("Certificate", formatDate(education[0]?.certificate_url));
-    setText("Is_Verified", formatDate(education[0]?.is_verified));
-    setText("Created_at", formatDate(education[0]?.created_at));
+    setText("StartDate", formatDate(education[0]?.start_date));
+    setText("GraduationDate", formatDate(education[0]?.graduation_date));
+    setText("GPA", fmt(education[0]?.gpa));
+    setText("Certificate", fmt(education[0]?.certificate_url));
+    setText("Is_Verified", fmt(education[0]?.is_verified));
+    setText("Created_at", fmt(education[0]?.created_at));
   }else{
   let infocard=``;
   for(let i=0;i<education.length;i++){
     const educationindx=education[i];
     infocard = infocard +
     `
-    <div class="info-row"><span>Full Name Student</span><strong id="FullNameStudent">${fmt(educationindx?.fullNamestudent)}</strong></div>
-					<div class="info-row"><span>University Name</span><strong id="UniversityName">${fmt(educationindx?.university_name)}</strong></div>
-					<div class="info-row"><span>Major</span><strong id="Major">${fmt(educationindx?.major)}</strong></div>
-					<div class="info-row"><span>Degree Type</span><strong id="DegreeType">${fmt(educationindx?.degree_type)}</strong></div>
-					<div class="info-row"><span>Study Mode</span><strong id="StudyMode">${fmt(educationindx?.study_mode)}</strong></div>
-					<div class="info-row"><span>Start Date</span><strong id="StartDate">${formatDate(educationindx?.start_date)}</strong></div>
-					<div class="info-row"><span>Graduation Date</span><strong id="GraduationDate">${formatDate(education?.graduation_date)}</strong></div>
-					<div class="info-row"><span>GPA</span><strong id="GPA">${fmt(educationindx?.gpa)}</strong></div>
-					<div class="info-row"><span>Certificate</span><strong id="Certificate">${fmt(educationindx?.certificate_url)}</strong></div>
-					<div class="info-row"><span>Is Verified</span><strong id="Is_Verified">${fmt(educationindx?.is_verified)}</strong></div>
-					<div class="info-row"><span>Created at</span><strong id="Created_at">${fmt(educationindx?.created_at)}</strong></div>
+      <div class="info-row">
+    <button  class="info-row" id="biometrucs${i}" >
+    <span>Full wife</span>
+    <strong id="Fullwife">${educationindx.certificate_url}</strong>
+      </button>
+      </div>
           `
   }
-  document.getElementById("educationInfo").innerHTML=infocard
+  document.getElementById("educationInfo").innerHTML=infocard;
+  education.forEach((educationindx,i)=>{
+    document.querySelector(`#biometrucs${i}`).addEventListener('click',()=>{
+      buttoneducation(educationindx);
+    });
+  });
 }}
 function renderPassport(passport) {
   if(passport[0] === null || passport[0] === undefined || passport[0] === ""){
+    document.getElementById("educationInfo").innerHTML=`<div class="info-row"><p>you not have Passport</p></div>`;
+  }else if(passport.length === 1){
     setText("FullNamePerson", fmt(passport[0]?.fullNameperson));
     setText("PassportNumber", fmt(passport[0]?.passport_number));
     setText("IssueDate", formatDate(passport[0]?.issue_date));
@@ -207,15 +259,21 @@ function renderPassport(passport) {
     const passportindx=passport[i];
     infocard = infocard +
     `
-          <div class="info-row"><span>Full Name Student</span><strong id="FullNamePerson">${fmt(passportindx?.fullNameperson)}</strong></div>
-					<div class="info-row"><span>University Name</span><strong id="PassportNumber">${fmt(passportindx?.passport_number)}</strong></div>
-					<div class="info-row"><span>Major</span><strong id="IssueDate">${fmt(passportindx?.issue_date)}</strong></div>
-					<div class="info-row"><span>Degree Type</span><strong id="ExpiryDate">${fmt(passportindx?.expiry_date)}</strong></div>
-					<div class="info-row"><span>Study Mode</span><strong id="IsActive">${fmt(passportindx?.is_active)}</strong></div>
-          `
+          <div class="info-row">
+    <button  class="info-row" id="biometrucs${i}" >
+    <span>Full wife</span>
+    <strong id="Fullwife">${passportindx.certificate_url}</strong>
+      </button>
+      </div>     
+    `
   }
   document.getElementById("passportInfo").innerHTML=infocard;
-}}
+  passpor.forEach((passportindx,i)=>{
+    document.querySelector(`#biometrucs${i}`).addEventListener('click',()=>{
+      buttonpasspor(passportindx);
+    });
+});}}
+
 function activateSection(sectionName) {
   sidebarLinks.forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.section === sectionName);

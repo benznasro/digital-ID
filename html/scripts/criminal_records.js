@@ -209,5 +209,5 @@ document.querySelectorAll('input[type="number"]').forEach((input) => {
 });
 
 //  Init
-//loadSidebarLogs();
-//loadSidebarContracts();
+loadSidebarLogs();
+loadSidebarContracts();
