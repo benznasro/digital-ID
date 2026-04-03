@@ -1,4 +1,4 @@
-import { apiFetch } from './utils.js';
+import { apiFetch, DEFAULT_PROFILE_PHOTO_URL, getPhotoUrlByPersonId } from './utils.js';
 
 const tableDefinitions = [
   { key: 'person', label: 'Person Profile' },
@@ -15,6 +15,7 @@ const tableDefinitions = [
 
 const els = {
   personTitle: document.getElementById('personTitle'),
+  personPhoto: document.getElementById('personPhoto'),
   tableNav: document.getElementById('tableNav'),
   sectionTitle: document.getElementById('sectionTitle'),
   sectionMeta: document.getElementById('sectionMeta'),
@@ -202,9 +203,10 @@ async function init() {
 
   setStatus('Loading person deep view...');
 
-  const [personRes, relatedRes] = await Promise.all([
+  const [personRes, relatedRes, photoUrl] = await Promise.all([
     apiFetch(`/api/person/${personId}`, 'GET'),
     apiFetch(`/api/person/${personId}/related`, 'GET'),
+    getPhotoUrlByPersonId(personId),
   ]);
 
   if (personRes?.error) {
@@ -221,6 +223,13 @@ async function init() {
 
   personData = personRes;
   relatedTables = relatedRes.tables || {};
+
+  if (els.personPhoto) {
+    els.personPhoto.onerror = () => {
+      els.personPhoto.src = DEFAULT_PROFILE_PHOTO_URL;
+    };
+    els.personPhoto.src = photoUrl || DEFAULT_PROFILE_PHOTO_URL;
+  }
 
   const fullName = `${fmt(personData.first_name)} ${fmt(personData.last_name)}`;
   els.personTitle.textContent = `${fullName} | National ID: ${fmt(personData.national_id)}`;

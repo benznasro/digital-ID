@@ -1,5 +1,7 @@
 const getAccessToken = () => localStorage.getItem('accessToken') || localStorage.getItem('token');
 
+export const DEFAULT_PROFILE_PHOTO_URL = '/uploads/deful%20pic.jfif';
+
 const saveTokens = (accessToken, refreshToken) => {
     if (accessToken) {
         localStorage.setItem('accessToken', accessToken);
@@ -67,4 +69,34 @@ export const apiFetch = async (url, method = 'GET', body = null) => {
     } catch {
         return { error: 'Invalid server response' };
     }
+};
+
+export const normalizePhotoUrl = (url) => {
+    if (!url || typeof url !== 'string') {
+        return DEFAULT_PROFILE_PHOTO_URL;
+    }
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
+        return url;
+    }
+    return `/${url.replace(/^\/+/, '')}`;
+};
+
+export const getPhotoUrlByPersonId = async (personId) => {
+    if (!personId) {
+        return DEFAULT_PROFILE_PHOTO_URL;
+    }
+
+    const response = await apiFetch(`/api/person_photos/person/${personId}`, 'GET');
+    if (response?.error || !response?.photo_url) {
+        return DEFAULT_PROFILE_PHOTO_URL;
+    }
+    return normalizePhotoUrl(response.photo_url);
+};
+
+export const getMyPhotoUrl = async () => {
+    const response = await apiFetch('/api/person_photos/me', 'GET');
+    if (response?.error || !response?.photo_url) {
+        return DEFAULT_PROFILE_PHOTO_URL;
+    }
+    return normalizePhotoUrl(response.photo_url);
 };

@@ -12,6 +12,7 @@ import marriage_router from "./Module/Marriage/Marriage.js";
 import passport_router from "./Module/passport/passport.js";
 import education_router from "./Module/education/education.js";
 import criminal_records from "./Module/criminal_records/criminal_records.js";
+import person_photos_router from "./Module/person_photos/person_photos.js";
 const app = express();
 const PORT = 5000;
 
@@ -26,6 +27,7 @@ res.send("server worked");
 });
 
 app.use(express.static('../html'));
+app.use('/uploads', express.static('../uploads'));
 app.use("/api/person",userrouts);
 app.use("/api/auth", authRouter);
 app.use("/api/birth_records", birth_records_router);
@@ -35,3 +37,4 @@ app.use("/api/Marriage",marriage_router);
 app.use("/api/passport", passport_router);
 app.use("/api/education", education_router);
 app.use("/api/criminal_records", criminal_records);
+app.use("/api/person_photos", person_photos_router);

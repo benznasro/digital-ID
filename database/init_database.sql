@@ -905,6 +905,40 @@ ALTER TABLE public.passports OWNER TO postgres;
 GRANT ALL ON TABLE public.passports TO postgres;
 
 
+-- public.person_photos definition
+
+-- Drop table
+
+-- DROP TABLE public.person_photos;
+
+CREATE TABLE IF NOT EXISTS public.person_photos (
+    id bigserial NOT NULL,
+    person_id int8 NOT NULL,
+    original_name varchar(255) NULL,
+    stored_name varchar(255) NOT NULL,
+    mime_type varchar(100) NOT NULL,
+    file_size_bytes int8 NOT NULL,
+    storage_path text NOT NULL,
+    photo_url text NOT NULL,
+    is_active bool DEFAULT true NOT NULL,
+    uploaded_by_user_id int4 NULL,
+    created_at timestamptz DEFAULT now() NOT NULL,
+    deactivated_at timestamptz NULL,
+    CONSTRAINT person_photos_file_size_bytes_check CHECK (file_size_bytes > 0),
+    CONSTRAINT person_photos_pkey PRIMARY KEY (id),
+    CONSTRAINT person_photos_person_id_fkey FOREIGN KEY (person_id) REFERENCES public.person(id) ON DELETE CASCADE,
+    CONSTRAINT person_photos_uploaded_by_user_id_fkey FOREIGN KEY (uploaded_by_user_id) REFERENCES public.users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_person_photos_person_created ON public.person_photos USING btree (person_id, created_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_person_photos_single_active ON public.person_photos USING btree (person_id) WHERE (is_active = true);
+
+-- Permissions
+
+ALTER TABLE public.person_photos OWNER TO postgres;
+GRANT ALL ON TABLE public.person_photos TO postgres;
+
+
 -- public.salary_audit definition
 
 -- Drop table
