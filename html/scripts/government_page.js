@@ -35,7 +35,6 @@ const relatedTableDefinitions = [
   { key: 'death_records', label: 'Death Records' },
 ];
 
-let currentRelatedTables = {};
 let currentPersonId = null;
 
 function tokenPayload(token) {
@@ -82,31 +81,6 @@ function fmtDate(value) {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return String(value);
   return d.toLocaleDateString();
-}
-
-function fmtAny(value, keyName = '') {
-  if (value === null || value === undefined || value === '') return 'Not available';
-  if (typeof value === 'boolean') return value ? 'Yes' : 'No';
-  if (typeof value === 'number') return String(value);
-
-  if (typeof value === 'string') {
-    const key = keyName.toLowerCase();
-    if (key.includes('date') || key.includes('time') || /^\d{4}-\d{2}-\d{2}/.test(value)) {
-      const d = new Date(value);
-      if (!Number.isNaN(d.getTime())) {
-        return d.toLocaleString();
-      }
-    }
-    return value;
-  }
-
-  return JSON.stringify(value);
-}
-
-function prettyLabel(name) {
-  return name
-    .replaceAll('_', ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function statusTag(isTrue) {
@@ -204,11 +178,18 @@ async function loadPersonDetails(personId) {
     </div>
     <section class="related-section">
       <h3>Other Tables</h3>
-      <div id="relatedButtons" class="related-buttons"></div>
+      <div id="relatedSummary" class="related-summary">Loading related records...</div>
       <div id="relatedStatus" class="related-status">Loading related records...</div>
-      <div id="relatedBody" class="related-body"></div>
+      <button id="moreInfoBtn" type="button" class="btn btn-primary more-info-btn">More Info</button>
     </section>
   `;
+
+  const moreInfoBtn = document.getElementById('moreInfoBtn');
+  if (moreInfoBtn) {
+    moreInfoBtn.addEventListener('click', () => {
+      window.location.href = `government_person_details.html?personId=${encodeURIComponent(personId)}`;
+    });
+  }
 
   const relatedRes = await apiFetch(`/api/person/${personId}/related`, 'GET');
   if (currentPersonId !== String(personId)) {
@@ -221,71 +202,20 @@ async function loadPersonDetails(personId) {
     return;
   }
 
-  currentRelatedTables = relatedRes.tables || {};
-  renderRelatedButtons(relatedRes.counts || {});
+  const relatedSummary = document.getElementById('relatedSummary');
+  const relatedStatus = document.getElementById('relatedStatus');
+  const counts = relatedRes.counts || {};
+  const total = Object.values(counts).reduce((acc, n) => acc + (Number(n) || 0), 0);
 
-  const firstWithData = relatedTableDefinitions.find((item) => (currentRelatedTables[item.key] || []).length > 0);
-  const firstKey = firstWithData ? firstWithData.key : relatedTableDefinitions[0].key;
-  showRelatedTable(firstKey);
-}
-
-function renderRelatedButtons(counts) {
-  const wrap = document.getElementById('relatedButtons');
-  if (!wrap) return;
-
-  wrap.innerHTML = relatedTableDefinitions
-    .map(({ key, label }) => {
-      const count = Number.isInteger(counts[key]) ? counts[key] : 0;
-      return `<button type="button" class="btn btn-secondary related-btn" data-key="${key}">${escapeHtml(label)} (${count})</button>`;
-    })
-    .join('');
-
-  wrap.querySelectorAll('.related-btn').forEach((btn) => {
-    btn.addEventListener('click', () => showRelatedTable(btn.dataset.key));
-  });
-}
-
-function showRelatedTable(tableKey) {
-  const statusEl = document.getElementById('relatedStatus');
-  const bodyEl = document.getElementById('relatedBody');
-  const wrap = document.getElementById('relatedButtons');
-  if (!statusEl || !bodyEl || !wrap) return;
-
-  wrap.querySelectorAll('.related-btn').forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.key === tableKey);
-  });
-
-  const rows = Array.isArray(currentRelatedTables[tableKey]) ? currentRelatedTables[tableKey] : [];
-  const tableDef = relatedTableDefinitions.find((item) => item.key === tableKey);
-  const label = tableDef?.label || prettyLabel(tableKey);
-
-  if (!rows.length) {
-    statusEl.textContent = `${label}: no records found.`;
-    bodyEl.innerHTML = '<div class="related-empty">No data in this table for this person.</div>';
-    return;
+  if (relatedSummary) {
+    relatedSummary.innerHTML = relatedTableDefinitions
+      .map(({ key, label }) => `<span class="related-pill">${escapeHtml(label)} (${Number(counts[key]) || 0})</span>`)
+      .join('');
   }
 
-  statusEl.textContent = `${label}: ${rows.length} record(s).`;
-
-  const headers = Object.keys(rows[0]);
-  const headHtml = headers.map((h) => `<th>${escapeHtml(prettyLabel(h))}</th>`).join('');
-  const bodyHtml = rows
-    .map((row) => {
-      const cells = headers
-        .map((h) => `<td>${escapeHtml(fmtAny(row[h], h))}</td>`)
-        .join('');
-      return `<tr>${cells}</tr>`;
-    })
-    .join('');
-
-  bodyEl.innerHTML = `
-    <div class="related-table-wrap">
-      <table class="related-table">
-        <thead><tr>${headHtml}</tr></thead>
-        <tbody>${bodyHtml}</tbody>
-      </table>
-    </div>
-  `;
+  if (relatedStatus) {
+    relatedStatus.textContent = `Found ${total} related record(s). Use More Info for full navigation.`;
+  }
 }
 
 async function runSearch() {
@@ -329,7 +259,6 @@ function clearFilters() {
   els.limit.value = '25';
   els.page.value = '1';
   currentPersonId = null;
-  currentRelatedTables = {};
   els.detailsBody.textContent = 'No person selected.';
 }
 

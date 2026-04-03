@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Person Deep View</title>
+  <link rel="stylesheet" href="style/government_person_details.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Person Deep View</h1>
+      <p id="personTitle">Loading selected person...</p>
+    </div>
+    <div class="topbar-actions">
+      <button id="backBtn" class="btn btn-secondary" type="button">Back</button>
+      <button id="logoutBtn" class="btn btn-primary" type="button">Logout</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="nav-panel">
+      <h2>Navigate Tables</h2>
+      <p class="hint">Select a table to view all records for this person.</p>
+      <div id="tableNav" class="table-nav"></div>
+    </aside>
+
+    <section class="content-panel">
+      <div class="section-head">
+        <h2 id="sectionTitle">Records</h2>
+        <p id="sectionMeta">Waiting for data...</p>
+      </div>
+      <div id="statusBanner" class="status-banner">Loading records...</div>
+      <div id="contentBody" class="content-body"></div>
+    </section>
+  </main>
+
+  <script type="module" src="scripts/government_person_details.js"></script>
+</body>
+</html>
