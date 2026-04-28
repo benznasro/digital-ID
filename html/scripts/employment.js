@@ -28,7 +28,7 @@ function showResult(elementId, res) {
 async function loadSidebarLogs() {
   const logsDiv = document.getElementById("sidebarLogs");
   try {
-    const logs = await apiFetch("/api/criminal_records/my_logs", "GET", null);
+    const logs = await apiFetch("/api/employment;/my_logs", "GET", null);
     if (!logs || !logs.length) {
       logsDiv.innerHTML ='<div class="log-entry"><i class="fa-solid fa-circle-dot"></i> No logs yet.</div>';
       return;
@@ -47,7 +47,7 @@ async function loadSidebarLogs() {
         return `<div class="log-entry">
 				<i class="fa-solid ${icon}"></i>
 				${log.new_person_name} 
- ${log.new_violation_type} at ${time}
+             ${log.new_violation_type} at ${time}
 			</div>`;
       })
       .join("");
@@ -65,7 +65,7 @@ async function loadSidebarContracts() {
   list.innerHTML =
     '<li class="contract-item"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</li>';
   try {
-    const logs = await apiFetch("/api/criminal_records/my_logs", "GET", null);
+    const logs = await apiFetch("/api/employment/my_logs", "GET", null);
     allContracts = logs || [];
     console.log(allContracts);
     applyFilters();
@@ -92,9 +92,9 @@ function renderContracts(contracts) {
  
   list.innerHTML = contracts
     .map((c) => {
-      const iscriminal_records = c.operation === "INSERT";
-      const label =  "criminal_records" ;
-      const badgeClass = iscriminal_records;
+      const isemployment; = c.operation === "INSERT";
+      const label =  "employment" ;
+      const badgeClass = isemployment;
       const date = new Date(c.changed_at).toLocaleDateString();
       return `<li class="contract-item">
 			<div class="contract-item-header">
@@ -120,12 +120,6 @@ function applyFilters() {
   console.log("yes");
 
   let filtered = allContracts;
-  
-  // 1 — filter by type
- /* if (typeFilter !== "all") {
-    filtered = filtered.filter((c) => c.operation === typeFilter);
-  }*/
-
   // 2 — filter by date range
   if (dateFrom) {
     const from = new Date(dateFrom);
@@ -152,7 +146,6 @@ function applyFilters() {
 
 // wire up all filter inputs to applyFilters
 document.getElementById("contractSearch").addEventListener("input", applyFilters);
-//document.getElementById('filterType').addEventListener('change',     applyFilters);
 document.getElementById("filterDateFrom").addEventListener("change", applyFilters);
 document.getElementById("filterDateTo").addEventListener("change", applyFilters);
 
@@ -166,25 +159,25 @@ document.getElementById("contractClear").addEventListener("click", () => {
 });
 
 //  criminal records Form
-document.getElementById("criminal_recordsForm").onsubmit = async function (e) {
+document.getElementById("employmentForm").onsubmit = async function (e) {
   e.preventDefault();
   const form = e.target;
   const data = {
     personId: Number(form.personId.value),
-    caseNumber: form.caseNumber.value,
-    status: form.status.value,
-    violationType: form.violationType.value,
-    disposition: form.disposition.value,
-    description: form.description.value,
-    occurrenceDate: form.occurrenceDate.value,
-    filingDate: form.filing_date.value,
-    fineAmount: Number(form.fineAmount.value),
-    sentenceDetails: form.sentenceDetails.value,
-    locationDetails: form.locationDetails.value,
+    companyId: Number(form.companyId.value),
+    managerId: Number(form.managerId.value),
+    jobTitle: form.jobTitle.value,
+    department: form.department.value,
+    employmentType: form.employmentType.value,
+    salary: Number(form.salary.value),
+    startDate: form.startDate.value,
+    endDate: form.endDate.value,
+    workLocation: form.workLocation.value,
+    isActive: form.isActive.value,
   };
   console.log(data);
-  const res = await apiFetch("/api/criminal_records/create", "POST", data);
-  showResult("criminal_recordsResult", res);
+  const res = await apiFetch("/api/employment/create", "POST", data);
+  showResult("employmentResult", res);
 
   if (!res.error) {
     loadSidebarLogs();
@@ -205,5 +198,5 @@ document.querySelectorAll('input[type="number"]').forEach((input) => {
 });
 
 //  Init
-loadSidebarLogs();
-loadSidebarContracts();
+//loadSidebarLogs();
+//loadSidebarContracts();

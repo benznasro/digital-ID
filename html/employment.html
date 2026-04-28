@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Criminal Records Registration</title>
+	<title>Employment Registration</title>
 	<link rel="stylesheet" href="style/Marriage_Notary_page.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
@@ -16,7 +16,7 @@
 			</button>
 			<div class="header-text">
 				<h1>Digital ID Portal</h1>
-				<p class="subtitle">Criminal Records Registration System</p>
+				<p class="subtitle">Employment Registration System</p>
 			</div>
 		</div>
 	</header>
@@ -86,73 +86,67 @@
 		<!-- Main Content -->
 		<main class="main-content">
 
-			<!-- Criminal Records Tab -->
+			<!-- employment; Tab -->
 			<div id="criminal_records" class="tab-content">
 				<div class="form-header">
-					<h2>Criminal Records Registration</h2>
-					<p class="section-desc">Register a new criminal records contract. Please fill all fields accurately and confirm all information before submission.</p>
+					<h2>employment Registration</h2>
+					<p class="section-desc">Register a new employment; contract. Please fill all fields accurately and confirm all information before submission.</p>
 				</div>
-				<form id="criminal_recordsForm" autocomplete="off">
+				<form id="employmentForm" autocomplete="off">
 					<fieldset class="form-section">
-						<legend class="section-title">Parties Information</legend>
 						<label class="form-field">
 							<span class="field-label">The violator ID</span>
 							<input type="number" name="personId" required placeholder="Enter violator's national ID">
 							<small class="helper-text">National ID number</small>
 						</label>
                         <label class="form-field">
-							<span class="field-label">The case Number </span>
-							<input type="number" name="caseNumber" required placeholder="Enter case Number">
-							<small class="helper-text">Enter The  case Number</small>
+							<span class="field-label">The company Id </span>
+							<input type="number" name="companyId" required placeholder="Enter companyId">
+							<small class="helper-text">Enter The  company Id</small>
 						</label>
                         <label class="form-field">
-							<span class="field-label">The  status </span>
-							<input type="text" name="status" required placeholder="Enter status">
-							<small class="helper-text">Enter The  status</small>
+							<span class="field-label">The  manager Id </span>
+							<input type="number" name="managerId" required placeholder="Enter managerId">
+							<small class="helper-text">Enter The  manager Id</small>
 						</label>
                         <label class="form-field">
-							<span class="field-label">The  violation Type </span>
-							<input type="text" name="violationType" required placeholder="Enter violation Type">
-							<small class="helper-text">Enter The  violation</small>
+							<span class="field-label">The  job Title </span>
+							<input type="number" name="jobTitle" required placeholder="Enter job Title">
+							<small class="helper-text">Enter The  job Title</small>
 						</label>
                         <label class="form-field">
-							<span class="field-label">The  disposition</span>
-							<input type="text" name="disposition" required placeholder="Enter disposition">
-							<small class="helper-text">Enter The  disposition</small>
+							<span class="field-label">The  department</span>
+							<input type="text" name="department" required placeholder="Enter department">
+							<small class="helper-text">Enter The  department</small>
 						</label>
                         <label class="form-field">
-							<span class="field-label">The  description </span>
-							<input type="text" name="description" required placeholder="Enter description">
-							<small class="helper-text">Enter The  description</small>
+							<span class="field-label">The  employment Type </span>
+							<input type="text" name="employmentType" required placeholder="Enter employmentType">
+							<small class="helper-text">Enter The  employment Type</small>
 						</label
 					</fieldset>
 					<fieldset class="form-section">
 						<label class="form-field">
-							<span class="field-label">occurrence Date</span>
-							<input type="date" name="occurrenceDate" required>
-							<small class="helper-text">Date of occurrence ceremony</small>
+							<span class="field-label">salary</span>
+							<input type="number" name="salary" required placeholder="Enter salary in DZD">
+							<small class="helper-text">Enter The salary </small>
 						</label>
                         <label class="form-field">
-							<span class="field-label">filing date</span>
-							<input type="date" name="filing_date" required>
-							<small class="helper-text">Date of filing ceremony</small>
+							<span class="field-label">start Date</span>
+							<input type="date" name="startDate" required>
+							<small class="helper-text">Date of start Date ceremony</small>
 						</label>
 						<label class="form-field">
-							<span class="field-label"> fine Amount</span>
-							<input type="number"  name="fineAmount" required placeholder="fine Amount">
-							<small class="helper-text">Enter fine Amount in DZD</small>
+							<span class="field-label"> end Date</span>
+							<input type="date"  name="end Date" required placeholder="end Date">
+							<small class="helper-text">Date of end Date ceremony</small>
 						</label>
 					</fieldset>
 					<fieldset class="form-section">
 						<label class="form-field">
-							<span class="field-label">sentence De tails</span>
-							<input type="text" name="sentenceDetails" required placeholder="sentence De tails">
-							<small class="helper-text">Enter sentence De tails</small>
-						</label>
-						<label class="form-field">
-							<span class="field-label">location De tails</span>
-							<input type="text" name="locationDetails" required placeholder="location De tails">
-							<small class="helper-text">Enter location De tails</small>
+							<span class="field-label">work Location</span>
+							<input type="text" name="workLocation" required placeholder="sworkLocation">
+							<small class="helper-text">Enter workLocation</small>
 						</label>
 
 					</fieldset>
@@ -160,11 +154,11 @@
 						<i class="fas fa-check-circle"></i> Register Marriage
 					</button>
 				</form>
-				<div id="criminal_recordsResult" class="result-container"></div>
+				<div id="employmentResult" class="result-container"></div>
 			</div>
 		</main>
 	</div>
 
-	<script type="module" src="scripts/criminal_records.js"></script>
+	<script type="module" src="employment.js"></script>
 </body>
 </html>
